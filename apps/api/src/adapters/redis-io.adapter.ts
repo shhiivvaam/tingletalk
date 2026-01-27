@@ -1,12 +1,13 @@
 import { IoAdapter } from '@nestjs/platform-socket.io';
 import { ServerOptions } from 'socket.io';
 import { createAdapter } from '@socket.io/redis-adapter';
-import { INestApplicationContext } from '@nestjs/common';
+import { INestApplicationContext, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import Redis from 'ioredis';
 
 export class RedisIoAdapter extends IoAdapter {
     private adapterConstructor: ReturnType<typeof createAdapter>;
+    private readonly logger = new Logger(RedisIoAdapter.name);
 
     constructor(
         private app: INestApplicationContext,
@@ -41,9 +42,9 @@ export class RedisIoAdapter extends IoAdapter {
             // Create adapter using ioredis clients
             this.adapterConstructor = createAdapter(pubClient as any, subClient as any);
 
-            console.log('✓ Redis WebSocket adapter connected successfully');
+            this.logger.log('✓ Redis WebSocket adapter connected successfully');
         } catch (error) {
-            console.error('Failed to connect Redis WebSocket adapter:', error);
+            this.logger.error('Failed to connect Redis WebSocket adapter:', error);
             throw new Error(`Redis WebSocket adapter connection failed: ${error.message}`);
         }
     }
