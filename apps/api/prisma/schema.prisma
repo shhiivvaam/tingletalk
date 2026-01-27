@@ -1,0 +1,35 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String?
+  isVerified Boolean @default(false)
+  
+  profile   Profile?
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Profile {
+  id        String @id @default(uuid())
+  userId    String @unique
+  user      User   @relation(fields: [userId], references: [id])
+  
+  bio       String?
+  avatarUrl String?
+  gender    String?
+  country   String?
+}
+
+// Conversation and Messages will be designed to support hybrid persistence later.
+// For now, focusing on User/Auth foundation.
