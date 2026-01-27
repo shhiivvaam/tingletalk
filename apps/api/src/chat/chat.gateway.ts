@@ -8,15 +8,72 @@ import {
     ConnectedSocket,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { Logger } from '@nestjs/common';
+import { Logger, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
+
+import { IsString, IsNotEmpty, MaxLength, IsIn, IsBoolean, IsObject, ValidateNested } from 'class-validator';
+import { Type } from 'class-transformer';
 import { SessionService } from '../modules/session/session.service';
 import { MatchingService } from '../modules/matching/matching.service';
+
+// --- DTOs ---
+class PreferencesDto {
+    @IsString()
+    @IsIn(['male', 'female', 'all'])
+    targetGender: 'male' | 'female' | 'all';
+}
+
+class FindMatchDto {
+    @IsString()
+    @IsNotEmpty()
+    @MaxLength(20)
+    username: string;
+
+    @IsString()
+    @IsIn(['male', 'female', 'other'])
+    gender: 'male' | 'female' | 'other';
+
+    @IsString()
+    country: string;
+
+    @IsString()
+    state?: string;
+
+    @IsString()
+    @IsIn(['local', 'global'])
+    scope: 'local' | 'global';
+
+    @IsObject()
+    @ValidateNested()
+    @Type(() => PreferencesDto)
+    targetGender: PreferencesDto['targetGender']; // Simplified for now, should be object
+}
+
+class SendMessageDto {
+    @IsString()
+    @IsNotEmpty()
+    roomId: string;
+
+    @IsString()
+    @IsNotEmpty()
+    @MaxLength(500) // Rate limit / Abuse prevention
+    message: string;
+}
+
+class TypingDto {
+    @IsString()
+    roomId: string;
+
+    @IsBoolean()
+    isTyping: boolean;
+}
 
 @WebSocketGateway({
     cors: {
         origin: '*',
+        credentials: true,
     },
 })
+@UsePipes(new ValidationPipe({ whitelist: true, transform: true })) // Strict Validation
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @WebSocketServer()
     server: Server;
@@ -29,6 +86,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     ) { }
 
     async handleConnection(client: Socket) {
+        // Enforce max connections per IP if needed, but Throttler handles rates
         this.logger.log(`Client connected: ${client.id}`);
     }
 
@@ -51,14 +109,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     @SubscribeMessage('findMatch')
     async handleFindMatch(
-        @MessageBody() data: any,
+        @MessageBody() data: FindMatchDto,
         @ConnectedSocket() client: Socket,
     ) {
         this.logger.log(`Finding match for ${client.id}`);
 
         // Create session
         await this.sessionService.createSession(client.id, {
-            tempId: data.tempId || client.id,
+            tempId: client.id,
             nickname: data.username,
             gender: data.gender,
             country: data.country,
@@ -71,7 +129,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
             gender: data.gender,
             country: data.country,
             state: data.state,
-            scope: data.scope || 'global',
+            scope: data.scope,
             preferences: {
                 targetGender: data.targetGender || 'all',
             },
@@ -102,20 +160,23 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     @SubscribeMessage('sendMessage')
     async handleMessage(
-        @MessageBody() data: { roomId: string; message: string },
+        @MessageBody() data: SendMessageDto,
         @ConnectedSocket() client: Socket,
     ) {
-        // Broadcast message to room
+        // Broadcast message to room - SANITIZATION happens here (trim)
+        const cleanMessage = data.message.trim();
+        if (!cleanMessage) return;
+
         client.to(data.roomId).emit('receiveMessage', {
             senderId: client.id,
-            message: data.message,
+            message: cleanMessage,
             timestamp: Date.now(),
         });
     }
 
     @SubscribeMessage('typing')
     async handleTyping(
-        @MessageBody() data: { roomId: string; isTyping: boolean },
+        @MessageBody() data: TypingDto,
         @ConnectedSocket() client: Socket,
     ) {
         client.to(data.roomId).emit('userTyping', {
@@ -124,3 +185,4 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         });
     }
 }
+

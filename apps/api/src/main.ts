@@ -3,11 +3,19 @@ import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import { RedisIoAdapter } from './adapters/redis-io.adapter';
 import { ValidationPipe } from '@nestjs/common';
+import helmet from 'helmet';
+import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 
 async function bootstrap() {
   try {
     const app = await NestFactory.create(AppModule);
     const configService = app.get(ConfigService);
+
+    // Apply Helmet for security headers
+    app.use(helmet());
+
+    // Apply Global Exception Filter
+    app.useGlobalFilters(new GlobalExceptionFilter());
 
     // Validate required environment variables
     const requiredEnvVars = ['REDIS_URL', 'DATABASE_URL', 'CORS_ORIGINS', 'PORT'];
