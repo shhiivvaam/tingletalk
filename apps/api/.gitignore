@@ -3,5 +3,6 @@ dist
 logs
 # Keep environment variables out of version control
 .env
+newrelic_agent.log
 
 /generated/prisma
