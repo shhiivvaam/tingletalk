@@ -6,10 +6,13 @@ import { ValidationPipe } from '@nestjs/common';
 import helmet from 'helmet';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 import { showServiceLogs } from './common/utils/dashboard';
+import { customLogger } from './common/utils/logger';
 
 async function bootstrap() {
   try {
-    const app = await NestFactory.create(AppModule);
+    const app = await NestFactory.create(AppModule, {
+      logger: customLogger,
+    });
     const configService = app.get(ConfigService);
 
     // Apply Helmet for security headers
