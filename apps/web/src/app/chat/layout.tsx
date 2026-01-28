@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { io, Socket } from 'socket.io-client';
 import { useUserStore } from '@/store/useUserStore';
+import { useChatStore } from '@/store/useChatStore';
 import OnlineUsersList from '@/components/chat/OnlineUsersList';
 import { Menu, X } from 'lucide-react';
 
@@ -18,8 +19,8 @@ interface OnlineUser {
 export default function ChatLayout({ children }: { children: React.ReactNode }) {
     const router = useRouter();
     const { username, gender, preferences } = useUserStore();
+    const { onlineUsers, setOnlineUsers, addOnlineUser, removeOnlineUser, addMessage, selectedUser, setSelectedUser } = useChatStore();
     const [socket, setSocket] = useState<Socket | null>(null);
-    const [onlineUsers, setOnlineUsers] = useState<OnlineUser[]>([]);
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
     useEffect(() => {
@@ -38,32 +39,44 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
         });
 
         newSocket.on('connect', () => {
-            // Join lobby by "finding match" with no specific intent?
-            // Actually our backend handleFindMatch creates the session.
-            // We need to trigger session creation.
             newSocket.emit('findMatch', {
                 username,
                 gender: gender || 'other',
                 scope: preferences?.location || 'global',
-                country: 'Unknown', // TODO: Get real location
+                country: 'Unknown',
                 targetGender: preferences?.targetGender || 'all',
             });
 
-            // Fetch initial list
             newSocket.emit('getOnlineUsers', {}, (users: OnlineUser[]) => {
                 setOnlineUsers(users || []);
             });
         });
 
         newSocket.on('userJoined', (user: OnlineUser) => {
-            setOnlineUsers(prev => {
-                if (prev.find(p => p.id === user.id)) return prev;
-                return [...prev, user];
-            });
+            addOnlineUser(user);
         });
 
         newSocket.on('userLeft', ({ userId }: { userId: string }) => {
-            setOnlineUsers(prev => prev.filter(u => u.id !== userId));
+            removeOnlineUser(userId);
+        });
+
+        newSocket.on('receiveMessage', (data: { senderId: string, message: string, timestamp: number }) => {
+            // We need to access the LATEST selectedUser state. 
+            // Since we are inside a closure, we should use the store getter if possible or rely on the hook.
+            // Zustand's hook returns current state.
+            const currentSelected = useChatStore.getState().selectedUser;
+
+            if (currentSelected?.id === data.senderId) {
+                addMessage({
+                    id: Date.now().toString() + Math.random(),
+                    senderId: data.senderId,
+                    text: data.message,
+                    timestamp: data.timestamp
+                });
+            } else {
+                // TODO: Show notification or badge for unread message from other user
+                console.log('Message from', data.senderId, 'but chatting with', currentSelected?.id);
+            }
         });
 
         setSocket(newSocket);
@@ -71,15 +84,7 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
         return () => {
             newSocket.disconnect();
         };
-    }, [username, gender, preferences, router]);
-
-    const handleSelectUser = (user: OnlineUser) => {
-        // For now, maybe just log? Or navigate to a direct chat URL?
-        // Since the current requirement is just "Main Chat Window panel",
-        // we might not have a direct chat UI ready yet for P2P.
-        // Let's implement a placeholder action.
-        console.log('Selected user:', user);
-    };
+    }, [username, gender, preferences, router, setOnlineUsers, addOnlineUser, removeOnlineUser, addMessage]);
 
     return (
         <div className="flex h-screen bg-slate-950 text-slate-200 overflow-hidden relative">
@@ -99,14 +104,30 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
                 <OnlineUsersList
                     users={onlineUsers}
                     currentUserId={socket?.id || null}
-                    onSelectUser={handleSelectUser}
+                    onSelectUser={setSelectedUser}
                 />
             </div>
 
             {/* Main Content */}
             <div className="flex-1 flex flex-col relative w-full h-full">
-                {children}
+                {/* 
+                   We pass the socket to children via Props if we could, but children are pre-determined.
+                   Alternatively, we can use a Context to provide the socket.
+                   Or we can just rely on the Page to grab the socket if we stored it? 
+                   actually, storing socket in Zustand is tricky (non-serializable).
+                   
+                   Better approach: 
+                   Render children (which is the Page). USE A CONTEXT for socket.
+                */}
+                <SocketContext.Provider value={socket}>
+                    {children}
+                </SocketContext.Provider>
             </div>
         </div>
     );
 }
+
+// Simple Context for Socket
+import { createContext, useContext } from 'react';
+export const SocketContext = createContext<Socket | null>(null);
+export const useSocket = () => useContext(SocketContext);

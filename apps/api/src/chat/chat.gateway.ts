@@ -10,7 +10,7 @@ import {
 import { Server, Socket } from 'socket.io';
 import { Logger, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 
-import { IsString, IsNotEmpty, MaxLength, IsIn, IsBoolean, IsObject, ValidateNested } from 'class-validator';
+import { IsString, IsNotEmpty, MaxLength, IsIn, IsBoolean, IsObject, ValidateNested, IsOptional } from 'class-validator';
 import { Type } from 'class-transformer';
 import { SessionService } from '../modules/session/session.service';
 import { MatchingService } from '../modules/matching/matching.service';
@@ -36,16 +36,16 @@ class FindMatchDto {
     country: string;
 
     @IsString()
+    @IsOptional()
     state?: string;
 
     @IsString()
     @IsIn(['local', 'global'])
     scope: 'local' | 'global';
 
-    @IsObject()
-    @ValidateNested()
-    @Type(() => PreferencesDto)
-    targetGender: PreferencesDto['targetGender']; // Simplified for now, should be object
+    @IsString()
+    @IsIn(['male', 'female', 'all'])
+    targetGender: 'male' | 'female' | 'all';
 }
 
 class SendMessageDto {
@@ -113,9 +113,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @SubscribeMessage('getOnlineUsers')
     async handleGetOnlineUsers(@ConnectedSocket() client: Socket) {
         const sessions = await this.sessionService.getAllSessions();
-        // Filter out self and sanitize
+
+        // Filter out self and sanitize, ONLY return sessions that are actually connected
+        // This prevents "ghost" users and one seeing themselves
         return sessions
-            .filter(s => s.id !== client.id)
+            .filter(s => s.id !== client.id && this.server.sockets.sockets.has(s.id))
             .map(s => ({
                 id: s.id,
                 nickname: s.nickname || 'Anonymous',
@@ -130,25 +132,29 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         @MessageBody() data: FindMatchDto,
         @ConnectedSocket() client: Socket,
     ) {
-        this.logger.log(`Finding match/joining lobby for ${client.id}`);
+        try {
+            this.logger.log(`User joining lobby: ${data.username} (${client.id})`);
 
-        // Create session
-        const session = await this.sessionService.createSession(client.id, {
-            tempId: client.id,
-            nickname: data.username,
-            gender: data.gender,
-            country: data.country,
-            state: data.state,
-        });
+            // Create session
+            const session = await this.sessionService.createSession(client.id, {
+                tempId: client.id,
+                nickname: data.username,
+                gender: data.gender,
+                country: data.country,
+                state: data.state,
+            });
 
-        // Broadcast to all that a new user joined the lobby
-        this.server.emit('userJoined', {
-            id: client.id,
-            nickname: session.nickname,
-            gender: session.gender,
-            country: session.country || 'Unknown',
-            isOccupied: false
-        });
+            // Broadcast to all that a new user joined the lobby
+            this.server.emit('userJoined', {
+                id: client.id,
+                nickname: session.nickname,
+                gender: session.gender,
+                country: session.country || 'Unknown',
+                isOccupied: false
+            });
+        } catch (error) {
+            this.logger.error(`Failed to handle findMatch for ${client.id}`, error);
+        }
 
         // We KEEP the matching logic for now if they want to use "Random Match" button later,
         // but for the lobby flow, they just stay "online".
