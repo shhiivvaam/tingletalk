@@ -19,7 +19,8 @@ interface OnlineUser {
 interface ChatState {
     onlineUsers: OnlineUser[];
     selectedUser: OnlineUser | null;
-    messages: Message[];
+    messages: Record<string, Message[]>; // Map userId -> messages
+    unreadCounts: Record<string, number>; // Map userId -> unread count
 
     setOnlineUsers: (users: OnlineUser[]) => void;
     addOnlineUser: (user: OnlineUser) => void;
@@ -27,14 +28,15 @@ interface ChatState {
 
     setSelectedUser: (user: OnlineUser | null) => void;
 
-    addMessage: (message: Message) => void;
-    clearMessages: () => void;
+    addMessage: (userId: string, message: Message) => void;
+    markAsRead: (userId: string) => void;
 }
 
-export const useChatStore = create<ChatState>((set) => ({
+export const useChatStore = create<ChatState>((set, get) => ({
     onlineUsers: [],
     selectedUser: null,
-    messages: [],
+    messages: {},
+    unreadCounts: {},
 
     setOnlineUsers: (users) => set({ onlineUsers: users }),
     addOnlineUser: (user) => set((state) => ({
@@ -46,10 +48,33 @@ export const useChatStore = create<ChatState>((set) => ({
         selectedUser: state.selectedUser?.id === userId ? null : state.selectedUser
     })),
 
-    setSelectedUser: (user) => set({ selectedUser: user, messages: [] }), // Clear messages on switch for now
+    setSelectedUser: (user) => {
+        set({ selectedUser: user });
+        if (user) {
+            get().markAsRead(user.id);
+        }
+    },
 
-    addMessage: (message) => set((state) => ({
-        messages: [...state.messages, message]
+    addMessage: (userId, message) => set((state) => {
+        const isSelected = state.selectedUser?.id === userId;
+        const currentMessages = state.messages[userId] || [];
+
+        return {
+            messages: {
+                ...state.messages,
+                [userId]: [...currentMessages, message]
+            },
+            unreadCounts: {
+                ...state.unreadCounts,
+                [userId]: isSelected ? 0 : (state.unreadCounts[userId] || 0) + 1
+            }
+        };
+    }),
+
+    markAsRead: (userId) => set((state) => ({
+        unreadCounts: {
+            ...state.unreadCounts,
+            [userId]: 0
+        }
     })),
-    clearMessages: () => set({ messages: [] }),
 }));

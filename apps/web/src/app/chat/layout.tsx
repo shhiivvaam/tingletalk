@@ -61,22 +61,13 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
         });
 
         newSocket.on('receiveMessage', (data: { senderId: string, message: string, timestamp: number }) => {
-            // We need to access the LATEST selectedUser state. 
-            // Since we are inside a closure, we should use the store getter if possible or rely on the hook.
-            // Zustand's hook returns current state.
-            const currentSelected = useChatStore.getState().selectedUser;
-
-            if (currentSelected?.id === data.senderId) {
-                addMessage({
-                    id: Date.now().toString() + Math.random(),
-                    senderId: data.senderId,
-                    text: data.message,
-                    timestamp: data.timestamp
-                });
-            } else {
-                // TODO: Show notification or badge for unread message from other user
-                console.log('Message from', data.senderId, 'but chatting with', currentSelected?.id);
-            }
+            const store = useChatStore.getState();
+            store.addMessage(data.senderId, {
+                id: Date.now().toString() + Math.random(),
+                senderId: data.senderId,
+                text: data.message,
+                timestamp: data.timestamp
+            });
         });
 
         setSocket(newSocket);

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Search, User } from 'lucide-react';
+import { useChatStore } from '@/store/useChatStore';
 
 interface OnlineUser {
     id: string;
@@ -17,6 +18,7 @@ interface OnlineUsersListProps {
 
 export default function OnlineUsersList({ users, currentUserId, onSelectUser }: OnlineUsersListProps) {
     const [filter, setFilter] = useState('');
+    const { unreadCounts } = useChatStore();
 
     const filteredUsers = users.filter(user =>
         String(user.nickname || '').toLowerCase().includes(filter.toLowerCase()) ||
@@ -73,9 +75,16 @@ export default function OnlineUsersList({ users, currentUserId, onSelectUser }: 
                                         <h3 className="font-semibold text-slate-200 truncate group-hover:text-pink-400 transition-colors">
                                             {user.nickname || 'Anonymous'}
                                         </h3>
-                                        <span className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">
-                                            {getCountryCode(user.country)}
-                                        </span>
+                                        <div className="flex items-center gap-2">
+                                            {unreadCounts[user.id] > 0 && (
+                                                <span className="w-5 h-5 rounded-full bg-pink-500 flex items-center justify-center text-[10px] font-bold text-white mb-2">
+                                                    {unreadCounts[user.id]}
+                                                </span>
+                                            )}
+                                            <span className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">
+                                                {getCountryCode(user.country)}
+                                            </span>
+                                        </div>
                                     </div>
                                     <div className="flex items-center justify-between text-xs text-slate-500">
                                         <span className="capitalize">{user.gender || 'Unknown'}</span>
