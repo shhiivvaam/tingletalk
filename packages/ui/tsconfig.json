@@ -3,11 +3,11 @@
     "compilerOptions": {
         "jsx": "react-jsx",
         "outDir": "dist",
-        "rootDir": ".",
+        "rootDir": "src",
         "module": "ESNext",
         "moduleResolution": "bundler"
     },
     "include": [
-        "index.tsx"
+        "src"
     ]
 }
