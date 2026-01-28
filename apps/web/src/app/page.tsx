@@ -44,7 +44,7 @@ export default function Home() {
 
     // Split-second delay for premium feel
     setTimeout(() => {
-      router.push('/chat/matching');
+      router.push('/chat');
     }, 800);
   };
 

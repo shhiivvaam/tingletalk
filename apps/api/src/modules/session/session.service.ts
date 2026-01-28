@@ -37,6 +37,16 @@ export class SessionService {
         return data ? JSON.parse(data) : null;
     }
 
+    async getAllSessions(): Promise<AnonymousSession[]> {
+        const keys = await this.redis.keys('session:*');
+        if (keys.length === 0) return [];
+        
+        const sessions = await this.redis.mget(keys);
+        return sessions
+            .filter((s) => s !== null)
+            .map((s) => JSON.parse(s as string));
+    }
+
     async removeSession(socketId: string): Promise<void> {
         await this.redis.del(this.getSessionKey(socketId));
     }

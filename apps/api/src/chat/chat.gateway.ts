@@ -102,9 +102,27 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 session.scope || 'global',
                 session.country
             );
+
+            // Broadcast user left
+            this.server.emit('userLeft', { userId: client.id });
         }
 
         await this.sessionService.removeSession(client.id);
+    }
+
+    @SubscribeMessage('getOnlineUsers')
+    async handleGetOnlineUsers(@ConnectedSocket() client: Socket) {
+        const sessions = await this.sessionService.getAllSessions();
+        // Filter out self and sanitize
+        return sessions
+            .filter(s => s.id !== client.id)
+            .map(s => ({
+                id: s.id,
+                nickname: s.nickname || 'Anonymous',
+                gender: s.gender,
+                country: s.country || 'Unknown',
+                isOccupied: false // Placeholder for now
+            }));
     }
 
     @SubscribeMessage('findMatch')
@@ -112,10 +130,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         @MessageBody() data: FindMatchDto,
         @ConnectedSocket() client: Socket,
     ) {
-        this.logger.log(`Finding match for ${client.id}`);
+        this.logger.log(`Finding match/joining lobby for ${client.id}`);
 
         // Create session
-        await this.sessionService.createSession(client.id, {
+        const session = await this.sessionService.createSession(client.id, {
             tempId: client.id,
             nickname: data.username,
             gender: data.gender,
@@ -123,39 +141,21 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
             state: data.state,
         });
 
-        const matchRequest = {
-            socketId: client.id,
-            username: data.username,
-            gender: data.gender,
-            country: data.country,
-            state: data.state,
-            scope: data.scope,
-            preferences: {
-                targetGender: data.targetGender || 'all',
-            },
-        };
+        // Broadcast to all that a new user joined the lobby
+        this.server.emit('userJoined', {
+            id: client.id,
+            nickname: session.nickname,
+            gender: session.gender,
+            country: session.country || 'Unknown',
+            isOccupied: false
+        });
 
-        // Try to find immediate match
-        const matchedSocketId = await this.matchingService.findMatch(matchRequest);
-
-        if (matchedSocketId) {
-            // Match found!
-            const roomId = `room_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-
-            // Join both users to room
-            client.join(roomId);
-            this.server.sockets.sockets.get(matchedSocketId)?.join(roomId);
-
-            // Notify both users
-            client.emit('matchFound', { roomId, partnerId: matchedSocketId });
-            this.server.to(matchedSocketId).emit('matchFound', { roomId, partnerId: client.id });
-
-            this.logger.log(`Match found: ${client.id} <-> ${matchedSocketId}`);
-        } else {
-            // Add to queue
-            await this.matchingService.addToQueue(matchRequest);
-            client.emit('searching', { message: 'Searching for a match...' });
-        }
+        // We KEEP the matching logic for now if they want to use "Random Match" button later,
+        // but for the lobby flow, they just stay "online".
+        // The frontend might NOT emit 'findMatch' immediately if they just go to lobby.
+        // Let's assume for now 'findMatch' IS user onboarding. 
+        // NOTE: If we switch to purely manual, we might want a separate 'joinLobby' event, 
+        // but 'findMatch' constructs the session, so we reuse it for now.
     }
 
     @SubscribeMessage('sendMessage')
