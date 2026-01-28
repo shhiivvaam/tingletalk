@@ -11,9 +11,13 @@ interface ChatWindowProps {
 }
 
 export default function ChatWindow({ socket, currentUserId }: ChatWindowProps) {
-    const { selectedUser, messages, addMessage } = useChatStore();
+    const { selectedUser, messages, addMessage, typingUsers, onlineUsers } = useChatStore();
     const [inputValue, setInputValue] = useState('');
     const messagesEndRef = useRef<HTMLDivElement>(null);
+    const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+    const isTyping = selectedUser ? typingUsers[selectedUser.id] : false;
+    const isOnline = selectedUser ? onlineUsers.some(u => u.id === selectedUser.id) : false;
 
     const userMessages = selectedUser ? (messages[selectedUser.id] || []) : [];
 
@@ -23,7 +27,7 @@ export default function ChatWindow({ socket, currentUserId }: ChatWindowProps) {
 
     useEffect(() => {
         scrollToBottom();
-    }, [userMessages]);
+    }, [userMessages, isTyping]);
 
     const handleSendMessage = (e?: React.FormEvent) => {
         e?.preventDefault();
@@ -50,10 +54,30 @@ export default function ChatWindow({ socket, currentUserId }: ChatWindowProps) {
         setInputValue('');
     };
 
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setInputValue(e.target.value);
+
+        if (!selectedUser || !socket) return;
+
+        // Emit typing started
+        socket.emit('typing', { roomId: selectedUser.id, isTyping: true });
+
+        // Clear existing timeout
+        if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+
+        // Set new timeout to stop typing after 1s of inactivity
+        typingTimeoutRef.current = setTimeout(() => {
+            socket.emit('typing', { roomId: selectedUser.id, isTyping: false });
+        }, 1000);
+    };
+
     const handleKeyDown = (e: React.KeyboardEvent) => {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
             handleSendMessage();
+            // Stop typing immediately on send
+            if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+            socket.emit('typing', { roomId: selectedUser?.id, isTyping: false });
         }
     };
 
@@ -137,31 +161,54 @@ export default function ChatWindow({ socket, currentUserId }: ChatWindowProps) {
                         );
                     })
                 )}
+
+
+                {/* Typing Indicator */}
+                {isTyping && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="flex justify-start"
+                    >
+                        <div className="bg-slate-800 rounded-2xl rounded-tl-none px-4 py-3 border border-white/5 flex items-center gap-1">
+                            <span className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+                            <span className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
+                            <span className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce"></span>
+                        </div>
+                    </motion.div>
+                )}
+
                 <div ref={messagesEndRef} />
             </div>
 
             {/* Input Area */}
             <div className="p-4 bg-slate-900/50 backdrop-blur-md border-t border-white/5">
-                <form
-                    onSubmit={handleSendMessage}
-                    className="flex items-center gap-2 bg-slate-800/50 p-2 rounded-xl border border-white/5 focus-within:ring-2 focus-within:ring-pink-500/50 transition-all"
-                >
-                    <input
-                        type="text"
-                        value={inputValue}
-                        onChange={(e) => setInputValue(e.target.value)}
-                        onKeyDown={handleKeyDown}
-                        placeholder="Type your message..."
-                        className="flex-1 bg-transparent px-4 py-2 text-slate-200 outline-none placeholder:text-slate-500"
-                    />
-                    <button
-                        type="submit"
-                        disabled={!inputValue.trim()}
-                        className="p-3 rounded-lg bg-pink-500 text-white hover:bg-pink-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                {isOnline ? (
+                    <form
+                        onSubmit={handleSendMessage}
+                        className="flex items-center gap-2 bg-slate-800/50 p-2 rounded-xl border border-white/5 focus-within:ring-2 focus-within:ring-pink-500/50 transition-all"
                     >
-                        <Send size={18} />
-                    </button>
-                </form>
+                        <input
+                            type="text"
+                            value={inputValue}
+                            onChange={handleInputChange}
+                            onKeyDown={handleKeyDown}
+                            placeholder="Type your message..."
+                            className="flex-1 bg-transparent px-4 py-2 text-slate-200 outline-none placeholder:text-slate-500"
+                        />
+                        <button
+                            type="submit"
+                            disabled={!inputValue.trim()}
+                            className="p-3 rounded-lg bg-pink-500 text-white hover:bg-pink-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        >
+                            <Send size={18} />
+                        </button>
+                    </form>
+                ) : (
+                    <div className="flex items-center justify-center p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-sm font-medium">
+                        User has disconnected
+                    </div>
+                )}
             </div>
         </div>
     );

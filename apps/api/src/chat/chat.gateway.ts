@@ -14,6 +14,7 @@ import { IsString, IsNotEmpty, MaxLength, IsIn, IsBoolean, IsObject, ValidateNes
 import { Type } from 'class-transformer';
 import { SessionService } from '../modules/session/session.service';
 import { MatchingService } from '../modules/matching/matching.service';
+import * as geoip from 'geoip-lite';
 
 // --- DTOs ---
 class PreferencesDto {
@@ -127,6 +128,16 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
             }));
     }
 
+
+    private getClientIp(client: Socket): string {
+        // Handle Nginx/Proxy headers
+        const forwarded = client.handshake.headers['x-forwarded-for'];
+        if (forwarded) {
+            return (Array.isArray(forwarded) ? forwarded[0] : forwarded.split(',')[0]).trim();
+        }
+        return client.handshake.address;
+    }
+
     @SubscribeMessage('findMatch')
     async handleFindMatch(
         @MessageBody() data: FindMatchDto,
@@ -135,13 +146,27 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         try {
             this.logger.log(`User joining lobby: ${data.username} (${client.id})`);
 
+            // 1. Detect Location
+            let ip = this.getClientIp(client);
+
+            // LOCALHOST DEV FIX: Use random public IP if localhost
+            if (ip === '::1' || ip === '127.0.0.1') {
+                // Random US/EU IPs for testing variation
+                const randomIps = ['24.48.0.1', '8.8.8.8', '194.12.1.1', '203.0.113.1'];
+                ip = randomIps[Math.floor(Math.random() * randomIps.length)];
+            }
+
+            const geo = geoip.lookup(ip);
+            const country = geo ? geo.country : (data.country || 'Unknown');
+            const state = geo ? geo.region : (data.state || undefined);
+
             // Create session
             const session = await this.sessionService.createSession(client.id, {
                 tempId: client.id,
                 nickname: data.username,
                 gender: data.gender,
-                country: data.country,
-                state: data.state,
+                country: country,
+                state: state,
             });
 
             // Broadcast to all that a new user joined the lobby
@@ -178,6 +203,72 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
             message: cleanMessage,
             timestamp: Date.now(),
         });
+    }
+
+    @SubscribeMessage('requestRandomMatch')
+    async handleRequestRandomMatch(
+        @MessageBody() data: FindMatchDto,
+        @ConnectedSocket() client: Socket,
+    ) {
+        try {
+            this.logger.log(`User requesting random match: ${client.id}`);
+
+            // Get session to confirm details
+            const session = await this.sessionService.getSession(client.id);
+            if (!session) return;
+
+            const matchRequest = {
+                socketId: client.id,
+                username: session.nickname,
+                gender: session.gender,
+                country: session.country,
+                state: session.state,
+                scope: data.scope,
+                preferences: {
+                    targetGender: data.targetGender
+                }
+            };
+
+            const matchId = await this.matchingService.findMatch(matchRequest);
+
+            if (matchId) {
+                this.logger.log(`Match found! ${client.id} <-> ${matchId}`);
+
+                // Get match details
+                const matchSession = await this.sessionService.getSession(matchId);
+
+                if (matchSession) {
+                    // Notify Requestor
+                    client.emit('matchFound', {
+                        user: {
+                            id: matchSession.id,
+                            nickname: matchSession.nickname,
+                            gender: matchSession.gender,
+                            country: matchSession.country,
+                            isOccupied: true
+                        }
+                    });
+
+                    // Notify Match
+                    this.server.to(matchId).emit('matchFound', {
+                        user: {
+                            id: session.id,
+                            nickname: session.nickname,
+                            gender: session.gender,
+                            country: session.country,
+                            isOccupied: true
+                        }
+                    });
+                }
+            } else {
+                this.logger.log(`No match found, adding ${client.id} to queue`);
+                await this.matchingService.addToQueue(matchRequest);
+                client.emit('waitingForMatch');
+            }
+
+        } catch (error) {
+            this.logger.error('Error in random matching', error);
+        }
     }
 
     @SubscribeMessage('typing')

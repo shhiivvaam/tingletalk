@@ -22,6 +22,7 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
     const { onlineUsers, setOnlineUsers, addOnlineUser, removeOnlineUser, addMessage, selectedUser, setSelectedUser } = useChatStore();
     const [socket, setSocket] = useState<Socket | null>(null);
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+    const [isSearching, setIsSearching] = useState(false);
 
     useEffect(() => {
         if (!username) {
@@ -70,12 +71,28 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
             });
         });
 
+        newSocket.on('userTyping', (data: { userId: string, isTyping: boolean }) => {
+            useChatStore.getState().setTyping(data.userId, data.isTyping);
+        });
+
         setSocket(newSocket);
 
         return () => {
             newSocket.disconnect();
         };
-    }, [username, gender, preferences, router, setOnlineUsers, addOnlineUser, removeOnlineUser, addMessage]);
+    }, [username, gender, preferences, router, setOnlineUsers, addOnlineUser, removeOnlineUser, addMessage, setSelectedUser]);
+
+    const handleRandomMatch = () => {
+        if (!socket) return;
+        setIsSearching(true);
+        socket.emit('requestRandomMatch', {
+            username,
+            gender: gender || 'other',
+            scope: preferences?.location || 'global',
+            country: 'Unknown',
+            targetGender: preferences?.targetGender || 'all',
+        });
+    };
 
     return (
         <div className="flex h-screen bg-slate-950 text-slate-200 overflow-hidden relative">
@@ -89,24 +106,28 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
 
             {/* Sidebar */}
             <div className={`
-                fixed inset-y-0 left-0 z-40 w-80 transform transition-transform duration-300 ease-in-out md:relative md:translate-x-0
+                fixed inset-y-0 left-0 z-40 w-80 bg-slate-900 border-r border-white/5 transform transition-transform duration-300 md:relative md:translate-x-0
                 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
             `}>
                 <OnlineUsersList
                     users={onlineUsers}
                     currentUserId={socket?.id || null}
-                    onSelectUser={setSelectedUser}
+                    onSelectUser={(user) => {
+                        setSelectedUser(user);
+                        setIsSidebarOpen(false);
+                    }}
+                    onFindMatch={handleRandomMatch}
+                    isSearching={isSearching}
                 />
             </div>
 
             {/* Main Content */}
             <div className="flex-1 flex flex-col relative w-full h-full">
-                {/* 
+                {/*
                    We pass the socket to children via Props if we could, but children are pre-determined.
                    Alternatively, we can use a Context to provide the socket.
-                   Or we can just rely on the Page to grab the socket if we stored it? 
+                   Or we can just rely on the Page to grab the socket if we stored it?
                    actually, storing socket in Zustand is tricky (non-serializable).
-                   
                    Better approach: 
                    Render children (which is the Page). USE A CONTEXT for socket.
                 */}

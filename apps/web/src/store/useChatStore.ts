@@ -30,6 +30,8 @@ interface ChatState {
 
     addMessage: (userId: string, message: Message) => void;
     markAsRead: (userId: string) => void;
+    setTyping: (userId: string, isTyping: boolean) => void;
+    typingUsers: Record<string, boolean>;
 }
 
 export const useChatStore = create<ChatState>((set, get) => ({
@@ -37,6 +39,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
     selectedUser: null,
     messages: {},
     unreadCounts: {},
+    typingUsers: {},
 
     setOnlineUsers: (users) => set({ onlineUsers: users }),
     addOnlineUser: (user) => set((state) => ({
@@ -44,8 +47,9 @@ export const useChatStore = create<ChatState>((set, get) => ({
     })),
     removeOnlineUser: (userId) => set((state) => ({
         onlineUsers: state.onlineUsers.filter(u => u.id !== userId),
-        // Deselect if the selected user left
-        selectedUser: state.selectedUser?.id === userId ? null : state.selectedUser
+        // Keep selectedUser even if they leave so we can show "Disconnected" state
+        // selectedUser: state.selectedUser?.id === userId ? null : state.selectedUser,
+        typingUsers: { ...state.typingUsers, [userId]: false } // Clear typing if they leave
     })),
 
     setSelectedUser: (user) => {
@@ -64,6 +68,10 @@ export const useChatStore = create<ChatState>((set, get) => ({
                 ...state.messages,
                 [userId]: [...currentMessages, message]
             },
+            typingUsers: {
+                ...state.typingUsers,
+                [userId]: false
+            },
             unreadCounts: {
                 ...state.unreadCounts,
                 [userId]: isSelected ? 0 : (state.unreadCounts[userId] || 0) + 1
@@ -76,5 +84,9 @@ export const useChatStore = create<ChatState>((set, get) => ({
             ...state.unreadCounts,
             [userId]: 0
         }
+    })),
+
+    setTyping: (userId, isTyping) => set((state) => ({
+        typingUsers: { ...state.typingUsers, [userId]: isTyping }
     })),
 }));

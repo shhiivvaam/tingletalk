@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Search, User } from 'lucide-react';
+import { Search, User, Zap } from 'lucide-react';
 import { useChatStore } from '@/store/useChatStore';
 
 interface OnlineUser {
@@ -14,9 +14,11 @@ interface OnlineUsersListProps {
     users: OnlineUser[];
     currentUserId: string | null;
     onSelectUser: (user: OnlineUser) => void;
+    onFindMatch: () => void;
+    isSearching: boolean;
 }
 
-export default function OnlineUsersList({ users, currentUserId, onSelectUser }: OnlineUsersListProps) {
+export default function OnlineUsersList({ users, currentUserId, onSelectUser, onFindMatch, isSearching }: OnlineUsersListProps) {
     const [filter, setFilter] = useState('');
     const { unreadCounts } = useChatStore();
 
@@ -51,6 +53,24 @@ export default function OnlineUsersList({ users, currentUserId, onSelectUser }: 
                         onChange={(e) => setFilter(e.target.value)}
                     />
                 </div>
+
+                <button
+                    onClick={onFindMatch}
+                    disabled={isSearching}
+                    className="w-full py-2 bg-gradient-to-r from-pink-500 to-violet-600 rounded-xl font-bold text-sm shadow-lg shadow-pink-500/20 hover:shadow-pink-500/40 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-wait"
+                >
+                    {isSearching ? (
+                        <>
+                            <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                            Searching...
+                        </>
+                    ) : (
+                        <>
+                            <Zap size={16} />
+                            Find Random Match
+                        </>
+                    )}
+                </button>
             </div>
 
             <div className="flex-1 overflow-y-auto p-2 space-y-2 custom-scrollbar">
