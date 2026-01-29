@@ -17,7 +17,11 @@ export class RedisIoAdapter extends IoAdapter {
     }
 
     async connectToRedis(): Promise<void> {
-        const redisUrl = this.configService.get<string>('REDIS_URL');
+        let redisUrl = this.configService.get<string>('REDIS_URL');
+
+        if (redisUrl) {
+            redisUrl = redisUrl.replace(/^['"](.*)['"]$/, '$1');
+        }
 
         if (!redisUrl) {
             throw new Error('REDIS_URL environment variable is required for WebSocket adapter');

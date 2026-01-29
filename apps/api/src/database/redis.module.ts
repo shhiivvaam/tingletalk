@@ -9,7 +9,12 @@ import Redis from 'ioredis';
             provide: 'REDIS_CLIENT',
             useFactory: (configService: ConfigService) => {
                 const logger = new Logger('RedisModule');
-                const redisUrl = configService.get<string>('REDIS_URL');
+                let redisUrl = configService.get<string>('REDIS_URL');
+
+                if (redisUrl) {
+                    // Sanitize: remove surrounding quotes if present
+                    redisUrl = redisUrl.replace(/^['"](.*)['"]$/, '$1');
+                }
 
                 if (!redisUrl) {
                     throw new Error('REDIS_URL environment variable is required');
