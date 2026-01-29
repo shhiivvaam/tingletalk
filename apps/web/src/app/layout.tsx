@@ -20,12 +20,12 @@ export default function RootLayout({
   return (
     <html lang="en" className={outfit.variable}>
       <head>
-        <meta name="google-adsense-account" content="ca-pub-9299390652489427" />
+        <meta name="google-adsense-account" content="ca-pub-9299390652489427"></meta>
         <script
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9299390652489427"
-          crossOrigin="anonymous"
-        />
+          crossOrigin="anonymous">
+        </script>
       </head>
       <body className="font-sans">
         <div className="mesh-gradient" />
