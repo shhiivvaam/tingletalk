@@ -29,38 +29,59 @@ export default function CameraModal({ onClose, onSend }: CameraModalProps) {
         }
     }, [webcamRef]);
 
-    const startRecording = useCallback(() => {
+    const startRecording = useCallback(async () => {
         setIsRecording(true);
         chunksRef.current = [];
         setRecordingTime(0);
 
-        if (webcamRef.current && webcamRef.current.stream) {
-            const stream = webcamRef.current.stream;
-            const mediaRecorder = new MediaRecorder(stream, {
-                mimeType: 'video/webm'
-            });
+        if (webcamRef.current) {
+            let stream = webcamRef.current.stream;
 
-            mediaRecorder.ondataavailable = (e) => {
-                if (e.data.size > 0) {
-                    chunksRef.current.push(e.data);
+            // Should verify stream has audio track
+            if (stream && stream.getAudioTracks().length === 0) {
+                // Try to force get a stream with audio if missing (e.g. initial load was photo mode)
+                try {
+                    const newStream = await navigator.mediaDevices.getUserMedia({
+                        video: { facingMode },
+                        audio: true
+                    });
+                    stream = newStream;
+                    // Note: this new stream isn't attached to the webcam view but we use it for recording
+                } catch (err) {
+                    console.error("Failed to get audio stream", err);
                 }
-            };
+            }
 
-            mediaRecorder.onstop = () => {
-                const blob = new Blob(chunksRef.current, { type: 'video/webm' });
-                setVideoBlob(blob);
-                setIsRecording(false);
-                if (timerRef.current) clearInterval(timerRef.current);
-            };
+            if (stream) {
+                const mediaRecorder = new MediaRecorder(stream);
 
-            mediaRecorderRef.current = mediaRecorder;
-            mediaRecorder.start();
+                mediaRecorder.ondataavailable = (e) => {
+                    if (e.data.size > 0) {
+                        chunksRef.current.push(e.data);
+                    }
+                };
 
-            timerRef.current = setInterval(() => {
-                setRecordingTime(prev => prev + 1);
-            }, 1000);
+                mediaRecorder.onstop = () => {
+                    const blob = new Blob(chunksRef.current, { type: 'video/webm' });
+                    setVideoBlob(blob);
+                    setIsRecording(false);
+                    if (timerRef.current) clearInterval(timerRef.current);
+
+                    // cleanup if we created a temporary stream
+                    if (stream !== webcamRef.current?.stream) {
+                        stream.getTracks().forEach(track => track.stop());
+                    }
+                };
+
+                mediaRecorderRef.current = mediaRecorder;
+                mediaRecorder.start();
+
+                timerRef.current = setInterval(() => {
+                    setRecordingTime(prev => prev + 1);
+                }, 1000);
+            }
         }
-    }, [webcamRef]);
+    }, [webcamRef, facingMode]);
 
     const stopRecording = useCallback(() => {
         if (mediaRecorderRef.current && isRecording) {
@@ -143,6 +164,7 @@ export default function CameraModal({ onClose, onSend }: CameraModalProps) {
                         <>
                             <Webcam
                                 audio={mode === 'video'}
+                                muted={true}
                                 ref={webcamRef}
                                 screenshotFormat="image/jpeg"
                                 videoConstraints={{ facingMode }}
