@@ -21,6 +21,7 @@ export default function CameraModal({ onClose, onSend }: CameraModalProps) {
     const [recordingTime, setRecordingTime] = useState(0);
     const chunksRef = useRef<Blob[]>([]);
     const timerRef = useRef<NodeJS.Timeout | null>(null);
+    const MAX_VIDEO_DURATION = 60; // 60 seconds
 
     const capture = useCallback(() => {
         if (webcamRef.current) {
@@ -77,7 +78,19 @@ export default function CameraModal({ onClose, onSend }: CameraModalProps) {
                 mediaRecorder.start();
 
                 timerRef.current = setInterval(() => {
-                    setRecordingTime(prev => prev + 1);
+                    setRecordingTime(prev => {
+                        if (prev >= MAX_VIDEO_DURATION) {
+                            if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+                                mediaRecorderRef.current.stop();
+                            }
+                            // Cleanup stream if temporary
+                            if (stream !== webcamRef.current?.stream) {
+                                stream.getTracks().forEach(track => track.stop());
+                            }
+                            return prev;
+                        }
+                        return prev + 1;
+                    });
                 }, 1000);
             }
         }

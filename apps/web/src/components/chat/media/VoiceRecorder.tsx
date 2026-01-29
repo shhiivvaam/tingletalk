@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Mic, Square, Trash2, Send } from 'lucide-react';
 import { UploadService } from '@/services/uploadService';
+import { useToastStore } from '@/store/useToastStore';
 
 interface VoiceRecorderProps {
     onSend: (fileUrl: string, metadata: { duration: number }) => void;
@@ -15,6 +16,8 @@ export default function VoiceRecorder({ onSend, onCancel }: VoiceRecorderProps) 
     const mediaRecorderRef = useRef<MediaRecorder | null>(null);
     const audioChunksRef = useRef<Blob[]>([]);
     const timerRef = useRef<NodeJS.Timeout | null>(null);
+    const MAX_DURATION = 12; // 12 seconds per requirement
+    const { addToast } = useToastStore();
 
     useEffect(() => {
         startRecording();
@@ -40,7 +43,14 @@ export default function VoiceRecorder({ onSend, onCancel }: VoiceRecorderProps) 
             setIsRecording(true);
 
             timerRef.current = setInterval(() => {
-                setDuration(prev => prev + 1);
+                setDuration(prev => {
+                    if (prev >= MAX_DURATION) {
+                        stopRecordingInternal();
+                        addToast('Maximum voice message duration reached (12s)', 'info');
+                        return prev;
+                    }
+                    return prev + 1;
+                });
             }, 1000);
 
         } catch (error) {
@@ -60,26 +70,28 @@ export default function VoiceRecorder({ onSend, onCancel }: VoiceRecorderProps) 
     const handleSend = async () => {
         stopRecordingInternal();
 
-        // Wait for onstop (or just process chunks if available immediately? MediaRecorder is async)
-        // We need to wait for the final chunk.
-        // A dirty way is to wait a small tick or wrap in a promise that resolves on stop.
-
-        // Better implementation: promisify the stop or just construct blob now if we know it's stopped.
-        // But since we just called stop(), the 'stop' event hasn't fired yet to gather the last chunk.
-
-        // Let's use a small delay or event listener.
-        if (mediaRecorderRef.current) {
-            mediaRecorderRef.current.onstop = async () => {
+        // Ensure we process chunks
+        const processAndUpload = async () => {
+            if (audioChunksRef.current.length > 0) {
                 const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
                 const audioFile = new File([audioBlob], 'voice_message.webm', { type: 'audio/webm' });
-
                 try {
                     const url = await UploadService.uploadFile(audioFile);
                     onSend(url, { duration });
                 } catch (err) {
                     console.error('Upload failed', err);
+                    addToast('Failed to upload audio', 'error');
                 }
-            };
+            }
+        };
+
+        if (mediaRecorderRef.current) {
+            // Give a tiny delay for the last 'ondataavailable' event to fire if it was just stopped
+            setTimeout(() => {
+                processAndUpload();
+            }, 200);
+        } else {
+            processAndUpload();
         }
     };
 

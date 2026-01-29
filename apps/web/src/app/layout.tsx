@@ -16,6 +16,8 @@ export const metadata: Metadata = {
   },
 };
 
+import ToastContainer from "@/components/ui/ToastContainer";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -40,6 +42,7 @@ export default function RootLayout({
       <body className="font-sans min-h-screen selection:bg-pink-500/30">
         <div className="aurora-bg" />
         <div className="relative z-10">
+          <ToastContainer />
           {children}
         </div>
       </body>

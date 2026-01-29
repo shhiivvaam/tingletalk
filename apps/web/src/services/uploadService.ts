@@ -7,7 +7,7 @@ interface PresignedResponse {
 }
 
 export const UploadService = {
-    async getPresignedUrl(fileType: string): Promise<PresignedResponse> {
+    async getPresignedUrl(fileType: string, fileSize: number): Promise<PresignedResponse> {
         const response = await fetch(`${API_URL}/upload/presigned`, {
             method: 'POST',
             headers: {
@@ -16,11 +16,13 @@ export const UploadService = {
             body: JSON.stringify({
                 fileType,
                 contentType: fileType,
+                fileSize,
             }),
         });
 
         if (!response.ok) {
-            throw new Error('Failed to get upload URL');
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to get upload URL');
         }
 
         return response.json();
@@ -28,8 +30,22 @@ export const UploadService = {
 
     async uploadFile(file: File): Promise<string> {
         try {
+            // 0. Client side Size Check (Optional, but good for UX)
+            const MAX_SIZES = {
+                'image': 10 * 1024 * 1024,
+                'video': 50 * 1024 * 1024,
+                'audio': 20 * 1024 * 1024,
+            } as const;
+
+            const type = file.type.split('/')[0] as keyof typeof MAX_SIZES;
+            const limit = MAX_SIZES[type] || MAX_SIZES['image'];
+
+            if (file.size > limit) {
+                throw new Error(`File too large. Max size is ${limit / (1024 * 1024)}MB`);
+            }
+
             // 1. Get Presigned URL
-            const { uploadUrl, publicUrl } = await this.getPresignedUrl(file.type);
+            const { uploadUrl, publicUrl } = await this.getPresignedUrl(file.type, file.size);
 
             // 2. Upload to S3 directly
             const uploadResponse = await fetch(uploadUrl, {
