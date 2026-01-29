@@ -1,56 +1,76 @@
+# Production-grade Dockerfile for NestJS API in Turborepo monorepo
 FROM node:20-alpine AS base
-
-FROM base AS builder
-# Check https://github.com/nodejs/docker-node/tree/b4117f9333da4138b03a546ec926ef50a31506c3#nodealpine to understand why libc6-compat might be needed.
 RUN apk add --no-cache libc6-compat
-# Set working directory
 WORKDIR /app
-# Install turbo globaly
-RUN npm install turbo --global
-COPY . .
-# Prune the workspace for the 'api' app
-RUN turbo prune api --docker
 
-# Add lockfile and package.json's of isolated subworkspace
+# Stage 1: Install ALL dependencies (including devDependencies for building)
 FROM base AS installer
-RUN apk add --no-cache libc6-compat
-WORKDIR /app
+# Copy all package files
+COPY package.json package-lock.json turbo.json tsconfig.json ./
+COPY apps/api/package.json ./apps/api/package.json
+COPY packages/shared/package.json ./packages/shared/package.json
 
-# First install dependencies (as they change less often)
-COPY .gitignore .gitignore
-COPY --from=builder /app/out/json/ .
-COPY --from=builder /app/out/package-lock.json ./package-lock.json
+# Install dependencies
+RUN npm ci
 
-# Copy full source (including Prisma schema) before npm install
-# This is needed because postinstall runs prisma generate
-COPY --from=builder /app/out/full/ .
-COPY turbo.json turbo.json
+# Copy all source code
+COPY apps/api ./apps/api
+COPY packages/shared ./packages/shared
 
-# Now install dependencies (this will run prisma generate via postinstall)
-RUN npm install
+# Generate Prisma Client
+RUN cd apps/api && npx prisma generate
 
-# Build the API
-RUN npx turbo build --filter=api...
+# Build shared package
+RUN cd packages/shared && npm run build
 
+# Build API
+RUN cd apps/api && npm run build
+
+# Stage 2: Production dependencies only
+FROM base AS prod-deps
+COPY package.json package-lock.json ./
+COPY apps/api/package.json ./apps/api/package.json
+COPY packages/shared/package.json ./packages/shared/package.json
+
+# Install production dependencies only
+RUN npm ci --omit=dev
+
+# Stage 3: Production runner
 FROM base AS runner
 WORKDIR /app
 
-# Don't run production as root
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nestjs
+# Create non-root user for security
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 nestjs
+
+# Copy production dependencies
+COPY --from=prod-deps --chown=nestjs:nodejs /app/node_modules ./node_modules
+COPY --from=prod-deps --chown=nestjs:nodejs /app/apps/api/node_modules ./apps/api/node_modules
+COPY --from=prod-deps --chown=nestjs:nodejs /app/packages/shared/node_modules ./packages/shared/node_modules
+
+# Copy built application
+COPY --from=installer --chown=nestjs:nodejs /app/apps/api/dist ./apps/api/dist
+COPY --from=installer --chown=nestjs:nodejs /app/apps/api/package.json ./apps/api/package.json
+COPY --from=installer --chown=nestjs:nodejs /app/apps/api/prisma ./apps/api/prisma
+COPY --from=installer --chown=nestjs:nodejs /app/packages/shared/dist ./packages/shared/dist
+COPY --from=installer --chown=nestjs:nodejs /app/packages/shared/package.json ./packages/shared/package.json
+
+# Switch to non-root user
 USER nestjs
 
-# Copy the built app
-COPY --from=installer /app/apps/api/dist ./dist
-COPY --from=installer /app/node_modules ./node_modules
-COPY --from=installer /app/apps/api/package.json ./package.json
-# Copy Prisma schema/migrations if runtime access is needed (usually client is enough)
-COPY --from=installer /app/apps/api/prisma ./prisma
+# Set working directory to API
+WORKDIR /app/apps/api
 
+# Expose port
 EXPOSE 5000
 
-ENV PORT=5000
-# Ensure Node env is production
+# Environment variables
 ENV NODE_ENV=production
+ENV PORT=5000
 
-CMD ["node", "dist/main"]
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
+    CMD node -e "require('http').get('http://localhost:5000/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"
+
+# Start the application
+CMD ["node", "dist/main.js"]
