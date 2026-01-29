@@ -32,7 +32,7 @@ export default function OnlineUsersList({ users, currentUserId, onSelectUser, on
     const [searchTerm, setSearchTerm] = useState('');
     const [activeTab, setActiveTab] = useState<SectionType>('online');
     const [genderFilter, setGenderFilter] = useState<'all' | 'male' | 'female'>('all');
-    const [locationFilter, setLocationFilter] = useState<'global' | 'nearest'>('global');
+    const [locationFilter, setLocationFilter] = useState<'global' | 'nearest'>('nearest');
     const [showFilters, setShowFilters] = useState(false);
 
     // --- Data Derivation ---
@@ -302,8 +302,8 @@ export default function OnlineUsersList({ users, currentUserId, onSelectUser, on
                                         <button
                                             onClick={() => setShowFilters(!showFilters)}
                                             className={`h-9 w-9 flex items-center justify-center rounded-xl border transition-all ${showFilters
-                                                    ? 'bg-slate-700 text-white border-slate-600'
-                                                    : 'bg-slate-800/50 text-slate-500 border-white/5 hover:bg-slate-800 hover:text-slate-400'
+                                                ? 'bg-slate-700 text-white border-slate-600'
+                                                : 'bg-slate-800/50 text-slate-500 border-white/5 hover:bg-slate-800 hover:text-slate-400'
                                                 }`}
                                         >
                                             <Filter size={14} />
@@ -349,8 +349,8 @@ export default function OnlineUsersList({ users, currentUserId, onSelectUser, on
                                                         <button
                                                             onClick={() => setLocationFilter('global')}
                                                             className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-bold border transition-all ${locationFilter === 'global'
-                                                                    ? 'bg-indigo-500/10 border-indigo-500/50 text-indigo-300 shadow-[0_0_10px_rgba(99,102,241,0.15)]'
-                                                                    : 'bg-slate-900/40 border-white/5 text-slate-500 hover:bg-white/5'
+                                                                ? 'bg-indigo-500/10 border-indigo-500/50 text-indigo-300 shadow-[0_0_10px_rgba(99,102,241,0.15)]'
+                                                                : 'bg-slate-900/40 border-white/5 text-slate-500 hover:bg-white/5'
                                                                 }`}
                                                         >
                                                             <Globe size={12} />
@@ -359,8 +359,8 @@ export default function OnlineUsersList({ users, currentUserId, onSelectUser, on
                                                         <button
                                                             onClick={() => setLocationFilter('nearest')}
                                                             className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-bold border transition-all ${locationFilter === 'nearest'
-                                                                    ? 'bg-violet-500/10 border-violet-500/50 text-violet-300 shadow-[0_0_10px_rgba(139,92,246,0.15)]'
-                                                                    : 'bg-slate-900/40 border-white/5 text-slate-500 hover:bg-white/5'
+                                                                ? 'bg-violet-500/10 border-violet-500/50 text-violet-300 shadow-[0_0_10px_rgba(139,92,246,0.15)]'
+                                                                : 'bg-slate-900/40 border-white/5 text-slate-500 hover:bg-white/5'
                                                                 }`}
                                                         >
                                                             <MapPin size={12} />
