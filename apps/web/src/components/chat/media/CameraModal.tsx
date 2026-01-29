@@ -181,7 +181,9 @@ export default function CameraModal({ onClose, onSend }: CameraModalProps) {
                                 ref={webcamRef}
                                 screenshotFormat="image/jpeg"
                                 videoConstraints={{ facingMode }}
-                                className="w-full h-full object-cover"
+                                className="w-full h-full object-cover absolute inset-0"
+                                onUserMedia={() => console.log('Webcam: User media loaded')}
+                                onUserMediaError={(err) => console.error('Webcam: User media error', err)}
                             />
                             {isRecording && (
                                 <div className="absolute top-4 left-0 right-0 flex justify-center">
