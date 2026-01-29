@@ -168,13 +168,15 @@ export default function OnlineUsersList({ users, currentUserId, onSelectUser, on
                                 {tab.count > 0 && (
                                     tab.id === 'inbox' ? (
                                         <span className={`px-1.5 py-0.5 rounded-full text-[10px] font-extrabold leading-none ${activeTab === tab.id
-                                                ? 'bg-white text-pink-600 shadow-sm'
-                                                : 'bg-white/10 text-slate-300'
+                                            ? 'bg-white text-pink-600 shadow-sm'
+                                            : 'bg-white/10 text-slate-300'
                                             }`}>
                                             {tab.count}
                                         </span>
                                     ) : (
-                                        <span className={`w-1.5 h-1.5 rounded-full ${activeTab === tab.id ? 'bg-white' : 'bg-pink-500'
+                                        <span className={`w-2 h-2 rounded-full shadow-sm ${tab.id === 'online'
+                                                ? 'bg-green-500 shadow-green-500/50'
+                                                : 'bg-pink-500 shadow-pink-500/50'
                                             }`} />
                                     )
                                 )}
