@@ -17,6 +17,8 @@ export interface AnonymousSession {
 export class SessionService {
     constructor(@Inject('REDIS_CLIENT') private readonly redis: Redis) { }
 
+    private readonly ONLINE_USERS_SET = 'online_users';
+
     private getSessionKey(socketId: string): string {
         return `session:${socketId}`;
     }
@@ -28,8 +30,14 @@ export class SessionService {
             createdAt: Date.now(),
         };
 
-        // Store in Redis with 24h TTL
-        await this.redis.setex(this.getSessionKey(socketId), 86400, JSON.stringify(session));
+        const sessionKey = this.getSessionKey(socketId);
+
+        // Use pipeline to execute commands atomically
+        const pipeline = this.redis.pipeline();
+        pipeline.setex(sessionKey, 86400, JSON.stringify(session)); // 24h TVL
+        pipeline.sadd(this.ONLINE_USERS_SET, socketId);
+        await pipeline.exec();
+
         return session;
     }
 
@@ -39,16 +47,48 @@ export class SessionService {
     }
 
     async getAllSessions(): Promise<AnonymousSession[]> {
-        const keys = await this.redis.keys('session:*');
-        if (keys.length === 0) return [];
+        // Get all socketIds from the Set (O(1) relative to total keyspace, O(N) relative to online users)
+        const socketIds = await this.redis.smembers(this.ONLINE_USERS_SET);
 
-        const sessions = await this.redis.mget(keys);
-        return sessions
-            .filter((s) => s !== null)
-            .map((s) => JSON.parse(s as string));
+        if (socketIds.length === 0) return [];
+
+        // Construct keys for MGET
+        const sessionKeys = socketIds.map(id => this.getSessionKey(id));
+
+        // Fetch all sessions in one go
+        const sessionsData = await this.redis.mget(sessionKeys);
+
+        const activeSessions: AnonymousSession[] = [];
+        const staleIds: string[] = [];
+
+        sessionsData.forEach((data, index) => {
+            if (data) {
+                try {
+                    activeSessions.push(JSON.parse(data));
+                } catch (e) {
+                    // Corruption check
+                    staleIds.push(socketIds[index]);
+                }
+            } else {
+                // Session expired or key missing, but ID still in set -> Stale
+                staleIds.push(socketIds[index]);
+            }
+        });
+
+        // Self-heal: Remove stale IDs from the set asynchronously
+        if (staleIds.length > 0) {
+            this.redis.srem(this.ONLINE_USERS_SET, ...staleIds).catch(err => {
+                console.error('Failed to clean up stale sessions', err);
+            });
+        }
+
+        return activeSessions;
     }
 
     async removeSession(socketId: string): Promise<void> {
-        await this.redis.del(this.getSessionKey(socketId));
+        const pipeline = this.redis.pipeline();
+        pipeline.del(this.getSessionKey(socketId));
+        pipeline.srem(this.ONLINE_USERS_SET, socketId);
+        await pipeline.exec();
     }
 }
