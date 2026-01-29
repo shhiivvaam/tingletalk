@@ -173,19 +173,26 @@ export default function Home() {
                     className="text-center"
                   />
 
-                  {/* Gender */}
-                  <CustomSelect
-                    label="I am"
-                    options={[
-                      { label: 'Male', value: 'male' },
-                      { label: 'Female', value: 'female' },
-                      { label: 'Other', value: 'other' }
-                    ]}
-                    value={formData.gender}
-                    onChange={(val) => handleInputChange('gender', val)}
-                    placeholder="Select"
-                    error={errors.gender}
-                  />
+                  {/* Gender Radio Group */}
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">I am</label>
+                    <div className="flex gap-2">
+                      {['Male', 'Female'].map((option) => (
+                        <button
+                          key={option}
+                          type="button"
+                          onClick={() => handleInputChange('gender', option.toLowerCase())}
+                          className={`flex-1 py-3 rounded-xl text-sm font-semibold transition-all duration-300 border ${formData.gender === option.toLowerCase()
+                              ? 'bg-gradient-to-r from-pink-500/20 to-violet-600/20 border-pink-500/50 text-white shadow-[0_0_15px_rgba(236,72,153,0.2)]'
+                              : 'bg-white/5 border-white/5 text-slate-400 hover:bg-white/10 hover:text-slate-200'
+                            }`}
+                        >
+                          {option}
+                        </button>
+                      ))}
+                    </div>
+                    {errors.gender && <p className="text-pink-500 text-xs mt-1 ml-1">{errors.gender}</p>}
+                  </div>
                 </div>
 
                 {/* LOC */}
