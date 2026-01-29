@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Search, Zap, ChevronDown, ChevronRight, MessageSquare, Clock, Users, Filter, Inbox } from 'lucide-react';
+import { Search, Zap, ChevronDown, ChevronRight, MessageSquare, Clock, Users, Filter, Inbox, Globe, MapPin } from 'lucide-react';
 import { useChatStore } from '@/store/useChatStore';
 import { useUserStore } from '@/store/useUserStore';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -298,38 +298,57 @@ export default function OnlineUsersList({ users, currentUserId, onSelectUser, on
                                         />
                                     </div>
 
-                                    {/* Filter Chips */}
-                                    <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
-                                        <Filter size={14} className="text-slate-500 shrink-0" />
-
-                                        {/* Gender Filter */}
-                                        <div className="flex bg-slate-800/50 rounded-lg p-0.5 border border-white/5 shrink-0">
-                                            {(['all', 'male', 'female'] as const).map(g => (
-                                                <button
-                                                    key={g}
-                                                    onClick={() => setGenderFilter(g)}
-                                                    className={`px-2.5 py-1 rounded-md transition-colors capitalize text-[10px] font-bold ${genderFilter === g ? 'bg-slate-600 text-white shadow-sm' : 'text-slate-500 hover:text-slate-300'
-                                                        }`}
-                                                >
-                                                    {g === 'all' ? 'All' : g.charAt(0).toUpperCase()}
-                                                </button>
-                                            ))}
+                                    {/* Filter Chips - Redesigned */}
+                                    <div className="flex flex-col gap-3">
+                                        {/* Gender Segmented Control */}
+                                        <div className="flex p-0.5 bg-slate-950/30 rounded-lg border border-white/5 relative">
+                                            {(['all', 'male', 'female'] as const).map((g) => {
+                                                const isActive = genderFilter === g;
+                                                return (
+                                                    <button
+                                                        key={g}
+                                                        onClick={() => setGenderFilter(g)}
+                                                        className={`flex-1 relative py-1.5 text-[10px] font-bold uppercase tracking-wider transition-colors z-10 ${isActive ? 'text-white' : 'text-slate-500 hover:text-slate-400'}`}
+                                                    >
+                                                        {isActive && (
+                                                            <motion.div
+                                                                layoutId="genderFilter"
+                                                                className="absolute inset-0 bg-slate-700/80 rounded-md shadow-sm border border-white/10"
+                                                                transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                                                            />
+                                                        )}
+                                                        <span className="relative z-10">{g}</span>
+                                                    </button>
+                                                );
+                                            })}
                                         </div>
 
-                                        {/* Location Filter */}
-                                        <div className="flex bg-slate-800/50 rounded-lg p-0.5 border border-white/5 shrink-0">
-                                            {(['global', 'nearest'] as const).map(l => (
-                                                <button
-                                                    key={l}
-                                                    onClick={() => setLocationFilter(l)}
-                                                    className={`px-2.5 py-1 rounded-md transition-colors capitalize text-[10px] font-bold ${locationFilter === l ? 'bg-indigo-500/80 text-white shadow-sm' : 'text-slate-500 hover:text-slate-300'
-                                                        }`}
-                                                >
-                                                    {l === 'nearest' ? 'Near' : 'Global'}
-                                                </button>
-                                            ))}
+                                        {/* Location Toggles */}
+                                        <div className="flex gap-2">
+                                            <button
+                                                onClick={() => setLocationFilter('global')}
+                                                className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-bold border transition-all ${locationFilter === 'global'
+                                                    ? 'bg-indigo-500/10 border-indigo-500/50 text-indigo-300 shadow-[0_0_10px_rgba(99,102,241,0.15)]'
+                                                    : 'bg-slate-900/40 border-white/5 text-slate-500 hover:bg-white/5'
+                                                    }`}
+                                            >
+                                                <Globe size={12} />
+                                                Global
+                                            </button>
+                                            <button
+                                                onClick={() => setLocationFilter('nearest')}
+                                                className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-bold border transition-all ${locationFilter === 'nearest'
+                                                    ? 'bg-violet-500/10 border-violet-500/50 text-violet-300 shadow-[0_0_10px_rgba(139,92,246,0.15)]'
+                                                    : 'bg-slate-900/40 border-white/5 text-slate-500 hover:bg-white/5'
+                                                    }`}
+                                            >
+                                                <MapPin size={12} />
+                                                Nearby
+                                            </button>
                                         </div>
                                     </div>
+
+
                                 </div>
                             </div>
 
@@ -428,6 +447,6 @@ export default function OnlineUsersList({ users, currentUserId, onSelectUser, on
                     )}
                 </AnimatePresence>
             </div>
-        </div>
+        </div >
     );
 }
