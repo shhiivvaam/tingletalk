@@ -176,26 +176,7 @@ export default function OnlineUsersList({ users, currentUserId, onSelectUser, on
 
     return (
         <div className="flex flex-col h-full bg-transparent">
-            {/* My Profile Section */}
-            <div className="p-5 border-b border-white/5 bg-slate-900/30 backdrop-blur-md">
-                <div className="flex items-center gap-4">
-                    <div className="relative w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-teal-400 flex items-center justify-center font-bold text-xl text-white shadow-lg shadow-blue-500/20 ring-1 ring-white/10">
-                        {getInitials(username)}
-                        <span className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-[3px] border-slate-900 rounded-full"></span>
-                    </div>
-                    <div className="flex-1 overflow-hidden">
-                        <h2 className="font-bold text-slate-100 truncate text-lg">{username || 'You'}</h2>
-                        <div className="flex items-center gap-2 text-xs text-slate-400 font-medium">
-                            <span className="capitalize px-2 py-0.5 rounded-md bg-white/5 border border-white/5">{gender || 'Anonymous'}</span>
-                            <span className="truncate">
-                                {getLocationString(country, state)}
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {/* Custom Tab Navigation */}
+            {/* Content Area */}
             <div className="px-4 pt-4 pb-2">
                 <div className="flex bg-slate-800/50 p-1 rounded-xl border border-white/5">
                     {tabs.map((tab) => (

@@ -187,12 +187,27 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
                 fixed inset-y-0 left-0 z-40 w-80 bg-slate-900/60 backdrop-blur-2xl border-r border-white/5 transform transition-transform duration-300 md:relative md:translate-x-0 flex flex-col
                 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
             `}>
-                {/* Branding Header */}
-                <div className="h-16 shrink-0 flex items-center gap-3 px-6 border-b border-white/5 bg-slate-900/50">
-                    <img src="/logo.png" alt="TingleTalk" className="w-8 h-8 object-contain" />
-                    <span className="font-black text-xl tracking-tight text-white/90">
-                        Tingle<span className="text-pink-500">Talk</span>
-                    </span>
+                {/* Branding & Profile Header */}
+                <div className="h-16 shrink-0 flex items-center justify-between px-4 border-b border-white/5 bg-slate-900/50 gap-2">
+                    {/* Left: Brand */}
+                    <div className="flex items-center gap-2">
+                        <img src="/logo.png" alt="TingleTalk" className="w-8 h-8 object-contain" />
+                        <span className="font-black text-lg tracking-tight text-white/90 hidden sm:block">
+                            Tingle<span className="text-pink-500">Talk</span>
+                        </span>
+                    </div>
+
+                    {/* Right: Profile */}
+                    <div className="flex items-center gap-3 bg-white/5 pl-1 pr-3 py-1 rounded-full border border-white/5">
+                        <div className="relative w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-teal-400 flex items-center justify-center font-bold text-xs text-white shadow-sm">
+                            {(username || '?').charAt(0).toUpperCase()}
+                            <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-slate-900 rounded-full"></span>
+                        </div>
+                        <div className="flex flex-col max-w-[80px]">
+                            <span className="text-xs font-bold text-slate-200 truncate">{username || 'You'}</span>
+                            <span className="text-[10px] text-slate-500 truncate capitalize">{gender}</span>
+                        </div>
+                    </div>
                 </div>
 
                 <div className="flex-1 overflow-hidden relative">
