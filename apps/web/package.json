@@ -13,6 +13,7 @@
     "@sentry/nextjs": "^10.37.0",
     "@tingle/shared": "^0.0.0",
     "@tingle/ui": "^0.0.0",
+    "@vercel/analytics": "^1.6.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "country-state-city": "^3.2.1",
