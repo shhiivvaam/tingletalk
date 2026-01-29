@@ -138,15 +138,21 @@ export default function ChatWindow({ socket, currentUserId }: ChatWindowProps) {
                 </div>
 
                 <div className="flex items-center gap-2">
-                    <button className="p-3 rounded-full hover:bg-white/5 text-slate-400 hover:text-white transition-all hover:scale-105 active:scale-95 border border-transparent hover:border-white/5">
+                    <button disabled title="Coming Soon" className="p-3 rounded-full text-slate-600 cursor-not-allowed border border-transparent relative group">
                         <Phone size={20} />
+                        <span className="absolute -top-1 -right-1 flex h-2 w-2">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-pink-400 opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-2 w-2 bg-pink-500"></span>
+                        </span>
+                        <span className="absolute top-10 right-0 w-max bg-slate-900 text-xs px-2 py-1 rounded border border-white/10 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">Coming Soon</span>
                     </button>
-                    <button className="p-3 rounded-full hover:bg-white/5 text-slate-400 hover:text-white transition-all hover:scale-105 active:scale-95 border border-transparent hover:border-white/5">
+                    <button disabled title="Coming Soon" className="p-3 rounded-full text-slate-600 cursor-not-allowed border border-transparent relative group">
                         <Video size={20} />
+                        <span className="absolute top-10 right-0 w-max bg-slate-900 text-xs px-2 py-1 rounded border border-white/10 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">Coming Soon</span>
                     </button>
-                    <button className="p-3 rounded-full hover:bg-white/5 text-slate-400 hover:text-white transition-all hover:scale-105 active:scale-95 border border-transparent hover:border-white/5">
+                    {/* <button className="p-3 rounded-full hover:bg-white/5 text-slate-400 hover:text-white transition-all hover:scale-105 active:scale-95 border border-transparent hover:border-white/5">
                         <MoreVertical size={20} />
-                    </button>
+                    </button> */}
                 </div>
             </div>
 
