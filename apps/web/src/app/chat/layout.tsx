@@ -214,69 +214,59 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
                         </div>
                     </button>
 
-                    {/* Profile Detail Popover */}
+                    {/* Profile Dropdown */}
                     <AnimatePresence>
                         {isProfileOpen && (
                             <>
-                                {/* Backdrop */}
-                                <motion.div
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    exit={{ opacity: 0 }}
-                                    className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[60]"
+                                {/* Invisible Backdrop to close on click outside */}
+                                <div
+                                    className="fixed inset-0 z-[60]"
                                     onClick={() => setIsProfileOpen(false)}
                                 />
-                                {/* Modal */}
+                                {/* Dropdown Menu */}
                                 <motion.div
-                                    initial={{ opacity: 0, scale: 0.95, y: -20 }}
+                                    initial={{ opacity: 0, scale: 0.95, y: -10 }}
                                     animate={{ opacity: 1, scale: 1, y: 0 }}
                                     exit={{ opacity: 0, scale: 0.95, y: -10 }}
-                                    className="absolute top-14 right-4 z-[70] w-72 bg-slate-900 rounded-2xl border border-white/10 shadow-xl overflow-hidden"
+                                    transition={{ duration: 0.15 }}
+                                    className="absolute top-14 right-4 z-[70] w-64 bg-slate-900 rounded-xl border border-white/10 shadow-xl overflow-hidden"
                                 >
-                                    <div className="h-24 bg-gradient-to-br from-pink-500/20 to-violet-600/20 relative">
-                                        <button
-                                            onClick={() => setIsProfileOpen(false)}
-                                            className="absolute top-2 right-2 p-1 rounded-full bg-black/20 hover:bg-black/40 text-white/70 hover:text-white transition-colors"
-                                        >
-                                            <X size={16} />
-                                        </button>
+                                    <div className="p-4 space-y-4">
+                                        {/* User Info */}
+                                        <div className="flex items-center gap-3 pb-4 border-b border-white/5">
+                                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-teal-400 flex items-center justify-center font-bold text-sm text-white shadow-sm shrink-0">
+                                                {(username || '?').charAt(0).toUpperCase()}
+                                            </div>
+                                            <div className="min-w-0">
+                                                <h3 className="font-bold text-slate-200 truncate">{username}</h3>
+                                                <span className="text-xs text-slate-500 capitalize">{gender}</span>
+                                            </div>
+                                        </div>
+
+                                        {/* Details */}
+                                        <div className="space-y-2">
+                                            <div className="flex items-center gap-3 text-sm">
+                                                <Calendar size={14} className="text-pink-500 shrink-0" />
+                                                <span className="text-slate-400">Age:</span>
+                                                <span className="font-medium text-slate-200">{useUserStore.getState().age}</span>
+                                            </div>
+                                            <div className="flex items-start gap-3 text-sm">
+                                                <MapPin size={14} className="text-violet-500 shrink-0 mt-0.5" />
+                                                <div className="flex flex-col">
+                                                    <span className="text-slate-200 leading-tight">
+                                                        {useUserStore.getState().state || 'Unknown'},
+                                                    </span>
+                                                    <span className="text-xs text-slate-500">
+                                                        {useUserStore.getState().country || 'Unknown'}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div className="px-6 pb-6 -mt-10">
-                                        <div className="relative w-20 h-20 rounded-[2rem] bg-gradient-to-br from-blue-500 to-teal-400 flex items-center justify-center font-bold text-3xl text-white shadow-xl ring-4 ring-slate-900 mx-auto mb-4">
-                                            {(username || '?').charAt(0).toUpperCase()}
-                                        </div>
 
-                                        <div className="text-center mb-6">
-                                            <h3 className="text-xl font-bold text-white">{username}</h3>
-                                            <span className="inline-block px-3 py-1 rounded-full bg-white/5 border border-white/5 text-xs font-medium text-slate-400 capitalize mt-1">
-                                                {gender}
-                                            </span>
-                                        </div>
-
-                                        <div className="space-y-3">
-                                            <div className="flex items-center gap-3 p-3 rounded-xl bg-white/5 border border-white/5">
-                                                <Calendar size={18} className="text-pink-500" />
-                                                <div>
-                                                    <p className="text-[10px] uppercase font-bold text-slate-500">Age</p>
-                                                    <p className="text-sm font-semibold text-slate-200">{useUserStore.getState().age} years old</p>
-                                                </div>
-                                            </div>
-                                            <div className="flex items-center gap-3 p-3 rounded-xl bg-white/5 border border-white/5">
-                                                <MapPin size={18} className="text-violet-500" />
-                                                <div>
-                                                    <p className="text-[10px] uppercase font-bold text-slate-500">Location</p>
-                                                    <p className="text-sm font-semibold text-slate-200 truncate w-full">
-                                                        {useUserStore.getState().state || 'Unknown'}, {useUserStore.getState().country || 'Unknown'}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div className="mt-6 pt-4 border-t border-white/5 text-center">
-                                            <p className="text-[10px] text-slate-600">
-                                                Connected as Anonymous User
-                                            </p>
-                                        </div>
+                                    {/* Footer */}
+                                    <div className="bg-white/5 px-4 py-2 text-[10px] text-center text-slate-500">
+                                        Connected as Anonymous
                                     </div>
                                 </motion.div>
                             </>
