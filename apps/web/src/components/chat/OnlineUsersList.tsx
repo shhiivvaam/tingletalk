@@ -133,46 +133,75 @@ export default function OnlineUsersList({ users, currentUserId, onSelectUser, on
         { id: 'history', label: 'History', icon: Clock, count: historyUsers.length },
     ];
 
-    // Component for a User Row
-    const UserRow = ({ user, isOnline }: { user: OnlineUser | any, isOnline: boolean }) => (
-        <button
-            onClick={() => onSelectUser(user)}
-            className="w-full p-2 rounded-xl hover:bg-white/5 transition-colors flex items-center gap-3 group text-left mb-1"
-        >
-            <div className={`relative w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm ${isOnline
-                ? 'bg-gradient-to-br from-pink-500 text-white to-violet-600'
-                : 'bg-slate-700 text-slate-400'
-                }`}>
-                {getInitials(user.nickname)}
-                {isOnline && <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-slate-900 rounded-full"></span>}
-            </div>
+    const UserRow = ({
+        user,
+        isOnline,
+        unreadCount,
+        onSelectUser
+    }: {
+        user: OnlineUser | any,
+        isOnline: boolean,
+        unreadCount: number,
+        onSelectUser: (user: OnlineUser) => void
+    }) => {
+        // Helper within row or passed as prop? 
+        // Let's replicate the helper logic simply or import it.
+        // Actually, simple helpers can be inline or utility.
+        const getInitials = (name: string | undefined | null) => (name || '?').charAt(0).toUpperCase();
+        const getCountryCode = (country: string | undefined | null) => {
+            if (!country || country === 'Unknown') return '';
+            return (typeof country === 'string') ? country.slice(0, 2).toUpperCase() : '';
+        };
 
-            <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between">
-                    <h3 className={`font-semibold truncate transition-colors ${isOnline ? 'text-slate-200 group-hover:text-pink-400' : 'text-slate-400'}`}>
-                        {user.nickname || 'Anonymous'}
-                    </h3>
-                    <div className="flex items-center gap-2">
-                        {(unreadCounts[user.id] || 0) > 0 && (
-                            <span className="w-5 h-5 rounded-full bg-pink-500 flex items-center justify-center text-[10px] font-bold text-white">
-                                {unreadCounts[user.id]}
+        const getLocationString = (c: string | undefined | null, s: string | undefined | null) => {
+            const cleanC = (!c || c === 'Unknown') ? undefined : c;
+            const cleanS = (!s || s === 'Unknown') ? undefined : s;
+
+            if (cleanS && cleanC) return `${cleanS}, ${getCountryCode(cleanC)}`;
+            if (cleanC) return cleanC;
+            return '';
+        };
+
+        return (
+            <button
+                onClick={() => onSelectUser(user)}
+                className="w-full p-2 rounded-xl hover:bg-white/5 transition-colors flex items-center gap-3 group text-left mb-1"
+            >
+                <div className={`relative w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm ${isOnline
+                    ? 'bg-gradient-to-br from-pink-500 text-white to-violet-600'
+                    : 'bg-slate-700 text-slate-400'
+                    }`}>
+                    {getInitials(user.nickname)}
+                    {isOnline && <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-slate-900 rounded-full"></span>}
+                </div>
+
+                <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between">
+                        <h3 className={`font-semibold truncate transition-colors ${isOnline ? 'text-slate-200 group-hover:text-pink-400' : 'text-slate-400'}`}>
+                            {user.nickname || 'Anonymous'}
+                        </h3>
+                        <div className="flex items-center gap-2">
+                            {unreadCount > 0 && (
+                                <span className="w-5 h-5 rounded-full bg-pink-500 flex items-center justify-center text-[10px] font-bold text-white">
+                                    {unreadCount}
+                                </span>
+                            )}
+                        </div>
+                    </div>
+                    <div className="flex items-center justify-between text-xs text-slate-500">
+                        <div className="flex items-center gap-2 max-w-[140px]">
+                            <span className="truncate" title={user.state ? `${user.state}, ${user.country}` : user.country}>
+                                {getLocationString(user.country, user.state)}
                             </span>
-                        )}
+                            {getLocationString(user.country, user.state) && <span className="opacity-50">•</span>}
+                            <span className="capitalize shrink-0">{user.gender}</span>
+                        </div>
+                        {isOnline && user.isOccupied && <span className="text-amber-500 shrink-0">Busy</span>}
                     </div>
                 </div>
-                <div className="flex items-center justify-between text-xs text-slate-500">
-                    <div className="flex items-center gap-2 max-w-[140px]">
-                        <span className="truncate" title={user.state ? `${user.state}, ${user.country}` : user.country}>
-                            {getLocationString(user.country, user.state)}
-                        </span>
-                        {getLocationString(user.country, user.state) && <span className="opacity-50">•</span>}
-                        <span className="capitalize shrink-0">{user.gender}</span>
-                    </div>
-                    {isOnline && user.isOccupied && <span className="text-amber-500 shrink-0">Busy</span>}
-                </div>
-            </div>
-        </button>
-    );
+            </button>
+        );
+    };
 
     return (
         <div className="flex flex-col h-full bg-transparent">
@@ -309,7 +338,15 @@ export default function OnlineUsersList({ users, currentUserId, onSelectUser, on
                                         <p className="text-xs">No users found</p>
                                     </div>
                                 ) : (
-                                    filteredOnlineUsers.map(user => <UserRow key={`online-${user.id}`} user={user} isOnline={true} />)
+                                    filteredOnlineUsers.map(user => (
+                                        <UserRow
+                                            key={`online-${user.id}`}
+                                            user={user}
+                                            isOnline={true}
+                                            unreadCount={unreadCounts[user.id] || 0}
+                                            onSelectUser={onSelectUser}
+                                        />
+                                    ))
                                 )}
                             </div>
                         </motion.div>
@@ -331,7 +368,15 @@ export default function OnlineUsersList({ users, currentUserId, onSelectUser, on
                                     <p className="text-xs">No active conversations</p>
                                 </div>
                             ) : (
-                                inboxUsers.map(user => <UserRow key={`inbox-${user.id}`} user={user} isOnline={users.some(u => u.id === user.id)} />)
+                                inboxUsers.map(user => (
+                                    <UserRow
+                                        key={`inbox-${user.id}`}
+                                        user={user}
+                                        isOnline={users.some(u => u.id === user.id)}
+                                        unreadCount={unreadCounts[user.id] || 0}
+                                        onSelectUser={onSelectUser}
+                                    />
+                                ))
                             )}
                         </motion.div>
                     )}
@@ -359,7 +404,15 @@ export default function OnlineUsersList({ users, currentUserId, onSelectUser, on
                                         <p className="text-xs">No recent history</p>
                                     </div>
                                 ) : (
-                                    historyUsers.map(user => <UserRow key={`history-${user.id}`} user={user} isOnline={false} />)
+                                    historyUsers.map(user => (
+                                        <UserRow
+                                            key={`history-${user.id}`}
+                                            user={user}
+                                            isOnline={false}
+                                            unreadCount={unreadCounts[user.id] || 0}
+                                            onSelectUser={onSelectUser}
+                                        />
+                                    ))
                                 )}
                             </div>
                         </motion.div>
