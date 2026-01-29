@@ -17,6 +17,7 @@ interface OnlineUser {
 interface OnlineUsersListProps {
     users: OnlineUser[];
     currentUserId: string | null;
+    selectedUserId?: string | null; // Added prop
     onSelectUser: (user: OnlineUser) => void;
     onFindMatch: () => void;
     isSearching: boolean;
@@ -24,7 +25,7 @@ interface OnlineUsersListProps {
 
 type SectionType = 'inbox' | 'online' | 'history';
 
-export default function OnlineUsersList({ users, currentUserId, onSelectUser, onFindMatch, isSearching }: OnlineUsersListProps) {
+export default function OnlineUsersList({ users, currentUserId, selectedUserId, onSelectUser, onFindMatch, isSearching }: OnlineUsersListProps) {
     const { unreadCounts, messages, knownUsers } = useChatStore();
     const { username, gender, country, state } = useUserStore();
 
@@ -145,9 +146,8 @@ export default function OnlineUsersList({ users, currentUserId, onSelectUser, on
         unreadCount: number,
         onSelectUser: (user: OnlineUser) => void
     }) => {
-        // Helper within row or passed as prop? 
-        // Let's replicate the helper logic simply or import it.
-        // Actually, simple helpers can be inline or utility.
+        const isSelected = selectedUserId === user.id; // Check selection
+
         const getInitials = (name: string | undefined | null) => (name || '?').charAt(0).toUpperCase();
         const getCountryCode = (country: string | undefined | null) => {
             if (!country || country === 'Unknown') return '';
@@ -166,11 +166,16 @@ export default function OnlineUsersList({ users, currentUserId, onSelectUser, on
         return (
             <button
                 onClick={() => onSelectUser(user)}
-                className="w-full p-2 rounded-xl hover:bg-white/5 transition-colors flex items-center gap-3 group text-left mb-1"
+                className={`w-full p-2 rounded-xl transition-all flex items-center gap-3 group text-left mb-1 relative overflow-hidden ${isSelected ? 'bg-pink-500/10 border border-pink-500/20' : 'hover:bg-white/5 border border-transparent'
+                    }`}
             >
-                <div className={`relative w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm ${isOnline
-                    ? 'bg-gradient-to-br from-pink-500 text-white to-violet-600'
-                    : 'bg-slate-700 text-slate-400'
+                {isSelected && (
+                    <div className="absolute left-0 top-0 bottom-0 w-1 bg-pink-500 rounded-r-full" />
+                )}
+
+                <div className={`relative w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm shadow-inner ${isOnline
+                        ? 'bg-gradient-to-br from-pink-500 text-white to-violet-600'
+                        : 'bg-slate-700 text-slate-400'
                     }`}>
                     {getInitials(user.nickname)}
                     {isOnline && <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-slate-900 rounded-full"></span>}
@@ -178,7 +183,8 @@ export default function OnlineUsersList({ users, currentUserId, onSelectUser, on
 
                 <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
-                        <h3 className={`font-semibold truncate transition-colors ${isOnline ? 'text-slate-200 group-hover:text-pink-400' : 'text-slate-400'}`}>
+                        <h3 className={`font-semibold truncate transition-colors ${isSelected ? 'text-pink-200' : (isOnline ? 'text-slate-200 group-hover:text-pink-400' : 'text-slate-400')
+                            }`}>
                             {user.nickname || 'Anonymous'}
                         </h3>
                         <div className="flex items-center gap-2">
@@ -189,7 +195,7 @@ export default function OnlineUsersList({ users, currentUserId, onSelectUser, on
                             )}
                         </div>
                     </div>
-                    <div className="flex items-center justify-between text-xs text-slate-500">
+                    <div className={`flex items-center justify-between text-xs transition-colors ${isSelected ? 'text-pink-300/70' : 'text-slate-500'}`}>
                         <div className="flex items-center gap-2 max-w-[140px]">
                             <span className="truncate" title={user.state ? `${user.state}, ${user.country}` : user.country}>
                                 {getLocationString(user.country, user.state)}

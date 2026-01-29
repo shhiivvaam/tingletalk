@@ -292,9 +292,10 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
                     <OnlineUsersList
                         users={onlineUsers}
                         currentUserId={socket?.id || null}
+                        selectedUserId={selectedUser?.id || null}
                         onSelectUser={(user) => {
                             setSelectedUser(user);
-                            setIsSidebarOpen(false);
+                            setIsSidebarOpen(false); // Close sidebar on mobile on selection
                         }}
                         onFindMatch={handleRandomMatch}
                         isSearching={isSearching}
