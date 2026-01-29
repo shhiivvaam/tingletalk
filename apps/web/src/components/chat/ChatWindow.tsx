@@ -107,8 +107,8 @@ export default function ChatWindow({ socket, currentUserId }: ChatWindowProps) {
         }
     };
 
-    const handleCameraCapture = (url: string) => {
-        handleSendMessage('', 'image', url);
+    const handleCameraCapture = (url: string, type: 'image' | 'video' = 'image') => {
+        handleSendMessage('', type, url);
     };
 
     const handleVoiceSend = (url: string, metadata: { duration: number }) => {
