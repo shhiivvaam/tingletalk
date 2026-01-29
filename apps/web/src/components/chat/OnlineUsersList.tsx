@@ -166,12 +166,17 @@ export default function OnlineUsersList({ users, currentUserId, onSelectUser, on
                                 <tab.icon size={14} />
                                 {tab.label}
                                 {tab.count > 0 && (
-                                    <span className={`px-1.5 py-0.5 rounded-full text-[10px] font-extrabold leading-none ${activeTab === tab.id
-                                            ? 'bg-white text-pink-600 shadow-sm'
-                                            : 'bg-white/10 text-slate-300'
-                                        }`}>
-                                        {tab.count}
-                                    </span>
+                                    tab.id === 'inbox' ? (
+                                        <span className={`px-1.5 py-0.5 rounded-full text-[10px] font-extrabold leading-none ${activeTab === tab.id
+                                                ? 'bg-white text-pink-600 shadow-sm'
+                                                : 'bg-white/10 text-slate-300'
+                                            }`}>
+                                            {tab.count}
+                                        </span>
+                                    ) : (
+                                        <span className={`w-1.5 h-1.5 rounded-full ${activeTab === tab.id ? 'bg-white' : 'bg-pink-500'
+                                            }`} />
+                                    )
                                 )}
                             </span>
                         </button>
@@ -239,6 +244,12 @@ export default function OnlineUsersList({ users, currentUserId, onSelectUser, on
                                 </button>
                             </div>
 
+                            {/* List Header */}
+                            <div className="px-3 pb-2 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest flex items-center justify-between">
+                                <span>Online Users</span>
+                                <span className="bg-slate-800/50 px-2 py-0.5 rounded text-slate-400">{filteredOnlineUsers.length}</span>
+                            </div>
+
                             {/* User List */}
                             <div className="flex-1 overflow-y-auto custom-scrollbar space-y-1 px-1">
                                 {filteredOnlineUsers.length === 0 ? (
@@ -282,16 +293,24 @@ export default function OnlineUsersList({ users, currentUserId, onSelectUser, on
                             animate={{ opacity: 1, x: 0 }}
                             exit={{ opacity: 0, x: 20 }}
                             transition={{ duration: 0.2 }}
-                            className="flex-1 overflow-y-auto custom-scrollbar px-1 py-2"
+                            className="flex-1 flex flex-col h-full"
                         >
-                            {historyUsers.length === 0 ? (
-                                <div className="flex flex-col items-center justify-center h-40 text-slate-500 space-y-2">
-                                    <Clock size={32} className="opacity-20" />
-                                    <p className="text-xs">No recent history</p>
-                                </div>
-                            ) : (
-                                historyUsers.map(user => <UserRow key={`history-${user.id}`} user={user} isOnline={false} />)
-                            )}
+                            {/* List Header */}
+                            <div className="px-3 pt-2 pb-2 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest flex items-center justify-between">
+                                <span>Recent History</span>
+                                <span className="bg-slate-800/50 px-2 py-0.5 rounded text-slate-400">{historyUsers.length}</span>
+                            </div>
+
+                            <div className="flex-1 overflow-y-auto custom-scrollbar space-y-1 px-1">
+                                {historyUsers.length === 0 ? (
+                                    <div className="flex flex-col items-center justify-center h-40 text-slate-500 space-y-2">
+                                        <Clock size={32} className="opacity-20" />
+                                        <p className="text-xs">No recent history</p>
+                                    </div>
+                                ) : (
+                                    historyUsers.map(user => <UserRow key={`history-${user.id}`} user={user} isOnline={false} />)
+                                )}
+                            </div>
                         </motion.div>
                     )}
                 </AnimatePresence>
