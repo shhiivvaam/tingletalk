@@ -11,8 +11,42 @@ env:
   FRONTEND_IMAGE: ${{ secrets.DOCKER_USERNAME }}/tingletalk-web
 
 jobs:
-  build-and-push:
-    name: Build and Push Docker Images
+  # Detect which parts of the codebase changed
+  detect-changes:
+    name: Detect Changes
+    runs-on: ubuntu-latest
+    outputs:
+      backend: ${{ steps.filter.outputs.backend }}
+      frontend: ${{ steps.filter.outputs.frontend }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Check for changes
+        uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          filters: |
+            backend:
+              - 'apps/api/**'
+              - 'packages/**'
+              - 'package.json'
+              - 'package-lock.json'
+              - 'tsconfig.json'
+              - 'turbo.json'
+              - 'docker-compose.yml'
+            frontend:
+              - 'apps/web/**'
+              - 'packages/**'
+              - 'package.json'
+              - 'package-lock.json'
+              - 'tsconfig.json'
+              - 'turbo.json'
+
+  build-backend:
+    name: Build and Push Backend
+    needs: detect-changes
+    if: needs.detect-changes.outputs.backend == 'true'
     runs-on: ubuntu-latest
     
     steps:
@@ -44,6 +78,35 @@ jobs:
           cache-from: type=registry,ref=${{ env.BACKEND_IMAGE }}:buildcache
           cache-to: type=registry,ref=${{ env.BACKEND_IMAGE }}:buildcache,mode=max
 
+      - name: Image digest
+        run: |
+          echo "Backend images pushed:"
+          echo "  - ${{ env.BACKEND_IMAGE }}:latest"
+          echo "  - ${{ env.BACKEND_IMAGE }}:${{ steps.vars.outputs.sha_short }}"
+
+  build-frontend:
+    name: Build and Push Frontend
+    needs: detect-changes
+    if: needs.detect-changes.outputs.frontend == 'true'
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Get short commit SHA
+        id: vars
+        run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
       - name: Build and push Frontend image
         uses: docker/build-push-action@v5
         with:
@@ -58,17 +121,14 @@ jobs:
 
       - name: Image digest
         run: |
-          echo "Backend images pushed:"
-          echo "  - ${{ env.BACKEND_IMAGE }}:latest"
-          echo "  - ${{ env.BACKEND_IMAGE }}:${{ steps.vars.outputs.sha_short }}"
-          echo ""
           echo "Frontend images pushed:"
           echo "  - ${{ env.FRONTEND_IMAGE }}:latest"
           echo "  - ${{ env.FRONTEND_IMAGE }}:${{ steps.vars.outputs.sha_short }}"
 
   deploy-backend:
     name: Deploy Backend to EC2
-    needs: build-and-push
+    needs: [detect-changes, build-backend]
+    if: needs.detect-changes.outputs.backend == 'true'
     runs-on: ubuntu-latest
     
     steps:
@@ -84,7 +144,8 @@ jobs:
 
   deploy-frontend:
     name: Deploy Frontend to Vercel
-    needs: build-and-push
+    needs: [detect-changes, build-frontend]
+    if: needs.detect-changes.outputs.frontend == 'true'
     runs-on: ubuntu-latest
     
     steps:
