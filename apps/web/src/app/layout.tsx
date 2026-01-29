@@ -20,12 +20,15 @@ export default function RootLayout({
   return (
     <html lang="en" className={outfit.variable}>
       <head>
+        {/* Google Adsense */}
         <meta name="google-adsense-account" content="ca-pub-9299390652489427"></meta>
         <script
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9299390652489427"
           crossOrigin="anonymous">
         </script>
+        {/* AdsTerra - EffectiveGate */}
+        <script src="https://pl28597008.effectivegatecpm.com/f6/ec/2f/f6ec2f262184e8f9a191cb7befad4db0.js"></script>
       </head>
       <body className="font-sans">
         <div className="mesh-gradient" />
