@@ -33,6 +33,7 @@ export default function OnlineUsersList({ users, currentUserId, onSelectUser, on
     const [activeTab, setActiveTab] = useState<SectionType>('online');
     const [genderFilter, setGenderFilter] = useState<'all' | 'male' | 'female'>('all');
     const [locationFilter, setLocationFilter] = useState<'global' | 'nearest'>('global');
+    const [showFilters, setShowFilters] = useState(false);
 
     // --- Data Derivation ---
 
@@ -286,69 +287,90 @@ export default function OnlineUsersList({ users, currentUserId, onSelectUser, on
 
                                 {/* List Filters */}
                                 <div className="flex flex-col gap-2">
-                                    {/* Search */}
-                                    <div className="relative w-full">
-                                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={14} />
-                                        <input
-                                            type="text"
-                                            placeholder="Search users..."
-                                            className="w-full bg-slate-800/50 rounded-xl py-2 pl-9 pr-3 text-xs font-medium text-slate-200 focus:outline-none focus:ring-1 focus:ring-pink-500/50 border border-white/5 placeholder:text-slate-600 h-9"
-                                            value={searchTerm}
-                                            onChange={(e) => setSearchTerm(e.target.value)}
-                                        />
+                                    {/* Search & Option Toggle */}
+                                    <div className="flex gap-2">
+                                        <div className="relative flex-1">
+                                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={14} />
+                                            <input
+                                                type="text"
+                                                placeholder="Search users..."
+                                                className="w-full bg-slate-800/50 rounded-xl py-2 pl-9 pr-3 text-xs font-medium text-slate-200 focus:outline-none focus:ring-1 focus:ring-pink-500/50 border border-white/5 placeholder:text-slate-600 h-9"
+                                                value={searchTerm}
+                                                onChange={(e) => setSearchTerm(e.target.value)}
+                                            />
+                                        </div>
+                                        <button
+                                            onClick={() => setShowFilters(!showFilters)}
+                                            className={`h-9 w-9 flex items-center justify-center rounded-xl border transition-all ${showFilters
+                                                    ? 'bg-slate-700 text-white border-slate-600'
+                                                    : 'bg-slate-800/50 text-slate-500 border-white/5 hover:bg-slate-800 hover:text-slate-400'
+                                                }`}
+                                        >
+                                            <Filter size={14} />
+                                        </button>
                                     </div>
 
-                                    {/* Filter Chips - Redesigned */}
-                                    <div className="flex flex-col gap-3">
-                                        {/* Gender Segmented Control */}
-                                        <div className="flex p-0.5 bg-slate-950/30 rounded-lg border border-white/5 relative">
-                                            {(['all', 'male', 'female'] as const).map((g) => {
-                                                const isActive = genderFilter === g;
-                                                return (
-                                                    <button
-                                                        key={g}
-                                                        onClick={() => setGenderFilter(g)}
-                                                        className={`flex-1 relative py-1.5 text-[10px] font-bold uppercase tracking-wider transition-colors z-10 ${isActive ? 'text-white' : 'text-slate-500 hover:text-slate-400'}`}
-                                                    >
-                                                        {isActive && (
-                                                            <motion.div
-                                                                layoutId="genderFilter"
-                                                                className="absolute inset-0 bg-slate-700/80 rounded-md shadow-sm border border-white/10"
-                                                                transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-                                                            />
-                                                        )}
-                                                        <span className="relative z-10">{g}</span>
-                                                    </button>
-                                                );
-                                            })}
-                                        </div>
-
-                                        {/* Location Toggles */}
-                                        <div className="flex gap-2">
-                                            <button
-                                                onClick={() => setLocationFilter('global')}
-                                                className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-bold border transition-all ${locationFilter === 'global'
-                                                    ? 'bg-indigo-500/10 border-indigo-500/50 text-indigo-300 shadow-[0_0_10px_rgba(99,102,241,0.15)]'
-                                                    : 'bg-slate-900/40 border-white/5 text-slate-500 hover:bg-white/5'
-                                                    }`}
+                                    {/* Collapsible Filters */}
+                                    <AnimatePresence>
+                                        {showFilters && (
+                                            <motion.div
+                                                initial={{ height: 0, opacity: 0 }}
+                                                animate={{ height: 'auto', opacity: 1 }}
+                                                exit={{ height: 0, opacity: 0 }}
+                                                transition={{ duration: 0.2 }}
+                                                className="overflow-hidden"
                                             >
-                                                <Globe size={12} />
-                                                Global
-                                            </button>
-                                            <button
-                                                onClick={() => setLocationFilter('nearest')}
-                                                className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-bold border transition-all ${locationFilter === 'nearest'
-                                                    ? 'bg-violet-500/10 border-violet-500/50 text-violet-300 shadow-[0_0_10px_rgba(139,92,246,0.15)]'
-                                                    : 'bg-slate-900/40 border-white/5 text-slate-500 hover:bg-white/5'
-                                                    }`}
-                                            >
-                                                <MapPin size={12} />
-                                                Nearby
-                                            </button>
-                                        </div>
-                                    </div>
+                                                <div className="flex flex-col gap-3 py-1">
+                                                    {/* Gender Segmented Control */}
+                                                    <div className="flex p-0.5 bg-slate-950/30 rounded-lg border border-white/5 relative">
+                                                        {(['all', 'male', 'female'] as const).map((g) => {
+                                                            const isActive = genderFilter === g;
+                                                            return (
+                                                                <button
+                                                                    key={g}
+                                                                    onClick={() => setGenderFilter(g)}
+                                                                    className={`flex-1 relative py-1.5 text-[10px] font-bold uppercase tracking-wider transition-colors z-10 ${isActive ? 'text-white' : 'text-slate-500 hover:text-slate-400'}`}
+                                                                >
+                                                                    {isActive && (
+                                                                        <motion.div
+                                                                            layoutId="genderFilter"
+                                                                            className="absolute inset-0 bg-slate-700/80 rounded-md shadow-sm border border-white/10"
+                                                                            transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                                                                        />
+                                                                    )}
+                                                                    <span className="relative z-10">{g}</span>
+                                                                </button>
+                                                            );
+                                                        })}
+                                                    </div>
 
-
+                                                    {/* Location Toggles */}
+                                                    <div className="flex gap-2">
+                                                        <button
+                                                            onClick={() => setLocationFilter('global')}
+                                                            className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-bold border transition-all ${locationFilter === 'global'
+                                                                    ? 'bg-indigo-500/10 border-indigo-500/50 text-indigo-300 shadow-[0_0_10px_rgba(99,102,241,0.15)]'
+                                                                    : 'bg-slate-900/40 border-white/5 text-slate-500 hover:bg-white/5'
+                                                                }`}
+                                                        >
+                                                            <Globe size={12} />
+                                                            Global
+                                                        </button>
+                                                        <button
+                                                            onClick={() => setLocationFilter('nearest')}
+                                                            className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-bold border transition-all ${locationFilter === 'nearest'
+                                                                    ? 'bg-violet-500/10 border-violet-500/50 text-violet-300 shadow-[0_0_10px_rgba(139,92,246,0.15)]'
+                                                                    : 'bg-slate-900/40 border-white/5 text-slate-500 hover:bg-white/5'
+                                                                }`}
+                                                        >
+                                                            <MapPin size={12} />
+                                                            Nearby
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
                                 </div>
                             </div>
 
