@@ -16,7 +16,9 @@ NC='\033[0m'
 IMAGE_NAME="shhiivvaam/tingletalk-api"
 CONTAINER_NAME="tingletalk-api"
 NEW_CONTAINER_NAME="tingletalk-api-new"
-ENV_FILE="$HOME/tingletalk/.env.production"
+# Auto-detect directory
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+ENV_FILE="$SCRIPT_DIR/.env.production"
 PORT=5000
 TEMP_PORT=5001
 HEALTH_ENDPOINT="http://localhost:${TEMP_PORT}/health"
