@@ -197,7 +197,7 @@ export default function CameraModal({ onClose, onSend }: CameraModalProps) {
                     )}
                 </div>
 
-                <div className="p-8 bg-black/80 backdrop-blur-xl flex flex-col gap-4">
+                <div className="p-4 md:p-8 bg-black/80 backdrop-blur-xl flex flex-col gap-4">
                     {/* Mode Switcher */}
                     {!imgSrc && !videoBlob && !isRecording && (
                         <div className="flex justify-center gap-6 pb-4">

@@ -252,34 +252,34 @@ export default function ChatWindow({ socket, currentUserId }: ChatWindowProps) {
         <div className="flex flex-col h-full bg-slate-950/50 backdrop-blur-3xl relative overflow-hidden">
 
             {/* Header */}
-            <div className="h-20 px-6 border-b border-white/5 flex items-center justify-between bg-slate-900/40 backdrop-blur-xl z-20">
+            <div className="h-16 px-4 md:px-6 border-b border-white/5 flex items-center justify-between bg-slate-900/40 backdrop-blur-xl z-20 shrink-0">
                 {/* User Info Toggle */}
-                <div className="relative">
+                <div className="relative min-w-0 flex-1 mr-2">
                     <button
                         onClick={() => setShowProfile(!showProfile)}
-                        className="flex items-center gap-4 hover:bg-white/5 p-2 -ml-2 rounded-xl transition-colors text-left"
+                        className="flex items-center gap-3 hover:bg-white/5 p-1.5 -ml-1.5 rounded-xl transition-colors text-left max-w-full"
                     >
-                        <div className="relative">
-                            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-pink-500 to-violet-600 flex items-center justify-center font-bold text-white text-lg shadow-lg shadow-pink-500/20 ring-2 ring-white/5">
+                        <div className="relative shrink-0">
+                            <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-br from-pink-500 to-violet-600 flex items-center justify-center font-bold text-white text-base md:text-lg shadow-lg shadow-pink-500/20 ring-2 ring-white/5">
                                 {(selectedUser.nickname || '?')[0].toUpperCase()}
                             </div>
                             {isOnline ? (
-                                <div className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-500 rounded-full border-2 border-slate-900 shadow-[0_0_8px_rgba(34,197,94,0.6)]"></div>
+                                <div className="absolute bottom-0 right-0 w-3 h-3 md:w-3.5 md:h-3.5 bg-green-500 rounded-full border-2 border-slate-900 shadow-[0_0_8px_rgba(34,197,94,0.6)]"></div>
                             ) : (
-                                <div className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-slate-500 rounded-full border-2 border-slate-900"></div>
+                                <div className="absolute bottom-0 right-0 w-3 h-3 md:w-3.5 md:h-3.5 bg-slate-500 rounded-full border-2 border-slate-900"></div>
                             )}
                         </div>
-                        <div>
-                            <h2 className="font-bold text-slate-100 text-lg flex items-center gap-2">
+                        <div className="min-w-0 flex-1">
+                            <h2 className="font-bold text-slate-100 text-base md:text-lg flex items-center gap-2 truncate">
                                 {selectedUser.nickname}
-                                <Flame size={14} className="text-pink-500 fill-pink-500 animate-pulse" />
+                                <Flame size={14} className="text-pink-500 fill-pink-500 animate-pulse shrink-0" />
                             </h2>
-                            <div className="flex items-center gap-2 text-xs font-medium text-slate-500">
-                                <span className="bg-slate-800 px-2 py-0.5 rounded-md capitalize text-slate-400 border border-white/5">{selectedUser.gender}</span>
+                            <div className="flex items-center gap-2 text-xs font-medium text-slate-500 truncate">
+                                <span className="bg-slate-800 px-1.5 py-0.5 rounded-md capitalize text-slate-400 border border-white/5 shrink-0">{selectedUser.gender}</span>
                                 {(selectedUser.country && selectedUser.country !== 'Unknown') && (
                                     <>
-                                        <span>•</span>
-                                        <span className="truncate max-w-[150px]">
+                                        <span className="shrink-0">•</span>
+                                        <span className="truncate">
                                             {selectedUser.country}
                                         </span>
                                     </>
@@ -361,42 +361,37 @@ export default function ChatWindow({ socket, currentUserId }: ChatWindowProps) {
                     </AnimatePresence>
                 </div>
 
-                <div className="flex items-center gap-2">
-                    <button disabled title="Coming Soon" className="p-3 rounded-full text-slate-600 cursor-not-allowed border border-transparent relative group">
-                        <Phone size={20} />
+                <div className="flex items-center gap-1 md:gap-2 shrink-0">
+                    <button disabled title="Coming Soon" className="p-2 md:p-3 rounded-full text-slate-600 cursor-not-allowed border border-transparent relative group">
+                        <Phone size={18} className="md:w-5 md:h-5" />
                         <span className="absolute -top-1 -right-1 flex h-2 w-2">
                             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-pink-400 opacity-75"></span>
                             <span className="relative inline-flex rounded-full h-2 w-2 bg-pink-500"></span>
                         </span>
-                        <span className="absolute top-10 right-0 w-max bg-slate-900 text-xs px-2 py-1 rounded border border-white/10 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">Coming Soon</span>
                     </button>
-                    <button disabled title="Coming Soon" className="p-3 rounded-full text-slate-600 cursor-not-allowed border border-transparent relative group">
-                        <Video size={20} />
-                        <span className="absolute top-10 right-0 w-max bg-slate-900 text-xs px-2 py-1 rounded border border-white/10 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">Coming Soon</span>
+                    <button disabled title="Coming Soon" className="p-2 md:p-3 rounded-full text-slate-600 cursor-not-allowed border border-transparent relative group">
+                        <Video size={18} className="md:w-5 md:h-5" />
                     </button>
-                    {/* <button className="p-3 rounded-full hover:bg-white/5 text-slate-400 hover:text-white transition-all hover:scale-105 active:scale-95 border border-transparent hover:border-white/5">
-                        <MoreVertical size={20} />
-                    </button> */}
                 </div>
             </div>
 
             {/* Messages Area */}
-            <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6 custom-scrollbar z-10">
+            <div className="flex-1 overflow-y-auto p-3 md:p-6 space-y-4 md:space-y-6 custom-scrollbar z-10 w-full">
                 {userMessages.length === 0 ? (
                     <div className="flex flex-col items-center justify-center h-full text-slate-500 space-y-6">
                         <motion.div
                             initial={{ scale: 0.8, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
-                            className="w-24 h-24 rounded-3xl bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center shadow-inner border border-white/5"
+                            className="w-20 h-20 md:w-24 md:h-24 rounded-3xl bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center shadow-inner border border-white/5"
                         >
-                            <span className="text-5xl">👋</span>
+                            <span className="text-4xl md:text-5xl">👋</span>
                         </motion.div>
-                        <div className="text-center space-y-2">
+                        <div className="text-center space-y-2 px-4">
                             <h3 className="font-bold text-slate-200 text-lg">Start the conversation!</h3>
                             <p className="text-sm text-slate-500">Don't be shy, say hello to {selectedUser.nickname}</p>
                         </div>
 
-                        <div className="flex flex-wrap gap-2 justify-center max-w-sm">
+                        <div className="flex flex-wrap gap-2 justify-center max-w-sm px-4">
                             {["Hi there! 👋", "How's it going?", "Nice to meet you!", "From where?"].map((text) => (
                                 <button
                                     key={text}
@@ -419,11 +414,11 @@ export default function ChatWindow({ socket, currentUserId }: ChatWindowProps) {
                                 initial={{ opacity: 0, y: 20, scale: 0.95 }}
                                 animate={{ opacity: 1, y: 0, scale: 1 }}
                                 transition={{ duration: 0.2 }}
-                                className={`flex ${isMe ? 'justify-end' : 'justify-start'} group`}
+                                className={`flex ${isMe ? 'justify-end' : 'justify-start'} group max-w-full`}
                             >
                                 <div
                                     className={`
-                                        max-w-[80%] md:max-w-[65%] rounded-2xl px-5 py-3.5 text-[15px] leading-relaxed shadow-sm relative
+                                        max-w-[85%] md:max-w-[65%] rounded-2xl px-4 py-3 md:px-5 md:py-3.5 text-[15px] leading-relaxed shadow-sm relative break-words
                                         ${isMe
                                             ? 'bg-gradient-to-br from-pink-600 to-violet-600 text-white rounded-tr-sm shadow-pink-900/10'
                                             : 'bg-slate-800/80 text-slate-100 rounded-tl-sm border border-white/5 shadow-black/20 backdrop-blur-sm'
@@ -443,21 +438,21 @@ export default function ChatWindow({ socket, currentUserId }: ChatWindowProps) {
                                         </div>
                                     ) : msg.type === 'audio' ? (
                                         <div className="flex items-center gap-2">
-                                            <audio controls src={msg.attachmentUrl} className="max-w-[240px] h-10" />
+                                            <audio controls src={msg.attachmentUrl} className="max-w-[200px] md:max-w-[240px] h-10" />
                                         </div>
                                     ) : (
-                                        <p>{msg.text}</p>
+                                        <p className="whitespace-pre-wrap break-words">{msg.text}</p>
                                     )}
                                     <div className={`flex items-center gap-1 justify-end mt-1 ${isMe ? 'text-pink-200/50' : 'text-slate-500'}`}>
-                                        <span className="text-[10px] font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <span className="text-[9px] md:text-[10px] font-medium opacity-70 group-hover:opacity-100 transition-opacity">
                                             {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                         </span>
                                         {isMe && (
                                             <span className="ml-1">
                                                 {msg.isRead ? (
-                                                    <CheckCheck size={14} className="text-blue-300" />
+                                                    <CheckCheck size={12} className="md:w-[14px] md:h-[14px] text-blue-300" />
                                                 ) : (
-                                                    <Check size={14} className="opacity-70" />
+                                                    <Check size={12} className="md:w-[14px] md:h-[14px] opacity-70" />
                                                 )}
                                             </span>
                                         )}
@@ -489,7 +484,7 @@ export default function ChatWindow({ socket, currentUserId }: ChatWindowProps) {
             </div>
 
             {/* Input Area */}
-            <div className="p-4 md:p-6 bg-slate-900/60 backdrop-blur-xl border-t border-white/5 z-20 relative">
+            <div className="p-2 md:p-6 bg-slate-900/60 backdrop-blur-xl border-t border-white/5 z-20 relative shrink-0">
                 {/* Hidden File Input */}
                 <input
                     type="file"
@@ -511,14 +506,14 @@ export default function ChatWindow({ socket, currentUserId }: ChatWindowProps) {
                             initial={{ opacity: 0, scale: 0.9, y: 10 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.9, y: 10 }}
-                            className="absolute bottom-full left-4 mb-4 z-50 shadow-2xl rounded-2xl overflow-hidden border border-white/10"
+                            className="absolute bottom-full left-2 md:left-4 mb-2 md:mb-4 z-50 shadow-2xl rounded-2xl overflow-hidden border border-white/10 w-[90vw] md:w-auto"
                         >
                             <EmojiPicker
                                 theme={Theme.DARK}
                                 onEmojiClick={onEmojiClick}
                                 searchDisabled={false}
-                                width={320}
-                                height={400}
+                                width="100%"
+                                height={350}
                                 lazyLoadEmojis={true}
                                 skinTonesDisabled
                             />
@@ -526,7 +521,8 @@ export default function ChatWindow({ socket, currentUserId }: ChatWindowProps) {
                     )}
 
                     {showGifPicker && (
-                        <div className="absolute bottom-full left-4 z-50">
+                        <div className="absolute bottom-full left-2 md:left-4 z-50 mb-2">
+                            {/* Ensure GIF Picker is responsive inside its component or styled here */}
                             <GifPicker
                                 onClose={() => setShowGifPicker(false)}
                                 onSelect={handleGifSelect}
@@ -542,10 +538,10 @@ export default function ChatWindow({ socket, currentUserId }: ChatWindowProps) {
                 />
 
                 {isOnline ? (
-                    <div className="flex items-end gap-2 max-w-4xl mx-auto">
+                    <div className="flex items-end gap-1.5 md:gap-2 max-w-4xl mx-auto w-full">
 
                         {isRecordingAudio ? (
-                            <div className="flex-1 flex justify-center">
+                            <div className="flex-1 flex justify-center w-full">
                                 <VoiceRecorder
                                     onCancel={() => setIsRecordingAudio(false)}
                                     onSend={handleVoiceSend}
@@ -555,14 +551,14 @@ export default function ChatWindow({ socket, currentUserId }: ChatWindowProps) {
                             <>
                                 <button
                                     onClick={() => setShowAttachmentMenu(!showAttachmentMenu)}
-                                    className={`p-3 rounded-full hover:bg-white/5 transition-colors ${showAttachmentMenu ? 'text-pink-400 bg-white/5' : 'text-slate-400 hover:text-pink-400'}`}
+                                    className={`p-2.5 md:p-3 rounded-full hover:bg-white/5 transition-colors shrink-0 ${showAttachmentMenu ? 'text-pink-400 bg-white/5' : 'text-slate-400 hover:text-pink-400'}`}
                                 >
-                                    <Plus size={24} />
+                                    <Plus size={22} className="md:w-6 md:h-6" />
                                 </button>
 
                                 <button
                                     onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                                    className={`p-3 rounded-full hover:bg-white/5 transition-colors ${showEmojiPicker ? 'text-pink-400 bg-white/5' : 'text-slate-400 hover:text-pink-400'}`}
+                                    className={`p-2.5 md:p-3 rounded-full hover:bg-white/5 transition-colors shrink-0 ${showEmojiPicker ? 'text-pink-400 bg-white/5' : 'text-slate-400 hover:text-pink-400'}`}
                                 >
                                     <span className="text-xl">😊</span>
                                 </button>
@@ -572,7 +568,7 @@ export default function ChatWindow({ socket, currentUserId }: ChatWindowProps) {
                                         e.preventDefault();
                                         handleSendMessage();
                                     }}
-                                    className="flex-1 flex items-center gap-3 bg-slate-950/50 p-2 rounded-[1.5rem] border border-white/10 focus-within:ring-2 focus-within:ring-pink-500/20 focus-within:border-pink-500/30 transition-all shadow-inner"
+                                    className="flex-1 flex items-center gap-2 bg-slate-950/50 p-1.5 rounded-[1.5rem] border border-white/10 focus-within:ring-2 focus-within:ring-pink-500/20 focus-within:border-pink-500/30 transition-all shadow-inner w-full min-w-0"
                                 >
                                     <input
                                         type="text"
@@ -581,12 +577,12 @@ export default function ChatWindow({ socket, currentUserId }: ChatWindowProps) {
                                         onKeyDown={handleKeyDown}
                                         onClick={() => setShowEmojiPicker(false)}
                                         placeholder="Type a message..."
-                                        className="flex-1 bg-transparent px-4 py-2 text-slate-200 outline-none placeholder:text-slate-600 font-medium"
+                                        className="flex-1 bg-transparent px-3 py-2 text-slate-200 outline-none placeholder:text-slate-600 font-medium text-base min-w-0"
                                     />
                                     <button
                                         type="submit"
                                         disabled={!inputValue.trim()}
-                                        className="p-3 rounded-full bg-gradient-to-r from-pink-500 to-indigo-600 text-white hover:scale-105 active:scale-95 disabled:opacity-50 disabled:scale-100 disabled:cursor-not-allowed transition-all shadow-lg shadow-pink-500/20"
+                                        className="p-2.5 rounded-full bg-gradient-to-r from-pink-500 to-indigo-600 text-white hover:scale-105 active:scale-95 disabled:opacity-50 disabled:scale-100 disabled:cursor-not-allowed transition-all shadow-lg shadow-pink-500/20 shrink-0"
                                     >
                                         <Send size={18} fill="currentColor" />
                                     </button>

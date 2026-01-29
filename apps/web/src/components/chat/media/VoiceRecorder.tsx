@@ -152,21 +152,21 @@ export default function VoiceRecorder({ onSend, onCancel }: VoiceRecorderProps) 
     };
 
     return (
-        <div className="flex items-center gap-4 bg-slate-900/90 p-3 rounded-full border border-white/10 animate-fade-in min-w-[300px] justify-between">
+        <div className="flex items-center gap-2 sm:gap-4 bg-slate-900/90 p-2 sm:p-3 rounded-full border border-white/10 animate-fade-in w-full max-w-[350px] justify-between shadow-xl backdrop-blur-md">
             {isRecording ? (
                 <>
-                    <div className="flex items-center gap-2 px-3">
+                    <div className="flex items-center gap-2 px-2 sm:px-3">
                         <div className={`w-2 h-2 rounded-full ${isPaused ? 'bg-yellow-500' : 'bg-red-500 animate-pulse'}`}></div>
-                        <span className="text-white font-mono min-w-[50px]">{formatTime(duration)}</span>
+                        <span className="text-white font-mono min-w-[40px] sm:min-w-[50px] text-sm">{formatTime(duration)}</span>
                     </div>
 
-                    <div className="flex gap-2">
+                    <div className="flex gap-1 sm:gap-2">
                         <button
                             onClick={handlePauseResume}
                             className="p-2 rounded-full hover:bg-white/10 text-slate-300 hover:text-white transition-colors"
                             title={isPaused ? "Resume" : "Pause"}
                         >
-                            {isPaused ? <Play size={20} className="fill-current" /> : <Pause size={20} className="fill-current" />}
+                            {isPaused ? <Play size={18} className="fill-current" /> : <Pause size={18} className="fill-current" />}
                         </button>
 
                         <button
@@ -174,21 +174,21 @@ export default function VoiceRecorder({ onSend, onCancel }: VoiceRecorderProps) 
                             className="p-2 rounded-full hover:bg-white/10 text-red-400 hover:text-red-300 transition-colors"
                             title="Stop & Review"
                         >
-                            <Square size={20} className="fill-current" />
+                            <Square size={18} className="fill-current" />
                         </button>
 
                         <button
                             onClick={onCancel}
                             className="p-2 rounded-full hover:bg-white/10 text-slate-400 hover:text-white transition-colors"
                         >
-                            <Trash2 size={20} />
+                            <Trash2 size={18} />
                         </button>
                     </div>
                 </>
             ) : (
                 <>
                     {/* Preview Mode */}
-                    <div className="flex items-center gap-2 px-3">
+                    <div className="flex items-center gap-2 px-2 sm:px-3">
                         <button
                             onClick={togglePreviewPlay}
                             className="p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
@@ -198,13 +198,13 @@ export default function VoiceRecorder({ onSend, onCancel }: VoiceRecorderProps) 
                         <span className="text-white font-mono text-sm">{formatTime(duration)}</span>
                     </div>
 
-                    <div className="flex gap-2">
+                    <div className="flex gap-1 sm:gap-2">
                         <button
                             onClick={onCancel} // Or restart? OnCancel just closes it.
                             className="p-2 rounded-full hover:bg-white/10 text-slate-400 hover:text-white transition-colors"
                             title="Delete"
                         >
-                            <Trash2 size={20} />
+                            <Trash2 size={18} />
                         </button>
 
                         <button
@@ -212,7 +212,7 @@ export default function VoiceRecorder({ onSend, onCancel }: VoiceRecorderProps) 
                             className="p-2 rounded-full bg-pink-500 hover:bg-pink-600 text-white transition-colors shadow-lg shadow-pink-500/20"
                             title="Send Voice Note"
                         >
-                            <Send size={20} />
+                            <Send size={18} />
                         </button>
                     </div>
                 </>

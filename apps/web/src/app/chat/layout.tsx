@@ -200,7 +200,7 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
 
             {/* Sidebar */}
             <div className={`
-                fixed inset-y-0 left-0 z-40 w-80 bg-slate-900/60 backdrop-blur-2xl border-r border-white/5 transform transition-transform duration-300 md:relative md:translate-x-0 flex flex-col
+                fixed inset-y-0 left-0 z-40 w-full md:w-80 bg-slate-900/95 backdrop-blur-2xl border-r border-white/5 transform transition-transform duration-300 md:relative md:translate-x-0 flex flex-col
                 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
             `}>
                 {/* Branding & Profile Header */}
