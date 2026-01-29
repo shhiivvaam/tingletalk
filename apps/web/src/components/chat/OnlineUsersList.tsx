@@ -24,7 +24,7 @@ type SectionType = 'inbox' | 'online' | 'history';
 
 export default function OnlineUsersList({ users, currentUserId, onSelectUser, onFindMatch, isSearching }: OnlineUsersListProps) {
     const { unreadCounts, messages, knownUsers } = useChatStore();
-    const { username, gender, preferences } = useUserStore();
+    const { username, gender, country, state } = useUserStore();
     const [searchTerm, setSearchTerm] = useState('');
     const [expandedSections, setExpandedSections] = useState<Record<SectionType, boolean>>({
         inbox: true,
@@ -148,7 +148,7 @@ export default function OnlineUsersList({ users, currentUserId, onSelectUser, on
                         <div className="flex items-center gap-2 text-xs text-slate-400">
                             <span className="capitalize">{gender || 'Anonymous'}</span>
                             <span>•</span>
-                            <span className="uppercase">{preferences?.location || 'Global'}</span>
+                            <span className="truncate">{state ? `${state}, ` : ''}{country || 'Unknown'}</span>
                         </div>
                     </div>
                 </div>

@@ -6,11 +6,14 @@ interface UserState {
     username: string | null;
     isAnonymous: boolean;
     gender: 'male' | 'female' | 'other' | null;
+    age: number | null;
+    country: string | null;
+    state: string | null;
     preferences: {
         targetGender: 'male' | 'female' | 'all';
         location: 'local' | 'global';
     };
-    setAnonymousUser: (data: { username: string; gender: string }) => void;
+    setAnonymousUser: (data: { username: string; gender: string; age: number; country: string; state: string }) => void;
     updatePreferences: (prefs: Partial<UserState['preferences']>) => void;
     reset: () => void;
 }
@@ -22,6 +25,9 @@ export const useUserStore = create<UserState>()(
             username: null,
             isAnonymous: false,
             gender: null,
+            age: null,
+            country: null,
+            state: null,
             preferences: {
                 targetGender: 'all',
                 location: 'global',
@@ -31,6 +37,9 @@ export const useUserStore = create<UserState>()(
                     ...state,
                     username: data.username,
                     gender: data.gender as any,
+                    age: data.age,
+                    country: data.country,
+                    state: data.state,
                     isAnonymous: true,
                 })),
             updatePreferences: (prefs) =>
@@ -38,7 +47,7 @@ export const useUserStore = create<UserState>()(
                     ...state,
                     preferences: { ...state.preferences, ...prefs },
                 })),
-            reset: () => set({ userId: null, username: null, isAnonymous: false }),
+            reset: () => set({ userId: null, username: null, isAnonymous: false, age: null, country: null, state: null }),
         }),
         {
             name: 'tingle-user-storage',
