@@ -13,6 +13,7 @@ interface OnlineUser {
     id: string;
     nickname: string;
     gender: 'male' | 'female' | 'other';
+    age?: number;
     country: string;
     state?: string;
     isOccupied: boolean;

@@ -32,6 +32,11 @@ class FindMatchDto {
     @IsIn(['male', 'female', 'other'])
     gender: 'male' | 'female' | 'other';
 
+    @IsOptional()
+    // @IsNumber() - incoming as string from some clients? No, class-transformer handles it if Typed.
+    // Let's assume number.
+    age?: number;
+
     @IsString()
     country: string;
 
@@ -66,6 +71,21 @@ class TypingDto {
     @IsBoolean()
     isTyping: boolean;
 }
+
+const CRAZY_GREETINGS = [
+    "Monkey time! 🐒",
+    "Pizza is here! 🍕",
+    "Knock knock! 🚪",
+    "Is this the Krusty Krab? 🦀",
+    "I come in peace 👽",
+    "Ready for chaos? 🌪️",
+    "Meow? 🐱",
+    "Help, I'm stuck in the matrix! 💊",
+    "Hola Amigo! 🌮",
+    "Boom! 💥",
+    "Do you believe in ghosts? 👻",
+    "I'm not a robot... beep boop 🤖"
+];
 
 @WebSocketGateway({
     cors: {
@@ -122,6 +142,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 id: s.id,
                 nickname: s.nickname || 'Anonymous',
                 gender: s.gender,
+                age: s.age, // Expose age
                 country: s.country || 'Unknown',
                 state: s.state,
                 isOccupied: false // Placeholder for now
@@ -141,6 +162,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 tempId: client.id,
                 nickname: data.username,
                 gender: data.gender,
+                age: data.age,
                 country: data.country || 'Unknown',
                 state: data.state, // Allow manual state or undefined
             });
@@ -150,6 +172,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 id: client.id,
                 nickname: session.nickname,
                 gender: session.gender,
+                age: session.age,
                 country: session.country || 'Unknown',
                 state: session.state,
                 isOccupied: false
@@ -198,6 +221,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 socketId: client.id,
                 username: session.nickname,
                 gender: session.gender,
+                age: session.age,
                 country: session.country,
                 state: session.state,
                 scope: data.scope,
@@ -221,6 +245,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
                             id: matchSession.id,
                             nickname: matchSession.nickname,
                             gender: matchSession.gender,
+                            age: matchSession.age,
                             country: matchSession.country,
                             state: matchSession.state,
                             isOccupied: true
@@ -233,10 +258,44 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
                             id: session.id,
                             nickname: session.nickname,
                             gender: session.gender,
+                            age: session.age,
                             country: session.country,
                             state: session.state,
                             isOccupied: true
                         }
+                    });
+
+                    // --- CRAZY AUTO GREETING ---
+                    const randomGreeting = CRAZY_GREETINGS[Math.floor(Math.random() * CRAZY_GREETINGS.length)];
+
+                    // Send from Requester (client) to Match (matchId)
+                    this.server.to(matchId).emit('receiveMessage', {
+                        senderId: client.id,
+                        message: randomGreeting,
+                        timestamp: Date.now(),
+                    });
+
+                    // Also verify to Requester that "you sent this" (so it shows in their UI)
+                    // Or actually, usually the sender adds it optimistically. 
+                    // But since this is server-generated, we should tell the sender "You sent this".
+                    // But 'receiveMessage' usually means "incoming".
+                    // The Frontend likely handles "my messages" by adding them locally.
+                    // IMPORTANT: Frontend needs to know this message was sent!
+                    // I'll emit a special event or just rely on the frontend to add a message if it detects a match?
+                    // No, server is generating content.
+
+                    // Let's emit 'messageSent' confirmation to sender? 
+                    // Or simply emit 'receiveMessage' with senderId = client.id to the client itself?
+                    // Frontend likely filters out messages where senderId == myId from "incoming" processing 
+                    // unless logic handles it.
+                    // Let's check ChatWindow.tsx. It listens loop?
+
+                    // Actually, let's just send it to the receiver. The sender will just see the chat open.
+                    // If the user wants the sender to SEE "I said Monkey Time!", we need to send it back.
+                    client.emit('receiveMessage', {
+                        senderId: client.id, // It's from ME
+                        message: randomGreeting,
+                        timestamp: Date.now()
                     });
                 }
             } else {

@@ -5,6 +5,7 @@ interface MatchRequest {
     socketId: string;
     username: string;
     gender: 'male' | 'female' | 'other';
+    age?: number;
     country: string;
     state?: string;
     scope: 'local' | 'global';
@@ -41,6 +42,10 @@ export class MatchingService {
         // Get all waiting users
         const waiting = await this.redis.zrange(queueKey, 0, -1);
 
+        // Scoring Variables
+        let bestMatchId: string | null = null;
+        let bestMatchScore = -1;
+
         for (const item of waiting) {
             const candidate: MatchRequest = JSON.parse(item);
 
@@ -49,7 +54,7 @@ export class MatchingService {
                 continue;
             }
 
-            // Check gender preferences
+            // Check gender preferences (HARD FILTER)
             const requestWantsCandidate =
                 request.preferences.targetGender === 'all' ||
                 request.preferences.targetGender === candidate.gender;
@@ -59,10 +64,49 @@ export class MatchingService {
                 candidate.preferences.targetGender === request.gender;
 
             if (requestWantsCandidate && candidateWantsRequest) {
-                // Match found! Remove from queue
-                await this.redis.zrem(queueKey, item);
-                return candidate.socketId;
+                // Calculate Similarity Score
+                let score = 0;
+
+                // 1. Location Score
+                if (request.state && candidate.state && request.state === candidate.state) {
+                    score += 20; // Same State
+                } else if (request.country === candidate.country) {
+                    score += 10; // Same Country (Likely true for local queue, but good for global)
+                }
+
+                // 2. Age Score
+                if (request.age && candidate.age) {
+                    const ageDiff = Math.abs(request.age - candidate.age);
+                    if (ageDiff <= 2) score += 15;      // Very close age
+                    else if (ageDiff <= 5) score += 10; // Close age
+                    else if (ageDiff <= 10) score += 5; // Reasonably close
+                }
+
+                // 3. FIFO Bonus (Slight preference for those waiting longer? 
+                // Actually simpler to just take highest score, break ties with first found)
+
+                // Update Best Match
+                if (score > bestMatchScore) {
+                    bestMatchScore = score;
+                    bestMatchId = candidate.socketId;
+                    // TODO: Could remove candidate instantly here, but cleaner to do separately?
+                    // Actually, we need to iterate ALL to find BEST.
+                }
             }
+        }
+
+        if (bestMatchId) {
+            // Remove the matched user from the queue (so they don't get matched again)
+            // Note: We need to find the correct item string to remove
+            const waitingAgain = await this.redis.zrange(queueKey, 0, -1);
+            for (const i of waitingAgain) {
+                const c = JSON.parse(i);
+                if (c.socketId === bestMatchId) {
+                    await this.redis.zrem(queueKey, i);
+                    break;
+                }
+            }
+            return bestMatchId;
         }
 
         return null;

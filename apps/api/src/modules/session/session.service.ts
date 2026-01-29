@@ -6,6 +6,7 @@ export interface AnonymousSession {
     tempId: string;
     nickname: string;
     gender: 'male' | 'female' | 'other';
+    age?: number;
     country: string;
     state?: string;
     scope?: 'local' | 'global';
@@ -40,7 +41,7 @@ export class SessionService {
     async getAllSessions(): Promise<AnonymousSession[]> {
         const keys = await this.redis.keys('session:*');
         if (keys.length === 0) return [];
-        
+
         const sessions = await this.redis.mget(keys);
         return sessions
             .filter((s) => s !== null)

@@ -56,11 +56,15 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
             newSocket.emit('findMatch', {
                 username,
                 gender: gender || 'other',
+                age: useUserStore.getState().age, // Send Age
                 scope: preferences?.location || 'global',
                 country: useUserStore.getState().country || 'Unknown',
                 state: useUserStore.getState().state,
                 targetGender: preferences?.targetGender || 'all',
             });
+
+            // If we have a stored session ID, we might need to verify it?
+            // For now, new connection = new session logic in Gateway
 
             newSocket.emit('getOnlineUsers', {}, (users: OnlineUser[]) => {
                 setOnlineUsers(users || []);
@@ -108,6 +112,19 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
             useChatStore.getState().setTyping(data.userId, data.isTyping);
         });
 
+        // Add Match Found Listener
+        newSocket.on('matchFound', (data: { user: OnlineUser }) => {
+            setIsSearching(false);
+            useChatStore.getState().setSelectedUser(data.user);
+
+            // Also ensure we know about this user
+            useChatStore.getState().addOnlineUser(data.user);
+
+            // Optional: Notification Sound?
+            // const audio = new Audio('/sounds/match.mp3');
+            // audio.play().catch(() => {});
+        });
+
         setSocket(newSocket);
 
         return () => {
@@ -127,6 +144,7 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
         socket.emit('requestRandomMatch', {
             username,
             gender: gender || 'other',
+            age: useUserStore.getState().age, // Send Age
             scope: preferences?.location || 'global',
             country: useUserStore.getState().country || 'Unknown',
             state: useUserStore.getState().state,
