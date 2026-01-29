@@ -40,6 +40,17 @@
     @apply w-full bg-slate-950/50 border border-white/10 rounded-2xl px-5 py-4 text-base outline-none transition-all duration-300 focus:border-pink-500/50 focus:bg-slate-900/80 focus:ring-2 focus:ring-pink-500/20 placeholder:text-slate-600;
   }
 
+  /* Hide number input spin buttons */
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  input[type="number"] {
+    -moz-appearance: textfield;
+  }
+
   /* Buttons */
   .btn-primary-glow {
     @apply relative overflow-hidden rounded-2xl font-bold transition-all duration-300 active:scale-95 bg-gradient-to-r from-pink-600 to-violet-600 text-white shadow-lg shadow-pink-500/25 hover:shadow-pink-500/40 hover:scale-[1.02] border border-white/10;
