@@ -262,26 +262,53 @@ export default function OnlineUsersList({ users, currentUserId, onSelectUser, on
                         >
                             {/* Search & Match Controls */}
                             <div className="px-2 pb-4 space-y-3">
+                                {/* Random Match - Primary Action */}
+                                <button
+                                    onClick={onFindMatch}
+                                    disabled={isSearching}
+                                    className="w-full py-3 bg-gradient-to-r from-pink-600 to-violet-600 rounded-xl font-bold text-sm text-white shadow-lg shadow-pink-500/25 hover:shadow-pink-500/40 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:scale-100 border border-white/10 relative overflow-hidden group"
+                                >
+                                    <div className="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
+                                    {isSearching ? (
+                                        <>
+                                            <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                                            Scanning...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Zap size={16} className="fill-white animate-pulse" />
+                                            Start Random Match
+                                        </>
+                                    )}
+                                </button>
+
+                                <div className="h-px bg-white/5 w-full my-2" />
+
+                                {/* List Filters */}
                                 <div className="flex flex-col gap-2">
+                                    {/* Search */}
                                     <div className="relative w-full">
                                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={14} />
                                         <input
                                             type="text"
-                                            placeholder="Find users..."
-                                            className="w-full bg-slate-800/50 rounded-xl py-2.5 pl-9 pr-3 text-sm text-slate-200 focus:outline-none focus:ring-1 focus:ring-pink-500/50 border border-white/5 placeholder:text-slate-600"
+                                            placeholder="Search users..."
+                                            className="w-full bg-slate-800/50 rounded-xl py-2 pl-9 pr-3 text-xs font-medium text-slate-200 focus:outline-none focus:ring-1 focus:ring-pink-500/50 border border-white/5 placeholder:text-slate-600 h-9"
                                             value={searchTerm}
                                             onChange={(e) => setSearchTerm(e.target.value)}
                                         />
                                     </div>
 
-                                    <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
-                                        {/* Gender Filters */}
-                                        <div className="flex bg-slate-800/50 rounded-xl p-1 border border-white/5 shrink-0">
+                                    {/* Filter Chips */}
+                                    <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
+                                        <Filter size={14} className="text-slate-500 shrink-0" />
+
+                                        {/* Gender Filter */}
+                                        <div className="flex bg-slate-800/50 rounded-lg p-0.5 border border-white/5 shrink-0">
                                             {(['all', 'male', 'female'] as const).map(g => (
                                                 <button
                                                     key={g}
                                                     onClick={() => setGenderFilter(g)}
-                                                    className={`px-3 py-1.5 flex items-center justify-center rounded-lg transition-colors capitalize text-[10px] font-bold ${genderFilter === g ? 'bg-slate-600 text-white shadow-sm' : 'text-slate-500 hover:text-slate-300'
+                                                    className={`px-2.5 py-1 rounded-md transition-colors capitalize text-[10px] font-bold ${genderFilter === g ? 'bg-slate-600 text-white shadow-sm' : 'text-slate-500 hover:text-slate-300'
                                                         }`}
                                                 >
                                                     {g === 'all' ? 'All' : g.charAt(0).toUpperCase()}
@@ -290,38 +317,20 @@ export default function OnlineUsersList({ users, currentUserId, onSelectUser, on
                                         </div>
 
                                         {/* Location Filter */}
-                                        <div className="flex bg-slate-800/50 rounded-xl p-1 border border-white/5 shrink-0">
+                                        <div className="flex bg-slate-800/50 rounded-lg p-0.5 border border-white/5 shrink-0">
                                             {(['global', 'nearest'] as const).map(l => (
                                                 <button
                                                     key={l}
                                                     onClick={() => setLocationFilter(l)}
-                                                    className={`px-3 py-1.5 flex items-center justify-center rounded-lg transition-colors capitalize text-[10px] font-bold ${locationFilter === l ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-500 hover:text-slate-300'
+                                                    className={`px-2.5 py-1 rounded-md transition-colors capitalize text-[10px] font-bold ${locationFilter === l ? 'bg-indigo-500/80 text-white shadow-sm' : 'text-slate-500 hover:text-slate-300'
                                                         }`}
                                                 >
-                                                    {l === 'nearest' ? 'Nearest' : 'Global'}
+                                                    {l === 'nearest' ? 'Near' : 'Global'}
                                                 </button>
                                             ))}
                                         </div>
                                     </div>
                                 </div>
-
-                                <button
-                                    onClick={onFindMatch}
-                                    disabled={isSearching}
-                                    className="w-full py-3 bg-gradient-to-r from-pink-600 to-violet-600 rounded-xl font-bold text-sm text-white shadow-lg shadow-pink-500/25 hover:shadow-pink-500/40 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:scale-100 border border-white/10"
-                                >
-                                    {isSearching ? (
-                                        <>
-                                            <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
-                                            Scanning...
-                                        </>
-                                    ) : (
-                                        <>
-                                            <Zap size={16} className="fill-white" />
-                                            Random Quick Match
-                                        </>
-                                    )}
-                                </button>
                             </div>
 
                             {/* List Header */}
