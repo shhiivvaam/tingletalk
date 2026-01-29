@@ -11,6 +11,9 @@ const outfit = Outfit({
 export const metadata: Metadata = {
   title: "Tingle Talk | Anonymous Dating & Fun Chats",
   description: "Meet new people, find a date, or just have fun. 100% anonymous, safe, and instant.",
+  icons: {
+    icon: '/favicon.png',
+  },
 };
 
 export default function RootLayout({

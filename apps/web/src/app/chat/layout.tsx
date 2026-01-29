@@ -184,19 +184,29 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
 
             {/* Sidebar */}
             <div className={`
-                fixed inset-y-0 left-0 z-40 w-80 bg-slate-900/60 backdrop-blur-2xl border-r border-white/5 transform transition-transform duration-300 md:relative md:translate-x-0
+                fixed inset-y-0 left-0 z-40 w-80 bg-slate-900/60 backdrop-blur-2xl border-r border-white/5 transform transition-transform duration-300 md:relative md:translate-x-0 flex flex-col
                 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
             `}>
-                <OnlineUsersList
-                    users={onlineUsers}
-                    currentUserId={socket?.id || null}
-                    onSelectUser={(user) => {
-                        setSelectedUser(user);
-                        setIsSidebarOpen(false);
-                    }}
-                    onFindMatch={handleRandomMatch}
-                    isSearching={isSearching}
-                />
+                {/* Branding Header */}
+                <div className="h-16 shrink-0 flex items-center gap-3 px-6 border-b border-white/5 bg-slate-900/50">
+                    <img src="/logo.png" alt="TingleTalk" className="w-8 h-8 object-contain" />
+                    <span className="font-black text-xl tracking-tight text-white/90">
+                        Tingle<span className="text-pink-500">Talk</span>
+                    </span>
+                </div>
+
+                <div className="flex-1 overflow-hidden relative">
+                    <OnlineUsersList
+                        users={onlineUsers}
+                        currentUserId={socket?.id || null}
+                        onSelectUser={(user) => {
+                            setSelectedUser(user);
+                            setIsSidebarOpen(false);
+                        }}
+                        onFindMatch={handleRandomMatch}
+                        isSearching={isSearching}
+                    />
+                </div>
             </div>
 
             {/* Main Content */}

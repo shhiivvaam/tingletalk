@@ -99,9 +99,18 @@ export default function Home() {
             transition={{ duration: 0.8 }}
             className="space-y-6"
           >
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-pink-500/30 bg-pink-500/10 text-pink-300 text-sm font-semibold backdrop-blur-md">
-              <Flame size={16} className="text-pink-500 animate-pulse" />
-              <span>#1 Anonymous Dating App</span>
+            {/* Header: Logo & Badge */}
+            <div className="flex items-center gap-8 justify-center lg:justify-start mb-6">
+              <img
+                src="/logo.png"
+                alt="TingleTalk Logo"
+                className="w-24 h-24 md:w-32 md:h-32 object-contain drop-shadow-[0_0_15px_rgba(236,72,153,0.5)]"
+              />
+
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-pink-500/30 bg-pink-500/10 text-pink-300 text-sm font-semibold backdrop-blur-md">
+                <Flame size={16} className="text-pink-500 animate-pulse" />
+                <span>#1 Anonymous Dating App</span>
+              </div>
             </div>
 
             <h1 className="text-6xl md:text-8xl font-black tracking-tighter leading-[0.9]">
@@ -183,8 +192,8 @@ export default function Home() {
                           type="button"
                           onClick={() => handleInputChange('gender', option.toLowerCase())}
                           className={`flex-1 py-3 rounded-xl text-sm font-semibold transition-all duration-300 border ${formData.gender === option.toLowerCase()
-                              ? 'bg-gradient-to-r from-pink-500/20 to-violet-600/20 border-pink-500/50 text-white shadow-[0_0_15px_rgba(236,72,153,0.2)]'
-                              : 'bg-white/5 border-white/5 text-slate-400 hover:bg-white/10 hover:text-slate-200'
+                            ? 'bg-gradient-to-r from-pink-500/20 to-violet-600/20 border-pink-500/50 text-white shadow-[0_0_15px_rgba(236,72,153,0.2)]'
+                            : 'bg-white/5 border-white/5 text-slate-400 hover:bg-white/10 hover:text-slate-200'
                             }`}
                         >
                           {option}
