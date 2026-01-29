@@ -100,12 +100,22 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
             removeOnlineUser(userId);
         });
 
-        newSocket.on('receiveMessage', (data: { senderId: string, message: string, timestamp: number }) => {
+        newSocket.on('receiveMessage', (data: {
+            senderId: string,
+            message: string,
+            type?: 'text' | 'image' | 'video' | 'audio' | 'gif',
+            attachmentUrl?: string,
+            metadata?: any,
+            timestamp: number
+        }) => {
             const store = useChatStore.getState();
             store.addMessage(data.senderId, {
                 id: Date.now().toString() + Math.random(),
                 senderId: data.senderId,
                 text: data.message,
+                type: data.type || 'text',
+                attachmentUrl: data.attachmentUrl,
+                metadata: data.metadata,
                 timestamp: data.timestamp
             });
         });

@@ -1,10 +1,13 @@
-'use client';
-
 import { useState, useRef, useEffect } from 'react';
-import { Send, User as UserIcon, MoreVertical, Phone, Video, Ghost, Flame, Calendar, MapPin, X, Check, CheckCheck } from 'lucide-react';
+import { Send, User as UserIcon, MoreVertical, Phone, Video, Ghost, Flame, Calendar, MapPin, X, Check, CheckCheck, Plus, Play, Pause, File as FileIcon } from 'lucide-react';
 import { useChatStore, Message } from '@/store/useChatStore';
 import { motion, AnimatePresence } from 'framer-motion';
 import EmojiPicker, { Theme, EmojiClickData } from 'emoji-picker-react';
+import AttachmentMenu from './media/AttachmentMenu';
+import CameraModal from './media/CameraModal';
+import VoiceRecorder from './media/VoiceRecorder';
+import GifPicker from './media/GifPicker';
+import { UploadService } from '@/services/uploadService';
 
 interface ChatWindowProps {
     socket: any;
@@ -16,8 +19,13 @@ export default function ChatWindow({ socket, currentUserId }: ChatWindowProps) {
     const [inputValue, setInputValue] = useState('');
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
     const [showProfile, setShowProfile] = useState(false);
+    const [showAttachmentMenu, setShowAttachmentMenu] = useState(false);
+    const [showCamera, setShowCamera] = useState(false);
+    const [showGifPicker, setShowGifPicker] = useState(false);
+    const [isRecordingAudio, setIsRecordingAudio] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     const isTyping = selectedUser ? typingUsers[selectedUser.id] : false;
     const isOnline = selectedUser ? onlineUsers.some(u => u.id === selectedUser.id) : false;
@@ -37,15 +45,18 @@ export default function ChatWindow({ socket, currentUserId }: ChatWindowProps) {
         }
     }, [userMessages, isTyping, selectedUser, socket]);
 
-    const handleSendMessage = (text = inputValue) => {
-        if (!text.trim() || !selectedUser || !socket) return;
+    const handleSendMessage = (text = inputValue, type: Message['type'] = 'text', attachmentUrl?: string, metadata?: any) => {
+        if ((!text.trim() && !attachmentUrl) || !selectedUser || !socket) return;
 
         const messageContent = text.trim();
 
         // Emit to server
         socket.emit('sendMessage', {
             roomId: selectedUser.id,
-            message: messageContent
+            message: messageContent,
+            type,
+            attachmentUrl,
+            metadata
         });
 
         // Optimistically add to UI
@@ -53,10 +64,61 @@ export default function ChatWindow({ socket, currentUserId }: ChatWindowProps) {
             id: Date.now().toString(),
             senderId: currentUserId,
             text: messageContent,
+            type,
+            attachmentUrl,
+            metadata,
             timestamp: Date.now(),
         };
         addMessage(selectedUser.id, newMessage);
         setInputValue('');
+        setShowEmojiPicker(false);
+    };
+
+    const handleMediaSelect = (type: 'image' | 'video' | 'camera' | 'audio' | 'gif') => {
+        if (type === 'camera') {
+            setShowCamera(true);
+        } else if (type === 'gif') {
+            setShowGifPicker(prev => !prev);
+        } else if (type === 'audio') {
+            setIsRecordingAudio(true);
+        } else {
+            // Trigger file input
+            if (fileInputRef.current) {
+                fileInputRef.current.accept = type === 'image' ? 'image/*' : 'video/*';
+                fileInputRef.current.click();
+            }
+        }
+    };
+
+    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        try {
+            // Determine type
+            const type = file.type.startsWith('image/') ? 'image' : 'video';
+            const url = await UploadService.uploadFile(file);
+            handleSendMessage('', type, url);
+        } catch (error) {
+            console.error(error);
+            alert('Failed to upload file');
+        } finally {
+            if (fileInputRef.current) fileInputRef.current.value = '';
+        }
+    };
+
+    const handleCameraCapture = (url: string) => {
+        handleSendMessage('', 'image', url);
+    };
+
+    const handleVoiceSend = (url: string, metadata: { duration: number }) => {
+        handleSendMessage('', 'audio', url, metadata);
+        setIsRecordingAudio(false);
+    };
+
+    const handleGifSelect = (url: string) => {
+        handleSendMessage('', 'gif', url);
+        setShowGifPicker(false);
     };
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -291,7 +353,23 @@ export default function ChatWindow({ socket, currentUserId }: ChatWindowProps) {
                                         ${isConsecutive ? (!isMe ? 'rounded-tl-2xl' : 'rounded-tr-2xl') : ''}
                                     `}
                                 >
-                                    <p>{msg.text}</p>
+                                    {msg.type === 'image' || msg.type === 'gif' ? (
+                                        <div onClick={() => window.open(msg.attachmentUrl, '_blank')} className="cursor-pointer">
+                                            <img src={msg.attachmentUrl || ''} alt="attachment" className="rounded-lg max-w-full max-h-64 object-cover" />
+                                            {msg.text && <p className="mt-2">{msg.text}</p>}
+                                        </div>
+                                    ) : msg.type === 'video' ? (
+                                        <div>
+                                            <video controls src={msg.attachmentUrl} className="rounded-lg max-w-full max-h-64" />
+                                            {msg.text && <p className="mt-2">{msg.text}</p>}
+                                        </div>
+                                    ) : msg.type === 'audio' ? (
+                                        <div className="flex items-center gap-2">
+                                            <audio controls src={msg.attachmentUrl} className="max-w-[240px] h-10" />
+                                        </div>
+                                    ) : (
+                                        <p>{msg.text}</p>
+                                    )}
                                     <div className={`flex items-center gap-1 justify-end mt-1 ${isMe ? 'text-pink-200/50' : 'text-slate-500'}`}>
                                         <span className="text-[10px] font-medium opacity-0 group-hover:opacity-100 transition-opacity">
                                             {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -334,6 +412,21 @@ export default function ChatWindow({ socket, currentUserId }: ChatWindowProps) {
 
             {/* Input Area */}
             <div className="p-4 md:p-6 bg-slate-900/60 backdrop-blur-xl border-t border-white/5 z-20 relative">
+                {/* Hidden File Input */}
+                <input
+                    type="file"
+                    ref={fileInputRef}
+                    className="hidden"
+                    onChange={handleFileChange}
+                />
+
+                {showCamera && (
+                    <CameraModal
+                        onClose={() => setShowCamera(false)}
+                        onSend={handleCameraCapture}
+                    />
+                )}
+
                 <AnimatePresence>
                     {showEmojiPicker && (
                         <motion.div
@@ -353,41 +446,75 @@ export default function ChatWindow({ socket, currentUserId }: ChatWindowProps) {
                             />
                         </motion.div>
                     )}
+
+                    {showGifPicker && (
+                        <div className="absolute bottom-full left-4 z-50">
+                            <GifPicker
+                                onClose={() => setShowGifPicker(false)}
+                                onSelect={handleGifSelect}
+                            />
+                        </div>
+                    )}
                 </AnimatePresence>
+
+                <AttachmentMenu
+                    isOpen={showAttachmentMenu}
+                    onClose={() => setShowAttachmentMenu(false)}
+                    onSelect={handleMediaSelect}
+                />
 
                 {isOnline ? (
                     <div className="flex items-end gap-2 max-w-4xl mx-auto">
-                        <button
-                            onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                            className={`p-3 rounded-full hover:bg-white/5 transition-colors ${showEmojiPicker ? 'text-pink-400 bg-white/5' : 'text-slate-400 hover:text-pink-400'}`}
-                        >
-                            <span className="text-xl">😊</span>
-                        </button>
-                        <form
-                            onSubmit={(e) => {
-                                e.preventDefault();
-                                handleSendMessage();
-                                setShowEmojiPicker(false);
-                            }}
-                            className="flex-1 flex items-center gap-3 bg-slate-950/50 p-2 rounded-[1.5rem] border border-white/10 focus-within:ring-2 focus-within:ring-pink-500/20 focus-within:border-pink-500/30 transition-all shadow-inner"
-                        >
-                            <input
-                                type="text"
-                                value={inputValue}
-                                onChange={handleInputChange}
-                                onKeyDown={handleKeyDown}
-                                onClick={() => setShowEmojiPicker(false)}
-                                placeholder="Type a message..."
-                                className="flex-1 bg-transparent px-4 py-2 text-slate-200 outline-none placeholder:text-slate-600 font-medium"
-                            />
-                            <button
-                                type="submit"
-                                disabled={!inputValue.trim()}
-                                className="p-3 rounded-full bg-gradient-to-r from-pink-500 to-indigo-600 text-white hover:scale-105 active:scale-95 disabled:opacity-50 disabled:scale-100 disabled:cursor-not-allowed transition-all shadow-lg shadow-pink-500/20"
-                            >
-                                <Send size={18} fill="currentColor" />
-                            </button>
-                        </form>
+
+                        {isRecordingAudio ? (
+                            <div className="flex-1 flex justify-center">
+                                <VoiceRecorder
+                                    onCancel={() => setIsRecordingAudio(false)}
+                                    onSend={handleVoiceSend}
+                                />
+                            </div>
+                        ) : (
+                            <>
+                                <button
+                                    onClick={() => setShowAttachmentMenu(!showAttachmentMenu)}
+                                    className={`p-3 rounded-full hover:bg-white/5 transition-colors ${showAttachmentMenu ? 'text-pink-400 bg-white/5' : 'text-slate-400 hover:text-pink-400'}`}
+                                >
+                                    <Plus size={24} />
+                                </button>
+
+                                <button
+                                    onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                                    className={`p-3 rounded-full hover:bg-white/5 transition-colors ${showEmojiPicker ? 'text-pink-400 bg-white/5' : 'text-slate-400 hover:text-pink-400'}`}
+                                >
+                                    <span className="text-xl">😊</span>
+                                </button>
+
+                                <form
+                                    onSubmit={(e) => {
+                                        e.preventDefault();
+                                        handleSendMessage();
+                                    }}
+                                    className="flex-1 flex items-center gap-3 bg-slate-950/50 p-2 rounded-[1.5rem] border border-white/10 focus-within:ring-2 focus-within:ring-pink-500/20 focus-within:border-pink-500/30 transition-all shadow-inner"
+                                >
+                                    <input
+                                        type="text"
+                                        value={inputValue}
+                                        onChange={handleInputChange}
+                                        onKeyDown={handleKeyDown}
+                                        onClick={() => setShowEmojiPicker(false)}
+                                        placeholder="Type a message..."
+                                        className="flex-1 bg-transparent px-4 py-2 text-slate-200 outline-none placeholder:text-slate-600 font-medium"
+                                    />
+                                    <button
+                                        type="submit"
+                                        disabled={!inputValue.trim()}
+                                        className="p-3 rounded-full bg-gradient-to-r from-pink-500 to-indigo-600 text-white hover:scale-105 active:scale-95 disabled:opacity-50 disabled:scale-100 disabled:cursor-not-allowed transition-all shadow-lg shadow-pink-500/20"
+                                    >
+                                        <Send size={18} fill="currentColor" />
+                                    </button>
+                                </form>
+                            </>
+                        )}
                     </div>
                 ) : (
                     <div className="flex items-center justify-center p-4 bg-red-500/5 border border-red-500/10 rounded-2xl text-red-400 text-sm font-medium animate-pulse">

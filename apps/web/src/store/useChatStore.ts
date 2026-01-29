@@ -1,10 +1,15 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 
+export type MessageType = 'text' | 'image' | 'video' | 'audio' | 'gif';
+
 export interface Message {
     id: string;
     senderId: string;
     text: string;
+    type?: MessageType;
+    attachmentUrl?: string; // S3, Giphy, etc.
+    metadata?: any;
     timestamp: number;
     isSystem?: boolean;
     isRead?: boolean;

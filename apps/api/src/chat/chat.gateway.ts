@@ -59,9 +59,23 @@ class SendMessageDto {
     roomId: string;
 
     @IsString()
-    @IsNotEmpty()
-    @MaxLength(500) // Rate limit / Abuse prevention
+    @IsOptional()
+    @MaxLength(500)
     message: string;
+
+    // --- Media Fields ---
+    @IsString()
+    @IsIn(['text', 'image', 'video', 'audio', 'gif'])
+    @IsOptional()
+    type: 'text' | 'image' | 'video' | 'audio' | 'gif' = 'text';
+
+    @IsString()
+    @IsOptional()
+    attachmentUrl?: string; // S3 Public URL
+
+    @IsObject()
+    @IsOptional()
+    metadata?: any; // duration, size, etc.
 }
 
 class TypingDto {
@@ -202,11 +216,15 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     ) {
         // Broadcast message to room - SANITIZATION happens here (trim)
         const cleanMessage = data.message.trim();
-        if (!cleanMessage) return;
+        // Allow empty message if there is an attachment (e.g. just sending image)
+        if (!cleanMessage && !data.attachmentUrl) return;
 
         client.to(data.roomId).emit('receiveMessage', {
             senderId: client.id,
             message: cleanMessage,
+            type: data.type || 'text',
+            attachmentUrl: data.attachmentUrl,
+            metadata: data.metadata,
             timestamp: Date.now(),
         });
     }

@@ -10,6 +10,7 @@ import { UsernameModule } from './modules/username/username.module';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { HybridThrottlerGuard } from './common/guards/hybrid-throttler.guard';
+import { UploadModule } from './modules/upload/upload.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { HybridThrottlerGuard } from './common/guards/hybrid-throttler.guard';
     SessionModule,
     ChatModule,
     UsernameModule,
+    UploadModule,
   ],
   controllers: [AppController],
   providers: [
