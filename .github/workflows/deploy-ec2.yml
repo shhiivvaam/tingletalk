@@ -80,7 +80,7 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             # Run deployment script
-            ~/deploy.sh
+            ~/tingletalk/deploy.sh
 
   deploy-frontend:
     name: Deploy Frontend to Vercel
