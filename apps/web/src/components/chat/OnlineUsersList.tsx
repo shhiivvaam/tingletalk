@@ -162,10 +162,17 @@ export default function OnlineUsersList({ users, currentUserId, onSelectUser, on
                                     transition={{ type: "spring", stiffness: 500, damping: 30 }}
                                 />
                             )}
-                            <span className="relative z-10 flex items-center gap-1.5">
+                            <span className="relative z-10 flex items-center gap-2">
                                 <tab.icon size={14} />
                                 {tab.label}
-                                {tab.count > 0 && <span className="text-[10px] opacity-70">({tab.count})</span>}
+                                {tab.count > 0 && (
+                                    <span className={`px-1.5 py-0.5 rounded-full text-[10px] font-extrabold leading-none ${activeTab === tab.id
+                                            ? 'bg-white text-pink-600 shadow-sm'
+                                            : 'bg-white/10 text-slate-300'
+                                        }`}>
+                                        {tab.count}
+                                    </span>
+                                )}
                             </span>
                         </button>
                     ))}
