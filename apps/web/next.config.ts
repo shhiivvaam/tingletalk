@@ -5,6 +5,7 @@ const nextConfig: NextConfig = {
   /* config options here */
   reactCompiler: true,
   reactStrictMode: false,
+  output: 'standalone', // docker deployment
 };
 
 export default withSentryConfig(nextConfig, {
