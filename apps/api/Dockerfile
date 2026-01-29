@@ -20,14 +20,14 @@ WORKDIR /app
 COPY .gitignore .gitignore
 COPY --from=builder /app/out/json/ .
 COPY --from=builder /app/out/package-lock.json ./package-lock.json
-RUN npm install
 
-# Build the project and its dependencies
+# Copy full source (including Prisma schema) before npm install
+# This is needed because postinstall runs prisma generate
 COPY --from=builder /app/out/full/ .
 COPY turbo.json turbo.json
 
-# Generate Prisma Client
-RUN npx prisma generate --schema=apps/api/prisma/schema.prisma
+# Now install dependencies (this will run prisma generate via postinstall)
+RUN npm install
 
 # Build the API
 RUN npx turbo build --filter=api...
