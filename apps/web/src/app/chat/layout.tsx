@@ -6,7 +6,8 @@ import { io, Socket } from 'socket.io-client';
 import { useUserStore } from '@/store/useUserStore';
 import { useChatStore } from '@/store/useChatStore';
 import OnlineUsersList from '@/components/chat/OnlineUsersList';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, Calendar, MapPin } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface OnlineUser {
     id: string;
@@ -22,6 +23,7 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
     const { onlineUsers, setOnlineUsers, addOnlineUser, removeOnlineUser, addMessage, selectedUser, setSelectedUser, addSessionId } = useChatStore();
     const [socket, setSocket] = useState<Socket | null>(null);
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+    const [isProfileOpen, setIsProfileOpen] = useState(false);
     const [isSearching, setIsSearching] = useState(false);
     const [isConnected, setIsConnected] = useState(false);
     const [isHydrated, setIsHydrated] = useState(false);
@@ -188,7 +190,7 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
                 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
             `}>
                 {/* Branding & Profile Header */}
-                <div className="h-16 shrink-0 flex items-center justify-between px-4 border-b border-white/5 bg-slate-900/50 gap-2">
+                <div className="h-16 shrink-0 flex items-center justify-between px-4 border-b border-white/5 bg-slate-900/50 gap-2 relative z-50">
                     {/* Left: Brand */}
                     <div className="flex items-center gap-2">
                         <img src="/logo.png" alt="TingleTalk" className="w-8 h-8 object-contain" />
@@ -197,17 +199,89 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
                         </span>
                     </div>
 
-                    {/* Right: Profile */}
-                    <div className="flex items-center gap-3 bg-white/5 pl-1 pr-3 py-1 rounded-full border border-white/5">
+                    {/* Right: Profile Toggle */}
+                    <button
+                        onClick={() => setIsProfileOpen(!isProfileOpen)}
+                        className="flex items-center gap-3 bg-white/5 pl-1 pr-3 py-1 rounded-full border border-white/5 hover:bg-white/10 transition-colors"
+                    >
                         <div className="relative w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-teal-400 flex items-center justify-center font-bold text-xs text-white shadow-sm">
                             {(username || '?').charAt(0).toUpperCase()}
                             <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-slate-900 rounded-full"></span>
                         </div>
-                        <div className="flex flex-col max-w-[80px]">
+                        <div className="flex flex-col max-w-[80px] text-left">
                             <span className="text-xs font-bold text-slate-200 truncate">{username || 'You'}</span>
                             <span className="text-[10px] text-slate-500 truncate capitalize">{gender}</span>
                         </div>
-                    </div>
+                    </button>
+
+                    {/* Profile Detail Popover */}
+                    <AnimatePresence>
+                        {isProfileOpen && (
+                            <>
+                                {/* Backdrop */}
+                                <motion.div
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    exit={{ opacity: 0 }}
+                                    className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[60]"
+                                    onClick={() => setIsProfileOpen(false)}
+                                />
+                                {/* Modal */}
+                                <motion.div
+                                    initial={{ opacity: 0, scale: 0.95, y: -20 }}
+                                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                                    exit={{ opacity: 0, scale: 0.95, y: -10 }}
+                                    className="absolute top-14 right-4 z-[70] w-72 bg-slate-900 rounded-2xl border border-white/10 shadow-xl overflow-hidden"
+                                >
+                                    <div className="h-24 bg-gradient-to-br from-pink-500/20 to-violet-600/20 relative">
+                                        <button
+                                            onClick={() => setIsProfileOpen(false)}
+                                            className="absolute top-2 right-2 p-1 rounded-full bg-black/20 hover:bg-black/40 text-white/70 hover:text-white transition-colors"
+                                        >
+                                            <X size={16} />
+                                        </button>
+                                    </div>
+                                    <div className="px-6 pb-6 -mt-10">
+                                        <div className="relative w-20 h-20 rounded-[2rem] bg-gradient-to-br from-blue-500 to-teal-400 flex items-center justify-center font-bold text-3xl text-white shadow-xl ring-4 ring-slate-900 mx-auto mb-4">
+                                            {(username || '?').charAt(0).toUpperCase()}
+                                        </div>
+
+                                        <div className="text-center mb-6">
+                                            <h3 className="text-xl font-bold text-white">{username}</h3>
+                                            <span className="inline-block px-3 py-1 rounded-full bg-white/5 border border-white/5 text-xs font-medium text-slate-400 capitalize mt-1">
+                                                {gender}
+                                            </span>
+                                        </div>
+
+                                        <div className="space-y-3">
+                                            <div className="flex items-center gap-3 p-3 rounded-xl bg-white/5 border border-white/5">
+                                                <Calendar size={18} className="text-pink-500" />
+                                                <div>
+                                                    <p className="text-[10px] uppercase font-bold text-slate-500">Age</p>
+                                                    <p className="text-sm font-semibold text-slate-200">{useUserStore.getState().age} years old</p>
+                                                </div>
+                                            </div>
+                                            <div className="flex items-center gap-3 p-3 rounded-xl bg-white/5 border border-white/5">
+                                                <MapPin size={18} className="text-violet-500" />
+                                                <div>
+                                                    <p className="text-[10px] uppercase font-bold text-slate-500">Location</p>
+                                                    <p className="text-sm font-semibold text-slate-200 truncate w-full">
+                                                        {useUserStore.getState().state || 'Unknown'}, {useUserStore.getState().country || 'Unknown'}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="mt-6 pt-4 border-t border-white/5 text-center">
+                                            <p className="text-[10px] text-slate-600">
+                                                Connected as Anonymous User
+                                            </p>
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            </>
+                        )}
+                    </AnimatePresence>
                 </div>
 
                 <div className="flex-1 overflow-hidden relative">
