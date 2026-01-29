@@ -11,12 +11,13 @@ interface ChatWindowProps {
 }
 
 export default function ChatWindow({ socket, currentUserId }: ChatWindowProps) {
-    const { selectedUser, messages, addMessage, typingUsers, onlineUsers } = useChatStore();
+    const { selectedUser, messages, addMessage, typingUsers, onlineUsers, mySessionIds } = useChatStore();
     const [inputValue, setInputValue] = useState('');
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     const isTyping = selectedUser ? typingUsers[selectedUser.id] : false;
+    // Helper to check if user is online based on ID (robust to missing users if just reconnected)
     const isOnline = selectedUser ? onlineUsers.some(u => u.id === selectedUser.id) : false;
 
     const userMessages = selectedUser ? (messages[selectedUser.id] || []) : [];
@@ -135,7 +136,7 @@ export default function ChatWindow({ socket, currentUserId }: ChatWindowProps) {
                     </div>
                 ) : (
                     userMessages.map((msg) => {
-                        const isMe = msg.senderId === currentUserId;
+                        const isMe = msg.senderId === currentUserId || mySessionIds.includes(msg.senderId);
                         return (
                             <motion.div
                                 key={msg.id}

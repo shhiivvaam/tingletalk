@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist, createJSONStorage } from 'zustand/middleware';
 
 interface UserState {
     userId: string | null;
@@ -42,6 +42,7 @@ export const useUserStore = create<UserState>()(
         }),
         {
             name: 'tingle-user-storage',
+            storage: createJSONStorage(() => sessionStorage), // Use sessionStorage for tab isolation
         }
     )
 );

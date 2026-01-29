@@ -19,12 +19,22 @@ interface OnlineUser {
 export default function ChatLayout({ children }: { children: React.ReactNode }) {
     const router = useRouter();
     const { username, gender, preferences } = useUserStore();
-    const { onlineUsers, setOnlineUsers, addOnlineUser, removeOnlineUser, addMessage, selectedUser, setSelectedUser } = useChatStore();
+    const { onlineUsers, setOnlineUsers, addOnlineUser, removeOnlineUser, addMessage, selectedUser, setSelectedUser, addSessionId } = useChatStore();
     const [socket, setSocket] = useState<Socket | null>(null);
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const [isSearching, setIsSearching] = useState(false);
+    const [isConnected, setIsConnected] = useState(false);
+    const [isHydrated, setIsHydrated] = useState(false);
+
+    // Wait for Zustand to hydrate from localStorage
+    useEffect(() => {
+        setIsHydrated(true);
+    }, []);
 
     useEffect(() => {
+        // Don't redirect until hydration is complete
+        if (!isHydrated) return;
+
         if (!username) {
             router.push('/');
             return;
@@ -37,9 +47,12 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
             transports: ['websocket'],
             autoConnect: true,
             withCredentials: true,
+            reconnection: true,
+            reconnectionAttempts: 5,
+            reconnectionDelay: 1000,
         });
 
-        newSocket.on('connect', () => {
+        const registerUser = () => {
             newSocket.emit('findMatch', {
                 username,
                 gender: gender || 'other',
@@ -51,6 +64,25 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
             newSocket.emit('getOnlineUsers', {}, (users: OnlineUser[]) => {
                 setOnlineUsers(users || []);
             });
+        };
+
+        newSocket.on('connect', () => {
+            console.log('✅ Connected to WebSocket');
+            setIsConnected(true);
+            if (newSocket.id) addSessionId(newSocket.id);
+            registerUser();
+        });
+
+        newSocket.on('reconnect', (attemptNumber) => {
+            console.log(`🔄 Reconnected after ${attemptNumber} attempts`);
+            setIsConnected(true);
+            if (newSocket.id) addSessionId(newSocket.id);
+            registerUser();
+        });
+
+        newSocket.on('disconnect', (reason) => {
+            console.log('❌ Disconnected:', reason);
+            setIsConnected(false);
         });
 
         newSocket.on('userJoined', (user: OnlineUser) => {
@@ -78,9 +110,15 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
         setSocket(newSocket);
 
         return () => {
-            newSocket.disconnect();
+            // Only disconnect if not in development hot reload
+            if (process.env.NODE_ENV === 'production') {
+                newSocket.disconnect();
+            } else {
+                // In development, just clean up listeners but keep connection
+                newSocket.removeAllListeners();
+            }
         };
-    }, [username, gender, preferences, router, setOnlineUsers, addOnlineUser, removeOnlineUser, addMessage, setSelectedUser]);
+    }, [username, gender, preferences, router, setOnlineUsers, addOnlineUser, removeOnlineUser, addMessage, setSelectedUser, isHydrated]);
 
     const handleRandomMatch = () => {
         if (!socket) return;
@@ -94,8 +132,28 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
         });
     };
 
+    // Show loading while hydrating to prevent flash
+    if (!isHydrated) {
+        return (
+            <div className="flex h-screen bg-slate-950 text-slate-200 items-center justify-center">
+                <div className="flex flex-col items-center gap-4">
+                    <div className="w-12 h-12 border-4 border-pink-500/30 border-t-pink-500 rounded-full animate-spin"></div>
+                    <p className="text-slate-400 text-sm">Loading...</p>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="flex h-screen bg-slate-950 text-slate-200 overflow-hidden relative">
+            {/* Connection Status Banner */}
+            {!isConnected && isHydrated && (
+                <div className="absolute top-0 left-0 right-0 z-50 bg-amber-500/90 backdrop-blur-sm text-white py-2 px-4 text-center text-sm font-medium flex items-center justify-center gap-2">
+                    <span className="w-2 h-2 bg-white rounded-full animate-pulse"></span>
+                    Reconnecting to server...
+                </div>
+            )}
+
             {/* Mobile Sidebar Toggle */}
             <button
                 onClick={() => setIsSidebarOpen(!isSidebarOpen)}
