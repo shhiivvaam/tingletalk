@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Send, User as UserIcon, MoreVertical, Phone, Video, Ghost, Flame } from 'lucide-react';
+import { Send, User as UserIcon, MoreVertical, Phone, Video, Ghost, Flame, Calendar, MapPin, X } from 'lucide-react';
 import { useChatStore, Message } from '@/store/useChatStore';
 import { motion, AnimatePresence } from 'framer-motion';
 import EmojiPicker, { Theme, EmojiClickData } from 'emoji-picker-react';
@@ -15,6 +15,7 @@ export default function ChatWindow({ socket, currentUserId }: ChatWindowProps) {
     const { selectedUser, messages, addMessage, typingUsers, onlineUsers, mySessionIds } = useChatStore();
     const [inputValue, setInputValue] = useState('');
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+    const [showProfile, setShowProfile] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -107,34 +108,112 @@ export default function ChatWindow({ socket, currentUserId }: ChatWindowProps) {
 
             {/* Header */}
             <div className="h-20 px-6 border-b border-white/5 flex items-center justify-between bg-slate-900/40 backdrop-blur-xl z-20">
-                <div className="flex items-center gap-4">
-                    <div className="relative">
-                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-pink-500 to-violet-600 flex items-center justify-center font-bold text-white text-lg shadow-lg shadow-pink-500/20 ring-2 ring-white/5">
-                            {(selectedUser.nickname || '?')[0].toUpperCase()}
-                        </div>
-                        {isOnline ? (
-                            <div className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-500 rounded-full border-2 border-slate-900 shadow-[0_0_8px_rgba(34,197,94,0.6)]"></div>
-                        ) : (
-                            <div className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-slate-500 rounded-full border-2 border-slate-900"></div>
-                        )}
-                    </div>
-                    <div>
-                        <h2 className="font-bold text-slate-100 text-lg flex items-center gap-2">
-                            {selectedUser.nickname}
-                            <Flame size={14} className="text-pink-500 fill-pink-500 animate-pulse" />
-                        </h2>
-                        <div className="flex items-center gap-2 text-xs font-medium text-slate-500">
-                            <span className="bg-slate-800 px-2 py-0.5 rounded-md capitalize text-slate-400 border border-white/5">{selectedUser.gender}</span>
-                            {(selectedUser.country && selectedUser.country !== 'Unknown') && (
-                                <>
-                                    <span>•</span>
-                                    <span className="truncate max-w-[150px]" title={selectedUser.state && selectedUser.state !== 'Unknown' ? `${selectedUser.state}, ${selectedUser.country}` : selectedUser.country}>
-                                        {selectedUser.state && selectedUser.state !== 'Unknown' ? `${selectedUser.state}, ` : ''}{selectedUser.country}
-                                    </span>
-                                </>
+                {/* User Info Toggle */}
+                <div className="relative">
+                    <button
+                        onClick={() => setShowProfile(!showProfile)}
+                        className="flex items-center gap-4 hover:bg-white/5 p-2 -ml-2 rounded-xl transition-colors text-left"
+                    >
+                        <div className="relative">
+                            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-pink-500 to-violet-600 flex items-center justify-center font-bold text-white text-lg shadow-lg shadow-pink-500/20 ring-2 ring-white/5">
+                                {(selectedUser.nickname || '?')[0].toUpperCase()}
+                            </div>
+                            {isOnline ? (
+                                <div className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-500 rounded-full border-2 border-slate-900 shadow-[0_0_8px_rgba(34,197,94,0.6)]"></div>
+                            ) : (
+                                <div className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-slate-500 rounded-full border-2 border-slate-900"></div>
                             )}
                         </div>
-                    </div>
+                        <div>
+                            <h2 className="font-bold text-slate-100 text-lg flex items-center gap-2">
+                                {selectedUser.nickname}
+                                <Flame size={14} className="text-pink-500 fill-pink-500 animate-pulse" />
+                            </h2>
+                            <div className="flex items-center gap-2 text-xs font-medium text-slate-500">
+                                <span className="bg-slate-800 px-2 py-0.5 rounded-md capitalize text-slate-400 border border-white/5">{selectedUser.gender}</span>
+                                {(selectedUser.country && selectedUser.country !== 'Unknown') && (
+                                    <>
+                                        <span>•</span>
+                                        <span className="truncate max-w-[150px]">
+                                            {selectedUser.country}
+                                        </span>
+                                    </>
+                                )}
+                            </div>
+                        </div>
+                    </button>
+
+                    {/* Chat User Profile Dropdown */}
+                    <AnimatePresence>
+                        {showProfile && (
+                            <>
+                                <div
+                                    className="fixed inset-0 z-[60]"
+                                    onClick={() => setShowProfile(false)}
+                                />
+                                <motion.div
+                                    initial={{ opacity: 0, scale: 0.95, y: 10, x: -10 }}
+                                    animate={{ opacity: 1, scale: 1, y: 0, x: 0 }}
+                                    exit={{ opacity: 0, scale: 0.95, y: 10, x: -10 }}
+                                    transition={{ duration: 0.15 }}
+                                    className="absolute top-full left-0 mt-2 z-[70] w-72 bg-slate-900 rounded-xl border border-white/10 shadow-2xl overflow-hidden"
+                                >
+                                    <div className="p-5 space-y-5">
+                                        {/* Header */}
+                                        <div className="flex items-center gap-4 border-b border-white/5 pb-4">
+                                            <div className="w-14 h-14 rounded-full bg-gradient-to-br from-pink-500 to-violet-600 flex items-center justify-center font-bold text-2xl text-white shadow-lg">
+                                                {(selectedUser.nickname || '?')[0].toUpperCase()}
+                                            </div>
+                                            <div>
+                                                <h3 className="text-lg font-bold text-white">{selectedUser.nickname}</h3>
+                                                <span className="inline-block px-2 py-0.5 rounded text-[10px] font-bold bg-white/10 text-slate-300 capitalize border border-white/5">
+                                                    {selectedUser.gender}
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        {/* Stats */}
+                                        <div className="space-y-3">
+                                            <div className="flex items-center gap-3 p-3 rounded-lg bg-white/5 border border-white/5">
+                                                <Calendar size={18} className="text-pink-500" />
+                                                <div>
+                                                    <p className="text-[10px] uppercase font-bold text-slate-500">Age</p>
+                                                    <p className="text-sm font-semibold text-slate-200">
+                                                        {selectedUser.age ? `${selectedUser.age} years old` : 'N/A'}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <div className="flex items-center gap-3 p-3 rounded-lg bg-white/5 border border-white/5">
+                                                <MapPin size={18} className="text-violet-500" />
+                                                <div>
+                                                    <p className="text-[10px] uppercase font-bold text-slate-500">Location</p>
+                                                    <p className="text-sm font-semibold text-slate-200">
+                                                        {selectedUser.state && selectedUser.state !== 'Unknown' ? `${selectedUser.state}, ` : ''}
+                                                        {selectedUser.country || 'Unknown'}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* Status */}
+                                        <div className="pt-2">
+                                            {isOnline ? (
+                                                <div className="flex items-center gap-2 text-xs text-green-400 justify-center bg-green-500/10 py-2 rounded-lg border border-green-500/20">
+                                                    <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                                                    Online Now
+                                                </div>
+                                            ) : (
+                                                <div className="flex items-center gap-2 text-xs text-slate-500 justify-center bg-slate-800/50 py-2 rounded-lg border border-white/5">
+                                                    <span className="w-2 h-2 rounded-full bg-slate-500"></span>
+                                                    Offline
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            </>
+                        )}
+                    </AnimatePresence>
                 </div>
 
                 <div className="flex items-center gap-2">
