@@ -332,8 +332,17 @@ CORS_ORIGIN=https://your-app.vercel.app
 
 ```bash
 # On EC2, in ~/tingletalk/apps/api
+
+# IMPORTANT: Don't use 'npx prisma' - it will install Prisma 7
+# Use the local version from node_modules instead
+
+# Set environment variables
 export $(cat .env.production | xargs)
-npx prisma migrate deploy
+
+# Run migrations using local Prisma (not npx)
+../../node_modules/.bin/prisma migrate deploy
+
+# Go back to root
 cd ../..
 ```
 

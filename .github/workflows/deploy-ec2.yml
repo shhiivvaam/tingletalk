@@ -79,34 +79,8 @@ jobs:
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            # Login to Docker Hub
-            echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
-            
-            # Pull latest backend image
-            docker pull ${{ env.BACKEND_IMAGE }}:latest
-            
-            # Stop and remove old container
-            docker stop tingletalk-api || true
-            docker rm tingletalk-api || true
-            
-            # Run new container from Docker Hub image
-            docker run -d \
-              --name tingletalk-api \
-              -p 5000:5000 \
-              --env-file ~/tingletalk/apps/api/.env.production \
-              --restart unless-stopped \
-              ${{ env.BACKEND_IMAGE }}:latest
-            
-            # Clean up old images (keep last 3 versions)
-            docker images ${{ env.BACKEND_IMAGE }} --format "{{.ID}} {{.Tag}}" | grep -v latest | tail -n +4 | awk '{print $1}' | xargs -r docker rmi || true
-            
-            # Show container status
-            echo "Container status:"
-            docker ps | grep tingletalk-api
-            
-            # Show recent logs
-            echo "Recent logs:"
-            docker logs --tail 50 tingletalk-api
+            # Run deployment script
+            ~/deploy.sh
 
   deploy-frontend:
     name: Deploy Frontend to Vercel
