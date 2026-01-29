@@ -9,8 +9,8 @@ const outfit = Outfit({
 });
 
 export const metadata: Metadata = {
-  title: "Tingle Talk | Instant Anonymous Chat",
-  description: "Connect with anyone, anywhere, instantly. No registration, 100% private, 100% anonymous.",
+  title: "Tingle Talk | Anonymous Dating & Fun Chats",
+  description: "Meet new people, find a date, or just have fun. 100% anonymous, safe, and instant.",
 };
 
 export default function RootLayout({
@@ -19,7 +19,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={outfit.variable}>
+    <html lang="en" className={`${outfit.variable} antialiased`}>
       <head>
         {/* Google Adsense */}
         <meta name="google-adsense-account" content="ca-pub-9299390652489427"></meta>
@@ -34,9 +34,11 @@ export default function RootLayout({
           strategy="afterInteractive"
         />
       </head>
-      <body className="font-sans">
-        <div className="mesh-gradient" />
-        {children}
+      <body className="font-sans min-h-screen selection:bg-pink-500/30">
+        <div className="aurora-bg" />
+        <div className="relative z-10">
+          {children}
+        </div>
       </body>
     </html>
   );

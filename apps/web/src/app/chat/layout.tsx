@@ -145,7 +145,7 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
     }
 
     return (
-        <div className="flex h-screen bg-slate-950 text-slate-200 overflow-hidden relative">
+        <div className="flex h-screen text-slate-200 overflow-hidden relative">
             {/* Connection Status Banner */}
             {!isConnected && isHydrated && (
                 <div className="absolute top-0 left-0 right-0 z-50 bg-amber-500/90 backdrop-blur-sm text-white py-2 px-4 text-center text-sm font-medium flex items-center justify-center gap-2">
@@ -157,14 +157,14 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
             {/* Mobile Sidebar Toggle */}
             <button
                 onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                className="md:hidden absolute top-4 left-4 z-50 p-2 bg-slate-800 rounded-lg"
+                className="md:hidden absolute top-4 left-4 z-50 p-2 bg-slate-800/80 backdrop-blur-md rounded-lg border border-white/10 text-white"
             >
                 {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
             </button>
 
             {/* Sidebar */}
             <div className={`
-                fixed inset-y-0 left-0 z-40 w-80 bg-slate-900 border-r border-white/5 transform transition-transform duration-300 md:relative md:translate-x-0
+                fixed inset-y-0 left-0 z-40 w-80 bg-slate-900/60 backdrop-blur-2xl border-r border-white/5 transform transition-transform duration-300 md:relative md:translate-x-0
                 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
             `}>
                 <OnlineUsersList

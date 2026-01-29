@@ -135,7 +135,7 @@ export default function OnlineUsersList({ users, currentUserId, onSelectUser, on
     );
 
     return (
-        <div className="flex flex-col h-full bg-slate-900/50 backdrop-blur-md border-r border-white/5 w-80">
+        <div className="flex flex-col h-full bg-transparent">
             {/* My Profile Section */}
             <div className="p-4 border-b border-white/5 bg-slate-800/20">
                 <div className="flex items-center gap-3">
