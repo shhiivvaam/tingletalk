@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Outfit } from "next/font/google";
 import "./globals.css";
+import Script from "next/script";
 
 const outfit = Outfit({
   subsets: ["latin"],
@@ -28,7 +29,10 @@ export default function RootLayout({
           crossOrigin="anonymous">
         </script>
         {/* AdsTerra - EffectiveGate */}
-        <script src="https://pl28597008.effectivegatecpm.com/f6/ec/2f/f6ec2f262184e8f9a191cb7befad4db0.js"></script>
+        <Script
+          src="https://pl28597008.effectivegatecpm.com/f6/ec/2f/f6ec2f262184e8f9a191cb7befad4db0.js"
+          strategy="afterInteractive"
+        />
       </head>
       <body className="font-sans">
         <div className="mesh-gradient" />
