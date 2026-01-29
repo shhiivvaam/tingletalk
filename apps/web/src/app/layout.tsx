@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Outfit } from "next/font/google";
-import Script from "next/script";
 import "./globals.css";
 
 const outfit = Outfit({
@@ -22,11 +21,10 @@ export default function RootLayout({
     <html lang="en" className={outfit.variable}>
       <head>
         <meta name="google-adsense-account" content="ca-pub-9299390652489427" />
-        <Script
+        <script
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9299390652489427"
           crossOrigin="anonymous"
-          strategy="afterInteractive"
         />
       </head>
       <body className="font-sans">
