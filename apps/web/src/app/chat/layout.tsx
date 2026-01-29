@@ -114,6 +114,10 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
             useChatStore.getState().setTyping(data.userId, data.isTyping);
         });
 
+        newSocket.on('messagesRead', (data: { readerId: string }) => {
+            useChatStore.getState().markMessagesAsSeen(data.readerId);
+        });
+
         // Add Match Found Listener
         newSocket.on('matchFound', (data: { user: OnlineUser }) => {
             setIsSearching(false);

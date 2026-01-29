@@ -87,6 +87,12 @@ const CRAZY_GREETINGS = [
     "I'm not a robot... beep boop 🤖"
 ];
 
+class MessageReadDto {
+    @IsString()
+    @IsNotEmpty()
+    roomId: string;
+}
+
 @WebSocketGateway({
     cors: {
         origin: '*',
@@ -202,6 +208,17 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
             senderId: client.id,
             message: cleanMessage,
             timestamp: Date.now(),
+        });
+    }
+
+    @SubscribeMessage('messageRead')
+    async handleMessageRead(
+        @MessageBody() data: MessageReadDto,
+        @ConnectedSocket() client: Socket,
+    ) {
+        // Notify the OTHER user (data.roomId) that THIS user (client.id) has read their messages
+        client.to(data.roomId).emit('messagesRead', {
+            readerId: client.id
         });
     }
 

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Send, User as UserIcon, MoreVertical, Phone, Video, Ghost, Flame, Calendar, MapPin, X } from 'lucide-react';
+import { Send, User as UserIcon, MoreVertical, Phone, Video, Ghost, Flame, Calendar, MapPin, X, Check, CheckCheck } from 'lucide-react';
 import { useChatStore, Message } from '@/store/useChatStore';
 import { motion, AnimatePresence } from 'framer-motion';
 import EmojiPicker, { Theme, EmojiClickData } from 'emoji-picker-react';
@@ -30,7 +30,12 @@ export default function ChatWindow({ socket, currentUserId }: ChatWindowProps) {
 
     useEffect(() => {
         scrollToBottom();
-    }, [userMessages, isTyping]);
+
+        // Notify server that we read the messages in this room
+        if (selectedUser && socket) {
+            socket.emit('messageRead', { roomId: selectedUser.id });
+        }
+    }, [userMessages, isTyping, selectedUser, socket]);
 
     const handleSendMessage = (text = inputValue) => {
         if (!text.trim() || !selectedUser || !socket) return;
@@ -291,6 +296,15 @@ export default function ChatWindow({ socket, currentUserId }: ChatWindowProps) {
                                         <span className="text-[10px] font-medium opacity-0 group-hover:opacity-100 transition-opacity">
                                             {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                         </span>
+                                        {isMe && (
+                                            <span className="ml-1">
+                                                {msg.isRead ? (
+                                                    <CheckCheck size={14} className="text-blue-300" />
+                                                ) : (
+                                                    <Check size={14} className="opacity-70" />
+                                                )}
+                                            </span>
+                                        )}
                                     </div>
                                 </div>
                             </motion.div>

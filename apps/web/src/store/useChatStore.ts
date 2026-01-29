@@ -7,6 +7,7 @@ export interface Message {
     text: string;
     timestamp: number;
     isSystem?: boolean;
+    isRead?: boolean;
 }
 
 interface OnlineUser {
@@ -34,6 +35,7 @@ interface ChatState {
     setSelectedUser: (user: OnlineUser | null) => void;
     addMessage: (userId: string, message: Message) => void;
     markAsRead: (userId: string) => void;
+    markMessagesAsSeen: (userId: string) => void;
     setTyping: (userId: string, isTyping: boolean) => void;
     addSessionId: (id: string) => void;
 }
@@ -96,6 +98,13 @@ export const useChatStore = create<ChatState>()(
                 unreadCounts: {
                     ...state.unreadCounts,
                     [userId]: 0
+                }
+            })),
+
+            markMessagesAsSeen: (userId) => set((state) => ({
+                messages: {
+                    ...state.messages,
+                    [userId]: (state.messages[userId] || []).map(msg => ({ ...msg, isRead: true }))
                 }
             })),
 
