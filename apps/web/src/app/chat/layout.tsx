@@ -57,7 +57,8 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
                 username,
                 gender: gender || 'other',
                 scope: preferences?.location || 'global',
-                country: 'Unknown',
+                country: useUserStore.getState().country || 'Unknown',
+                state: useUserStore.getState().state,
                 targetGender: preferences?.targetGender || 'all',
             });
 
@@ -127,7 +128,8 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
             username,
             gender: gender || 'other',
             scope: preferences?.location || 'global',
-            country: 'Unknown',
+            country: useUserStore.getState().country || 'Unknown',
+            state: useUserStore.getState().state,
             targetGender: preferences?.targetGender || 'all',
         });
     };

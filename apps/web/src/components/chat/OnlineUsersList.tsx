@@ -9,6 +9,7 @@ interface OnlineUser {
     nickname: string;
     gender: 'male' | 'female' | 'other';
     country: string;
+    state?: string;
     isOccupied: boolean;
 }
 
@@ -30,6 +31,7 @@ export default function OnlineUsersList({ users, currentUserId, onSelectUser, on
     const [searchTerm, setSearchTerm] = useState('');
     const [activeTab, setActiveTab] = useState<SectionType>('online');
     const [genderFilter, setGenderFilter] = useState<'all' | 'male' | 'female'>('all');
+    const [locationFilter, setLocationFilter] = useState<'global' | 'nearest'>('global');
 
     // --- Data Derivation ---
 
@@ -40,9 +42,9 @@ export default function OnlineUsersList({ users, currentUserId, onSelectUser, on
             .filter(id => messages[id] && messages[id].length > 0)
             .map(id => knownUsers[id] || {
                 id,
-                nickname: 'Unknown',
+                nickname: 'Anonymous', // Better than 'Unknown'
                 gender: 'other',
-                country: 'VN',
+                country: 'Unknown', // Setting to Unknown ensures it gets hidden by UI logic
                 isOccupied: false
             })
             .filter(user => {
@@ -51,15 +53,46 @@ export default function OnlineUsersList({ users, currentUserId, onSelectUser, on
             });
     }, [messages, knownUsers]);
 
-    // 2. Online: Filtered by Gender and Search
+    // 2. Online: Filtered by Gender and Search + Sorted by Location
     const filteredOnlineUsers = useMemo(() => {
-        return users.filter(user => {
+        let result = users.filter(user => {
             const matchesSearch = (user.nickname || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
                 (user.country || '').toLowerCase().includes(searchTerm.toLowerCase());
             const matchesGender = genderFilter === 'all' || user.gender === genderFilter;
             return matchesSearch && matchesGender;
         });
-    }, [users, searchTerm, genderFilter]);
+
+        if (locationFilter === 'nearest') {
+            result = result.sort((a, b) => {
+                // Priority 1: State Match
+                const aState = a.state || '';
+                const bState = b.state || '';
+                const myState = state || '';
+
+                const aIsSameState = aState && myState && aState === myState;
+                const bIsSameState = bState && myState && bState === myState;
+
+                if (aIsSameState && !bIsSameState) return -1;
+                if (!aIsSameState && bIsSameState) return 1;
+
+                // Priority 2: Country Match
+                const aCountry = a.country || '';
+                const bCountry = b.country || '';
+                const myCountry = country || '';
+
+                const aIsSameCountry = aCountry === myCountry;
+                const bIsSameCountry = bCountry === myCountry;
+
+                if (aIsSameCountry && !bIsSameCountry) return -1;
+                if (!aIsSameCountry && bIsSameCountry) return 1;
+
+                // Priority 3 (Optional): Fallback to string comparison for stable sort
+                return 0;
+            });
+        }
+
+        return result;
+    }, [users, searchTerm, genderFilter, locationFilter, country, state]);
 
     // 3. History: Closed chats or just duplicates of Inbox for now?
     const historyUsers = useMemo(() => {
@@ -70,16 +103,28 @@ export default function OnlineUsersList({ users, currentUserId, onSelectUser, on
             .filter(id => !onlineIds.has(id) && messages[id]?.length > 0)
             .map(id => knownUsers[id] || {
                 id,
-                nickname: 'Offline User',
+                nickname: 'Anonymous', // User might be offline and not in knownUsers
                 gender: 'other',
-                country: 'VN',
+                country: 'Unknown', // Hide location if unknown
                 isOccupied: false
             });
     }, [messages, knownUsers, users]);
 
     // Helpers
     const getInitials = (name: string | undefined | null) => (name || '?').charAt(0).toUpperCase();
-    const getCountryCode = (country: string | undefined | null) => (country && typeof country === 'string') ? country.slice(0, 2).toUpperCase() : 'UN';
+    const getCountryCode = (country: string | undefined | null) => {
+        if (!country || country === 'Unknown') return '';
+        return (typeof country === 'string') ? country.slice(0, 2).toUpperCase() : '';
+    };
+
+    const getLocationString = (c: string | undefined | null, s: string | undefined | null) => {
+        const cleanC = (!c || c === 'Unknown') ? undefined : c;
+        const cleanS = (!s || s === 'Unknown') ? undefined : s;
+
+        if (cleanS && cleanC) return `${cleanS}, ${getCountryCode(cleanC)}`;
+        if (cleanC) return cleanC;
+        return '';
+    };
 
     const tabs: { id: SectionType; label: string; icon: any; count: number }[] = [
         { id: 'online', label: 'Online', icon: Users, count: filteredOnlineUsers.length },
@@ -104,7 +149,7 @@ export default function OnlineUsersList({ users, currentUserId, onSelectUser, on
             <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between">
                     <h3 className={`font-semibold truncate transition-colors ${isOnline ? 'text-slate-200 group-hover:text-pink-400' : 'text-slate-400'}`}>
-                        {user.nickname || 'Unknown'}
+                        {user.nickname || 'Anonymous'}
                     </h3>
                     <div className="flex items-center gap-2">
                         {(unreadCounts[user.id] || 0) > 0 && (
@@ -115,12 +160,14 @@ export default function OnlineUsersList({ users, currentUserId, onSelectUser, on
                     </div>
                 </div>
                 <div className="flex items-center justify-between text-xs text-slate-500">
-                    <div className="flex items-center gap-2">
-                        <span className="uppercase font-bold tracking-wider">{getCountryCode(user.country)}</span>
-                        <span>•</span>
-                        <span className="capitalize">{user.gender}</span>
+                    <div className="flex items-center gap-2 max-w-[140px]">
+                        <span className="truncate" title={user.state ? `${user.state}, ${user.country}` : user.country}>
+                            {getLocationString(user.country, user.state)}
+                        </span>
+                        {getLocationString(user.country, user.state) && <span className="opacity-50">•</span>}
+                        <span className="capitalize shrink-0">{user.gender}</span>
                     </div>
-                    {isOnline && user.isOccupied && <span className="text-amber-500">Busy</span>}
+                    {isOnline && user.isOccupied && <span className="text-amber-500 shrink-0">Busy</span>}
                 </div>
             </div>
         </button>
@@ -139,7 +186,9 @@ export default function OnlineUsersList({ users, currentUserId, onSelectUser, on
                         <h2 className="font-bold text-slate-100 truncate text-lg">{username || 'You'}</h2>
                         <div className="flex items-center gap-2 text-xs text-slate-400 font-medium">
                             <span className="capitalize px-2 py-0.5 rounded-md bg-white/5 border border-white/5">{gender || 'Anonymous'}</span>
-                            <span className="truncate">{state ? `${state}, ` : ''}{country || 'Unknown'}</span>
+                            <span className="truncate">
+                                {getLocationString(country, state)}
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -175,8 +224,8 @@ export default function OnlineUsersList({ users, currentUserId, onSelectUser, on
                                         </span>
                                     ) : (
                                         <span className={`w-2 h-2 rounded-full shadow-sm ${tab.id === 'online'
-                                                ? 'bg-green-500 shadow-green-500/50'
-                                                : 'bg-pink-500 shadow-pink-500/50'
+                                            ? 'bg-green-500 shadow-green-500/50'
+                                            : 'bg-pink-500 shadow-pink-500/50'
                                             }`} />
                                     )
                                 )}
@@ -202,8 +251,8 @@ export default function OnlineUsersList({ users, currentUserId, onSelectUser, on
                         >
                             {/* Search & Match Controls */}
                             <div className="px-2 pb-4 space-y-3">
-                                <div className="flex gap-2">
-                                    <div className="relative flex-1">
+                                <div className="flex flex-col gap-2">
+                                    <div className="relative w-full">
                                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={14} />
                                         <input
                                             type="text"
@@ -213,17 +262,35 @@ export default function OnlineUsersList({ users, currentUserId, onSelectUser, on
                                             onChange={(e) => setSearchTerm(e.target.value)}
                                         />
                                     </div>
-                                    <div className="flex bg-slate-800/50 rounded-xl p-1 border border-white/5">
-                                        {(['all', 'male', 'female'] as const).map(g => (
-                                            <button
-                                                key={g}
-                                                onClick={() => setGenderFilter(g)}
-                                                className={`px-2.5 flex items-center justify-center rounded-lg transition-colors capitalize text-[10px] font-bold ${genderFilter === g ? 'bg-slate-600 text-white shadow-sm' : 'text-slate-500 hover:text-slate-300'
-                                                    }`}
-                                            >
-                                                {g === 'all' ? 'All' : g.charAt(0).toUpperCase()}
-                                            </button>
-                                        ))}
+
+                                    <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
+                                        {/* Gender Filters */}
+                                        <div className="flex bg-slate-800/50 rounded-xl p-1 border border-white/5 shrink-0">
+                                            {(['all', 'male', 'female'] as const).map(g => (
+                                                <button
+                                                    key={g}
+                                                    onClick={() => setGenderFilter(g)}
+                                                    className={`px-3 py-1.5 flex items-center justify-center rounded-lg transition-colors capitalize text-[10px] font-bold ${genderFilter === g ? 'bg-slate-600 text-white shadow-sm' : 'text-slate-500 hover:text-slate-300'
+                                                        }`}
+                                                >
+                                                    {g === 'all' ? 'All' : g.charAt(0).toUpperCase()}
+                                                </button>
+                                            ))}
+                                        </div>
+
+                                        {/* Location Filter */}
+                                        <div className="flex bg-slate-800/50 rounded-xl p-1 border border-white/5 shrink-0">
+                                            {(['global', 'nearest'] as const).map(l => (
+                                                <button
+                                                    key={l}
+                                                    onClick={() => setLocationFilter(l)}
+                                                    className={`px-3 py-1.5 flex items-center justify-center rounded-lg transition-colors capitalize text-[10px] font-bold ${locationFilter === l ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-500 hover:text-slate-300'
+                                                        }`}
+                                                >
+                                                    {l === 'nearest' ? 'Nearest' : 'Global'}
+                                                </button>
+                                            ))}
+                                        </div>
                                     </div>
                                 </div>
 

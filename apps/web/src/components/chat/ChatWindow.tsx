@@ -125,8 +125,14 @@ export default function ChatWindow({ socket, currentUserId }: ChatWindowProps) {
                         </h2>
                         <div className="flex items-center gap-2 text-xs font-medium text-slate-500">
                             <span className="bg-slate-800 px-2 py-0.5 rounded-md capitalize text-slate-400 border border-white/5">{selectedUser.gender}</span>
-                            <span>•</span>
-                            <span className="uppercase tracking-wider">{selectedUser.country || 'Unknown'}</span>
+                            {(selectedUser.country && selectedUser.country !== 'Unknown') && (
+                                <>
+                                    <span>•</span>
+                                    <span className="truncate max-w-[150px]" title={selectedUser.state && selectedUser.state !== 'Unknown' ? `${selectedUser.state}, ${selectedUser.country}` : selectedUser.country}>
+                                        {selectedUser.state && selectedUser.state !== 'Unknown' ? `${selectedUser.state}, ` : ''}{selectedUser.country}
+                                    </span>
+                                </>
+                            )}
                         </div>
                     </div>
                 </div>

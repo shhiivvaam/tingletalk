@@ -14,7 +14,6 @@ import { IsString, IsNotEmpty, MaxLength, IsIn, IsBoolean, IsObject, ValidateNes
 import { Type } from 'class-transformer';
 import { SessionService } from '../modules/session/session.service';
 import { MatchingService } from '../modules/matching/matching.service';
-import * as geoip from 'geoip-lite';
 
 // --- DTOs ---
 class PreferencesDto {
@@ -124,18 +123,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 nickname: s.nickname || 'Anonymous',
                 gender: s.gender,
                 country: s.country || 'Unknown',
+                state: s.state,
                 isOccupied: false // Placeholder for now
             }));
-    }
-
-
-    private getClientIp(client: Socket): string {
-        // Handle Nginx/Proxy headers
-        const forwarded = client.handshake.headers['x-forwarded-for'];
-        if (forwarded) {
-            return (Array.isArray(forwarded) ? forwarded[0] : forwarded.split(',')[0]).trim();
-        }
-        return client.handshake.address;
     }
 
     @SubscribeMessage('findMatch')
@@ -146,27 +136,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         try {
             this.logger.log(`User joining lobby: ${data.username} (${client.id})`);
 
-            // 1. Detect Location
-            let ip = this.getClientIp(client);
-
-            // LOCALHOST DEV FIX: Use random public IP if localhost
-            if (ip === '::1' || ip === '127.0.0.1') {
-                // Random US/EU IPs for testing variation
-                const randomIps = ['24.48.0.1', '8.8.8.8', '194.12.1.1', '203.0.113.1'];
-                ip = randomIps[Math.floor(Math.random() * randomIps.length)];
-            }
-
-            const geo = geoip.lookup(ip);
-            const country = geo ? geo.country : (data.country || 'Unknown');
-            const state = geo ? geo.region : (data.state || undefined);
-
-            // Create session
+            // Creates session using verified data from DTO used in manual entry
             const session = await this.sessionService.createSession(client.id, {
                 tempId: client.id,
                 nickname: data.username,
                 gender: data.gender,
-                country: country,
-                state: state,
+                country: data.country || 'Unknown',
+                state: data.state, // Allow manual state or undefined
             });
 
             // Broadcast to all that a new user joined the lobby
@@ -175,6 +151,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 nickname: session.nickname,
                 gender: session.gender,
                 country: session.country || 'Unknown',
+                state: session.state,
                 isOccupied: false
             });
         } catch (error) {
@@ -245,6 +222,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
                             nickname: matchSession.nickname,
                             gender: matchSession.gender,
                             country: matchSession.country,
+                            state: matchSession.state,
                             isOccupied: true
                         }
                     });
@@ -256,6 +234,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
                             nickname: session.nickname,
                             gender: session.gender,
                             country: session.country,
+                            state: session.state,
                             isOccupied: true
                         }
                     });
