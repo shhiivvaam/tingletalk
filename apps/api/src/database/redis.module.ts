@@ -20,6 +20,13 @@ import Redis from 'ioredis';
                     throw new Error('REDIS_URL environment variable is required');
                 }
 
+                // LOGGING FOR DEBUGGING
+                logger.log(`Connecting to Redis with URL: ${redisUrl.replace(/:[^:]*@/, ':***@')}`);
+                logger.log(`Connecting to Redis with URL: ${redisUrl}`);
+                console.log(`Connecting to Redis with URL: ${redisUrl.replace(/:[^:]*@/, ':***@')}`);
+                console.log(`Connecting to Redis with URL: ${redisUrl}`);
+
+
                 const redis = new Redis(redisUrl, {
                     db: 0, // Explicitly use DB 0 for Upstash
                     maxRetriesPerRequest: 3,
