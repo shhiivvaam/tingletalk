@@ -11,6 +11,7 @@ export interface AnonymousSession {
     state?: string;
     scope?: 'local' | 'global';
     createdAt: number;
+    isOccupied: boolean;
     isInQueue?: boolean; // Optimization to avoid zrange on disconnect
 }
 
@@ -24,11 +25,12 @@ export class SessionService {
         return `session:${socketId}`;
     }
 
-    async createSession(socketId: string, data: Omit<AnonymousSession, 'id' | 'createdAt'>): Promise<AnonymousSession> {
+    async createSession(socketId: string, data: Omit<AnonymousSession, 'id' | 'createdAt' | 'isOccupied' | 'isInQueue'>): Promise<AnonymousSession> {
         const session: AnonymousSession = {
             ...data,
             id: socketId,
             createdAt: Date.now(),
+            isOccupied: false,
             isInQueue: false,
         };
 
@@ -120,5 +122,13 @@ export class SessionService {
         pipeline.del(this.getSessionKey(socketId));
         pipeline.srem(this.ONLINE_USERS_SET, socketId);
         await pipeline.exec();
+    }
+
+    async updateSessionStatus(socketId: string, isOccupied: boolean): Promise<void> {
+        const session = await this.getSession(socketId);
+        if (session) {
+            session.isOccupied = isOccupied;
+            await this.redis.setex(this.getSessionKey(socketId), 86400, JSON.stringify(session));
+        }
     }
 }

@@ -3,6 +3,7 @@ import { Search, Zap, ChevronDown, ChevronRight, MessageSquare, Clock, Users, Fi
 import { useChatStore } from '@/store/useChatStore';
 import { useUserStore } from '@/store/useUserStore';
 import { motion, AnimatePresence } from 'framer-motion';
+import RandomMatchModal from './RandomMatchModal';
 
 interface OnlineUser {
     id: string;
@@ -17,9 +18,9 @@ interface OnlineUser {
 interface OnlineUsersListProps {
     users: OnlineUser[];
     currentUserId: string | null;
-    selectedUserId?: string | null; // Added prop
+    selectedUserId?: string | null;
     onSelectUser: (user: OnlineUser) => void;
-    onFindMatch: () => void;
+    onFindMatch: (strategy?: 'optimal' | 'immediate') => void; // Updated signature
     isSearching: boolean;
 }
 
@@ -35,6 +36,12 @@ export default function OnlineUsersList({ users, currentUserId, selectedUserId, 
     const [genderFilter, setGenderFilter] = useState<'all' | 'male' | 'female'>('all');
     const [locationFilter, setLocationFilter] = useState<'global' | 'nearest'>('nearest');
     const [showFilters, setShowFilters] = useState(false);
+    const [isMatchModalOpen, setIsMatchModalOpen] = useState(false); // Modal state
+
+    const handleStartMatch = (strategy: 'optimal' | 'immediate') => {
+        setIsMatchModalOpen(false);
+        onFindMatch(strategy);
+    };
 
     // --- Data Derivation ---
 
@@ -174,8 +181,8 @@ export default function OnlineUsersList({ users, currentUserId, selectedUserId, 
                 )}
 
                 <div className={`relative w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm shadow-inner ${isOnline
-                        ? 'bg-gradient-to-br from-pink-500 text-white to-violet-600'
-                        : 'bg-slate-700 text-slate-400'
+                    ? 'bg-gradient-to-br from-pink-500 text-white to-violet-600'
+                    : 'bg-slate-700 text-slate-400'
                     }`}>
                     {getInitials(user.nickname)}
                     {isOnline && <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-slate-900 rounded-full"></span>}
@@ -271,7 +278,7 @@ export default function OnlineUsersList({ users, currentUserId, selectedUserId, 
                             <div className="px-2 pb-4 space-y-3">
                                 {/* Random Match - Primary Action */}
                                 <button
-                                    onClick={onFindMatch}
+                                    onClick={() => setIsMatchModalOpen(true)}
                                     disabled={isSearching}
                                     className="w-full py-3 bg-gradient-to-r from-pink-600 to-violet-600 rounded-xl font-bold text-sm text-white shadow-lg shadow-pink-500/25 hover:shadow-pink-500/40 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:scale-100 border border-white/10 relative overflow-hidden group"
                                 >
@@ -475,6 +482,12 @@ export default function OnlineUsersList({ users, currentUserId, selectedUserId, 
                     )}
                 </AnimatePresence>
             </div>
+
+            <RandomMatchModal
+                isOpen={isMatchModalOpen}
+                onClose={() => setIsMatchModalOpen(false)}
+                onSelectStrategy={handleStartMatch}
+            />
         </div >
     );
 }

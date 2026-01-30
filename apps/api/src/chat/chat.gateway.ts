@@ -51,6 +51,11 @@ class FindMatchDto {
     @IsString()
     @IsIn(['male', 'female', 'all'])
     targetGender: 'male' | 'female' | 'all';
+
+    @IsString()
+    @IsOptional()
+    @IsIn(['optimal', 'immediate'])
+    strategy?: 'optimal' | 'immediate';
 }
 
 class SendMessageDto {
@@ -249,7 +254,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         @ConnectedSocket() client: Socket,
     ) {
         try {
-            this.logger.log(`User requesting random match: ${client.id}`);
+            this.logger.log(`User requesting random match: ${client.id} (Strategy: ${data.strategy || 'optimal'})`);
 
             // Get session to confirm details
             const session = await this.sessionService.getSession(client.id);
@@ -268,18 +273,26 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 }
             };
 
-            const matchId = await this.matchingService.findMatch(matchRequest);
+            let matchId: string | null = null;
+
+            if (data.strategy === 'immediate') {
+                // IMMEDIATE STRATEGY: Find random online user
+                const allSessions = await this.sessionService.getAllSessions();
+                matchId = await this.matchingService.findRandomOnlineUser(matchRequest, allSessions);
+            } else {
+                // OPTIMAL STRATEGY: Use Queue
+                matchId = await this.matchingService.findMatch(matchRequest);
+            }
 
             if (matchId) {
                 this.logger.log(`Match found! ${client.id} <-> ${matchId}`);
-
                 // Get match details
                 const matchSession = await this.sessionService.getSession(matchId);
 
                 if (matchSession) {
-                    // Update flags - Both are NOT in queue now
-                    this.sessionService.updateSession(client.id, { isInQueue: false });
-                    this.sessionService.updateSession(matchId, { isInQueue: false });
+                    // Update flags - Both are NOT in queue now AND are occupied
+                    await this.sessionService.updateSession(client.id, { isInQueue: false, isOccupied: true });
+                    await this.sessionService.updateSession(matchId, { isInQueue: false, isOccupied: true });
 
                     // Notify Requestor
                     client.emit('matchFound', {
@@ -317,23 +330,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
                         timestamp: Date.now(),
                     });
 
-                    // Also verify to Requester that "you sent this" (so it shows in their UI)
-                    // Or actually, usually the sender adds it optimistically. 
-                    // But since this is server-generated, we should tell the sender "You sent this".
-                    // But 'receiveMessage' usually means "incoming".
-                    // The Frontend likely handles "my messages" by adding them locally.
-                    // IMPORTANT: Frontend needs to know this message was sent!
-                    // I'll emit a special event or just rely on the frontend to add a message if it detects a match?
-                    // No, server is generating content.
-
-                    // Let's emit 'messageSent' confirmation to sender? 
-                    // Or simply emit 'receiveMessage' with senderId = client.id to the client itself?
-                    // Frontend likely filters out messages where senderId == myId from "incoming" processing 
-                    // unless logic handles it.
-                    // Let's check ChatWindow.tsx. It listens loop?
-
-                    // Actually, let's just send it to the receiver. The sender will just see the chat open.
-                    // If the user wants the sender to SEE "I said Monkey Time!", we need to send it back.
                     client.emit('receiveMessage', {
                         senderId: client.id, // It's from ME
                         message: randomGreeting,
@@ -341,6 +337,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
                     });
                 }
             } else {
+                // If immediate failed (nobody online), should we queue them?
+                // Probably yes, better than nothing. Or tell them "No one available"?
+                // Let's queue them as fallback even in immediate mode, 
+                // OR just tell them to wait.
+                // Standard behavior: Queue.
                 this.logger.log(`No match found, adding ${client.id} to queue`);
                 await this.matchingService.addToQueue(matchRequest);
                 // Mark user as being in queue

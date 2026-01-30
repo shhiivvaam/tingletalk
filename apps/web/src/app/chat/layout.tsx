@@ -154,7 +154,7 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
         };
     }, [username, gender, preferences, router, setOnlineUsers, addOnlineUser, removeOnlineUser, addMessage, setSelectedUser, isHydrated]);
 
-    const handleRandomMatch = () => {
+    const handleRandomMatch = (strategy: 'optimal' | 'immediate' = 'optimal') => {
         if (!socket) return;
         setIsSearching(true);
         socket.emit('requestRandomMatch', {
@@ -165,6 +165,7 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
             country: useUserStore.getState().country || 'Unknown',
             state: useUserStore.getState().state,
             targetGender: preferences?.targetGender || 'all',
+            strategy // Pass the selected strategy
         });
     };
 

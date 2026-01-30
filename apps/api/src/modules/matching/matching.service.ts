@@ -117,4 +117,34 @@ export class MatchingService {
             }
         }
     }
+    async findRandomOnlineUser(request: MatchRequest, onlineUsers: any[]): Promise<string | null> {
+        // Filter candidates:
+        // 1. Not self
+        // 2. Not occupied
+        // 3. Gender preference matches (Two-way check)
+
+        const candidates = onlineUsers.filter(user => {
+            if (user.id === request.socketId) return false;
+            if (user.isOccupied) return false;
+
+            // My Preference Check
+            const iWantUser = request.preferences.targetGender === 'all' ||
+                request.preferences.targetGender === user.gender;
+
+            // Their Preference Check (If user has generic preferences? For now assume they are open if just "Online")
+            // Ideally we'd know their preferences, but for "Online List" matches we assume standard compatibility
+            // or just use their gender to see if they match ME.
+            // Let's strictly check: If I am Male, and I want Female, candidates must be Female.
+
+            return iWantUser;
+        });
+
+        if (candidates.length === 0) {
+            return null;
+        }
+
+        // Random Selection
+        const randomIndex = Math.floor(Math.random() * candidates.length);
+        return candidates[randomIndex].id;
+    }
 }
