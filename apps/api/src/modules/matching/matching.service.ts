@@ -96,7 +96,7 @@ export class MatchingService {
         }
 
         if (bestMatchId) {
-            // Remove the matched user from the queue = (so they don't get matched again)
+            // Remove the matched user from the queue (so they don't get matched again)
             // Note: We need to find the correct item string to remove
             const waitingAgain = await this.redis.zrange(queueKey, 0, -1);
             for (const i of waitingAgain) {
