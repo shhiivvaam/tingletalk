@@ -14,10 +14,25 @@ export const metadata: Metadata = {
   description: "Meet new people, find a date, or just have fun. 100% anonymous, safe, and instant.",
   icons: {
     icon: '/favicon.png',
+    apple: '/icons/icon-192x192.png',
+  },
+  manifest: '/manifest.json',
+  themeColor: '#ec4899',
+  viewport: {
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 1,
+    userScalable: false,
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'TingleTalk',
   },
 };
 
 import ToastContainer from "@/components/ui/ToastContainer";
+import PWAInstallPrompt from "@/components/PWAInstallPrompt";
 
 export default function RootLayout({
   children,
@@ -44,6 +59,7 @@ export default function RootLayout({
         <div className="aurora-bg" />
         <div className="relative z-10">
           <ToastContainer />
+          <PWAInstallPrompt />
           {children}
         </div>
         <Analytics />
