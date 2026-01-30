@@ -14,50 +14,65 @@ export default function PWAInstallPrompt() {
     const [isInstalled, setIsInstalled] = useState(false);
 
     useEffect(() => {
+        console.log('[PWA] Component mounted');
+
         // Check if app is already installed
         if (window.matchMedia('(display-mode: standalone)').matches) {
+            console.log('[PWA] App is already installed (standalone mode)');
             setIsInstalled(true);
             return;
         }
 
+        console.log('[PWA] App not installed, setting up listeners');
+
         // Register service worker
         if ('serviceWorker' in navigator) {
+            console.log('[PWA] Service Worker supported');
             window.addEventListener('load', () => {
                 navigator.serviceWorker
                     .register('/sw.js')
                     .then((registration) => {
-                        console.log('Service Worker registered:', registration);
+                        console.log('[PWA] ✅ Service Worker registered:', registration);
                     })
                     .catch((error) => {
-                        console.log('Service Worker registration failed:', error);
+                        console.error('[PWA] ❌ Service Worker registration failed:', error);
                     });
             });
+        } else {
+            console.warn('[PWA] Service Worker not supported in this browser');
         }
 
         // Listen for beforeinstallprompt event
         const handleBeforeInstallPrompt = (e: Event) => {
+            console.log('[PWA] 🎉 beforeinstallprompt event fired!');
             e.preventDefault();
             setDeferredPrompt(e as BeforeInstallPromptEvent);
 
             // Show install prompt after a delay (3 seconds)
             setTimeout(() => {
                 const dismissed = localStorage.getItem('pwa-install-dismissed');
+                console.log('[PWA] Dismissed flag:', dismissed);
                 if (!dismissed) {
+                    console.log('[PWA] Showing install prompt');
                     setShowInstallPrompt(true);
+                } else {
+                    console.log('[PWA] Install prompt was previously dismissed');
                 }
             }, 3000);
         };
 
         window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+        console.log('[PWA] Added beforeinstallprompt listener');
 
         // Listen for app installed event
         window.addEventListener('appinstalled', () => {
-            console.log('PWA installed successfully');
+            console.log('[PWA] ✅ PWA installed successfully');
             setIsInstalled(true);
             setShowInstallPrompt(false);
         });
 
         return () => {
+            console.log('[PWA] Component unmounting, removing listeners');
             window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
         };
     }, []);
