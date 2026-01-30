@@ -207,7 +207,7 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
     }
 
     return (
-        <div className="flex h-screen text-slate-200 overflow-hidden relative">
+        <div className="flex h-screen bg-slate-950 text-slate-200 overflow-hidden relative">
             {/* Notification Toast */}
             <AnimatePresence>
                 {notification && (
@@ -244,149 +244,103 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
                 </div>
             )}
 
-
+            {/* Premium Vertical Toggle Button (Floating) */}
+            <button
+                onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                className={`
+                    fixed top-1/2 -translate-y-1/2 z-[60]
+                    flex items-center justify-center
+                    h-24 w-6 md:w-8
+                    transition-all duration-500 ease-out group
+                    ${isSidebarOpen
+                        ? 'left-[100%] md:left-80 -translate-x-full rounded-l-2xl hover:bg-white/5 border-r-0'
+                        : 'left-0 rounded-r-2xl bg-gradient-to-b from-pink-600 to-violet-600 shadow-[4px_0_15px_rgba(236,72,153,0.3)]'}
+                    border border-white/10 backdrop-blur-md
+                `}
+            >
+                <div className="flex flex-col items-center gap-1">
+                    {isSidebarOpen ? (
+                        <ChevronLeft size={20} className="text-white/40 group-hover:text-white transition-colors" />
+                    ) : (
+                        <ChevronRight size={20} className="text-white animate-pulse" />
+                    )}
+                </div>
+            </button>
 
             {/* Sidebar */}
             <motion.div
                 initial={false}
                 animate={{
                     x: isSidebarOpen ? 0 : '-100%',
+                    width: isSidebarOpen ? (typeof window !== 'undefined' && window.innerWidth >= 768 ? 320 : '100%') : 0
                 }}
-                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                transition={{ type: "spring", stiffness: 400, damping: 40 }}
                 className={`
-                    fixed inset-y-0 left-0 z-40 w-full md:w-80 bg-slate-900/95 backdrop-blur-2xl border-r border-white/5 md:relative md:translate-x-0 flex flex-col
+                    fixed inset-y-0 left-0 z-50 md:relative bg-slate-900/95 backdrop-blur-3xl border-r border-white/5 flex flex-col overflow-hidden
                 `}
             >
-                {/* Premium Mobile Slice Toggle (Center-Left) */}
-                <button
-                    onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                    className={`
-                        md:hidden absolute top-1/2 -translate-y-1/2 z-50
-                        flex items-center justify-center
-                        h-32 w-12
-                        bg-gradient-to-b from-pink-500/90 to-violet-600/90
-                        backdrop-blur-md border border-white/20 shadow-[10px_0_30px_rgba(236,72,153,0.3)]
-                        transition-all duration-500 ease-in-out group
-                        ${isSidebarOpen 
-                            ? 'right-6 rounded-2xl bg-slate-800/40 backdrop-blur-2xl border-white/10 shadow-none' 
-                            : 'left-full rounded-r-2xl border-l-0'}
-                    `}
-                >
-                    <div className="flex flex-col items-center gap-2">
-                        {isSidebarOpen ? (
-                            <>
-                                <ChevronLeft size={24} className="text-white group-hover:-translate-x-1 transition-transform" />
-                                <span className="text-[9px] font-black text-white/40 uppercase tracking-[0.2em] [writing-mode:vertical-lr] rotate-180">HIDE</span>
-                            </>
-                        ) : (
-                            <>
-                                <ChevronRight size={24} className="text-white group-hover:translate-x-1 transition-transform animate-pulse" />
-                                <span className="text-[9px] font-black text-white/90 uppercase tracking-[0.2em] [writing-mode:vertical-lr]">USERS</span>
-                            </>
-                        )}
-                    </div>
-                </button>
+                {/* Fixed Width Content Container */}
+                <div className="w-[100vw] md:w-80 h-full flex flex-col shrink-0">
+                    {/* Header */}
+                    <div className="h-16 shrink-0 flex items-center justify-between px-4 border-b border-white/5 bg-slate-900/50">
+                        <div className="flex items-center gap-2">
+                            <img src="/logo.png" alt="TingleTalk" className="w-8 h-8 object-contain" />
+                            <span className="font-black text-lg tracking-tight text-white/90">
+                                Tingle<span className="text-pink-500">Talk</span>
+                            </span>
+                        </div>
 
-                {/* Branding & Profile Header */}
-                <div className="h-16 shrink-0 flex items-center justify-between px-4 border-b border-white/5 bg-slate-900/50 gap-2 relative z-50">
-                    {/* Left: Brand */}
-                    <div className="flex items-center gap-2">
-                        <img src="/logo.png" alt="TingleTalk" className="w-8 h-8 object-contain" />
-                        <span className="font-black text-lg tracking-tight text-white/90 hidden sm:block">
-                            Tingle<span className="text-pink-500">Talk</span>
-                        </span>
-                    </div>
-
-                    {/* Right: Profile Toggle */}
-                    <button
-                        onClick={() => setIsProfileOpen(!isProfileOpen)}
-                        className="flex items-center gap-3 bg-white/5 pl-1 pr-3 py-1 rounded-full border border-white/5 hover:bg-white/10 transition-colors"
-                    >
-                        <div className="relative w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-teal-400 flex items-center justify-center font-bold text-xs text-white shadow-sm">
+                        <button
+                            onClick={() => setIsProfileOpen(!isProfileOpen)}
+                            className="relative w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-teal-400 flex items-center justify-center font-bold text-xs text-white shadow-sm border border-white/10"
+                        >
                             {(username || '?').charAt(0).toUpperCase()}
                             <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-slate-900 rounded-full"></span>
-                        </div>
-                        <div className="flex flex-col max-w-[80px] text-left">
-                            <span className="text-xs font-bold text-slate-200 truncate">{username || 'You'}</span>
-                            <span className="text-[10px] text-slate-500 truncate capitalize">{gender}</span>
-                        </div>
-                    </button>
+                        </button>
+                    </div>
 
-                    {/* Profile Dropdown */}
+                    {/* Profile Dropdown (Inside Sidebar context) */}
                     <AnimatePresence>
                         {isProfileOpen && (
-                            <>
-                                {/* Invisible Backdrop to close on click outside */}
-                                <div
-                                    className="fixed inset-0 z-[60]"
-                                    onClick={() => setIsProfileOpen(false)}
-                                />
-                                {/* Dropdown Menu */}
-                                <motion.div
-                                    initial={{ opacity: 0, scale: 0.95, y: -10 }}
-                                    animate={{ opacity: 1, scale: 1, y: 0 }}
-                                    exit={{ opacity: 0, scale: 0.95, y: -10 }}
-                                    transition={{ duration: 0.15 }}
-                                    className="absolute top-14 right-4 z-[70] w-64 bg-slate-900 rounded-xl border border-white/10 shadow-xl overflow-hidden"
-                                >
-                                    <div className="p-4 space-y-4">
-                                        {/* User Info */}
-                                        <div className="flex items-center gap-3 pb-4 border-b border-white/5">
-                                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-teal-400 flex items-center justify-center font-bold text-sm text-white shadow-sm shrink-0">
-                                                {(username || '?').charAt(0).toUpperCase()}
-                                            </div>
-                                            <div className="min-w-0">
-                                                <h3 className="font-bold text-slate-200 truncate">{username}</h3>
-                                                <span className="text-xs text-slate-500 capitalize">{gender}</span>
-                                            </div>
-                                        </div>
-
-                                        {/* Details */}
-                                        <div className="space-y-2">
-                                            <div className="flex items-center gap-3 text-sm">
-                                                <Calendar size={14} className="text-pink-500 shrink-0" />
-                                                <span className="text-slate-400">Age:</span>
-                                                <span className="font-medium text-slate-200">{useUserStore.getState().age}</span>
-                                            </div>
-                                            <div className="flex items-start gap-3 text-sm">
-                                                <MapPin size={14} className="text-violet-500 shrink-0 mt-0.5" />
-                                                <div className="flex flex-col">
-                                                    <span className="text-slate-200 leading-tight">
-                                                        {useUserStore.getState().state || 'Unknown'},
-                                                    </span>
-                                                    <span className="text-xs text-slate-500">
-                                                        {useUserStore.getState().country || 'Unknown'}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </div>
+                            <motion.div
+                                initial={{ opacity: 0, y: -10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -10 }}
+                                className="absolute top-16 left-4 right-4 z-[70] bg-slate-800/90 backdrop-blur-xl rounded-xl border border-white/10 p-4 shadow-2xl"
+                            >
+                                <div className="flex items-center gap-3 pb-3 border-b border-white/5">
+                                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-teal-400 flex items-center justify-center font-bold text-sm text-white">{getInitials(username)}</div>
+                                    <div className="min-w-0">
+                                        <h3 className="font-bold text-white truncate">{username}</h3>
+                                        <p className="text-xs text-slate-400 capitalize">{gender} • {useUserStore.getState().age}</p>
                                     </div>
-
-                                    {/* Footer */}
-                                    <div className="bg-white/5 px-4 py-2 text-[10px] text-center text-slate-500">
-                                        Connected as Anonymous
-                                    </div>
-                                </motion.div>
-                            </>
+                                </div>
+                                <div className="pt-3 flex items-center gap-2 text-xs text-slate-300">
+                                    <MapPin size={12} className="text-pink-500" />
+                                    <span>{useUserStore.getState().state}, {useUserStore.getState().country}</span>
+                                </div>
+                            </motion.div>
                         )}
                     </AnimatePresence>
-                </div>
-                <div className="flex-1 overflow-hidden relative">
-                    <OnlineUsersList
-                        users={onlineUsers}
-                        currentUserId={socket?.id || null}
-                        selectedUserId={selectedUser?.id || null}
-                        onSelectUser={(user) => {
-                            setSelectedUser(user);
-                            setIsSidebarOpen(false); // Close sidebar on mobile on selection
-                        }}
-                        onFindMatch={handleRandomMatch}
-                        isSearching={isSearching}
-                    />
+
+                    {/* User List */}
+                    <div className="flex-1 overflow-hidden relative">
+                        <OnlineUsersList
+                            users={onlineUsers}
+                            currentUserId={socket?.id || null}
+                            selectedUserId={selectedUser?.id || null}
+                            onSelectUser={(user) => {
+                                setSelectedUser(user);
+                                if (typeof window !== 'undefined' && window.innerWidth < 768) setIsSidebarOpen(false);
+                            }}
+                            onFindMatch={handleRandomMatch}
+                            isSearching={isSearching}
+                        />
+                    </div>
                 </div>
             </motion.div>
 
-            {/* Backdrop for Mobile Sidebar */}
+            {/* Mobile Backdrop */}
             <AnimatePresence>
                 {isSidebarOpen && (
                     <motion.div
@@ -394,21 +348,13 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         onClick={() => setIsSidebarOpen(false)}
-                        className="md:hidden fixed inset-0 bg-slate-950/60 backdrop-blur-[2px] z-30"
+                        className="md:hidden fixed inset-0 bg-slate-950/60 backdrop-blur-[2px] z-40"
                     />
                 )}
             </AnimatePresence>
 
-            {/* Main Content */}
-            <div className="flex-1 flex flex-col relative w-full h-full">
-                {/*
-                   We pass the socket to children via Props if we could, but children are pre-determined.
-                   Alternatively, we can use a Context to provide the socket.
-                   Or we can just rely on the Page to grab the socket if we stored it?
-                   actually, storing socket in Zustand is tricky (non-serializable).
-                   Better approach: 
-                   Render children (which is the Page). USE A CONTEXT for socket.
-                */}
+            {/* Content Area */}
+            <div className="flex-1 flex flex-col relative min-w-0 h-full bg-slate-950">
                 <SocketContext.Provider value={socket}>
                     {children}
                 </SocketContext.Provider>
@@ -416,6 +362,8 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
         </div>
     );
 }
+
+const getInitials = (name: string | null) => (name || '?').charAt(0).toUpperCase();
 
 // Simple Context for Socket
 import { createContext, useContext } from 'react';
