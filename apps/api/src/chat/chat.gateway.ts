@@ -151,8 +151,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 );
             }
 
-            // Broadcast user left
-            this.server.emit('userLeft', { userId: client.id });
+            // Broadcast user left - DISABLED FOR SCALING (Cost reduction)
+            // this.server.emit('userLeft', { userId: client.id });
         }
 
         await this.sessionService.removeSession(client.id);
@@ -164,8 +164,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
         // Filter out self and sanitize, ONLY return sessions that are actually connected
         // This prevents "ghost" users and one seeing themselves
+        // LIMIT to 100 to save bandwidth
         return sessions
             .filter(s => s.id !== client.id && this.server.sockets.sockets.has(s.id))
+            .slice(0, 100)
             .map(s => ({
                 id: s.id,
                 nickname: s.nickname || 'Anonymous',
@@ -195,8 +197,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 state: data.state, // Allow manual state or undefined
             });
 
-            // Broadcast to all that a new user joined the lobby
-            this.server.emit('userJoined', {
+            // Broadcast to all that a new user joined the lobby - DISABLED FOR SCALING
+            /* this.server.emit('userJoined', {
                 id: client.id,
                 nickname: session.nickname,
                 gender: session.gender,
@@ -204,7 +206,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 country: session.country || 'Unknown',
                 state: session.state,
                 isOccupied: false
-            });
+            }); */
         } catch (error) {
             this.logger.error(`Failed to handle findMatch for ${client.id}`, error);
         }
@@ -276,9 +278,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
             let matchId: string | null = null;
 
             if (data.strategy === 'immediate') {
-                // IMMEDIATE STRATEGY: Find random online user
-                const allSessions = await this.sessionService.getAllSessions();
-                matchId = await this.matchingService.findRandomOnlineUser(matchRequest, allSessions);
+                // IMMEDIATE STRATEGY: Find random online user efficiently
+                // OLD: const allSessions = await this.sessionService.getAllSessions();
+                // OLD: matchId = await this.matchingService.findRandomOnlineUser(matchRequest, allSessions);
+
+                matchId = await this.findImmediateMatch(matchRequest);
             } else {
                 // OPTIMAL STRATEGY: Use Queue
                 matchId = await this.matchingService.findMatch(matchRequest);
@@ -352,6 +356,35 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         } catch (error) {
             this.logger.error('Error in random matching', error);
         }
+    }
+
+    private async findImmediateMatch(request: any): Promise<string | null> {
+        const MAX_ATTEMPTS = 5; // Try 5 different random users
+        const checkedIds: string[] = [request.socketId]; // Don't match self
+
+        for (let i = 0; i < MAX_ATTEMPTS; i++) {
+            // Get a random candidate from SessionService
+            const candidateSession = await this.sessionService.getRandomOnlineSession(checkedIds);
+
+            if (!candidateSession) {
+                // If we can't find ANY available session, stop trying
+                break;
+            }
+
+            checkedIds.push(candidateSession.id);
+
+            // Check Gender Preferences
+            const iWantUser = request.preferences.targetGender === 'all' ||
+                request.preferences.targetGender === candidateSession.gender;
+
+            // Note: We cannot check if *they* want us because 'preferences' are not in Session object yet.
+            // Assumption: Online users are available for general chat.
+
+            if (iWantUser) {
+                return candidateSession.id;
+            }
+        }
+        return null;
     }
 
     @SubscribeMessage('typing')
