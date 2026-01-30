@@ -29,8 +29,8 @@ export class RedisIoAdapter extends IoAdapter {
 
         try {
             // Use ioredis for consistency with the rest of the app
-            const pubClient = new Redis(redisUrl, { db: 0 });
-            const subClient = new Redis(redisUrl, { db: 0 });
+            const pubClient = new Redis(redisUrl);
+            const subClient = new Redis(redisUrl);
 
             await Promise.all([
                 new Promise((resolve, reject) => {

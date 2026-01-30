@@ -29,6 +29,13 @@ echo -e "${GREEN}🚀 [1/8] Starting deployment...${NC}"
 # Ensure log directory exists
 mkdir -p "$LOG_DIR"
 
+# 0. Pre-Deployment Cleanup
+# Only remove stopped containers and dangling images. 
+# Keep active images for rollback safety.
+echo -e "${YELLOW}🧹 [0/8] Cleaning up dangling resources...${NC}"
+docker container prune -f || true
+docker image prune -f || true
+
 # 1. Pull latest image
 echo -e "${YELLOW}📦 [2/8] Pulling latest image: ${IMAGE_NAME}:latest...${NC}"
 docker pull ${IMAGE_NAME}:latest
