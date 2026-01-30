@@ -1,4 +1,12 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
+
+export const viewport: Viewport = {
+  themeColor: '#ec4899',
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+};
 import { Outfit } from "next/font/google";
 import "./globals.css";
 import Script from "next/script";
@@ -10,26 +18,72 @@ const outfit = Outfit({
 });
 
 export const metadata: Metadata = {
-  title: "Tingle Talk | Anonymous Dating & Fun Chats",
-  description: "Meet new people, find a date, or just have fun. 100% anonymous, safe, and instant.",
+  title: {
+    default: "Tingle Talk | Anonymous Dating & Fun Chats",
+    template: "%s | Tingle Talk"
+  },
+  description: "Meet new people, find a date, or just have fun. 100% anonymous, safe, and instant random chatting platform.",
+  keywords: ["anonymous dating", "random chat", "chat with strangers", "anonymous messaging", "dating app", "instant connection", "group chat", "private chat"],
+  authors: [{ name: "Tingle Talk Team" }],
+  creator: "Tingle Talk",
+  publisher: "Tingle Talk",
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  metadataBase: new URL('https://tingletalk.com'),
+  alternates: {
+    canonical: '/',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  openGraph: {
+    title: "Tingle Talk | Anonymous Dating & Fun Chats",
+    description: "Meet new people, find a date, or just have fun. 100% anonymous, safe, and instant.",
+    url: 'https://tingletalk.com',
+    siteName: 'Tingle Talk',
+    images: [
+      {
+        url: '/assets/logo.png',
+        width: 800,
+        height: 800,
+        alt: 'Tingle Talk Logo',
+      },
+    ],
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: "Tingle Talk | Anonymous Dating & Fun Chats",
+    description: "Meet new people, find a date, or just have fun. 100% anonymous, safe, and instant.",
+    images: ['/assets/logo.png'],
+    creator: '@tingletalk',
+  },
   icons: {
     icon: [
       { url: '/assets/favicon.ico', sizes: 'any' },
       { url: '/assets/favicon.png', type: 'image/png' },
     ],
+    apple: [
+      { url: '/assets/logo.png' },
+    ],
   },
   manifest: '/assets/manifest.json',
-  themeColor: '#ec4899',
-  viewport: {
-    width: 'device-width',
-    initialScale: 1,
-    maximumScale: 1,
-    userScalable: false,
-  },
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
-    title: 'TingleTalk',
+    title: 'Tingle Talk',
   },
 };
 
