@@ -12,16 +12,6 @@ const outfit = Outfit({
 export const metadata: Metadata = {
   title: "Tingle Talk | Anonymous Dating & Fun Chats",
   description: "Meet new people, find a date, or just have fun. 100% anonymous, safe, and instant.",
-  icons: {
-    icon: [
-      { url: '/favicon.ico', sizes: 'any' },
-      { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
-      { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
-    ],
-    apple: [
-      { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
-    ],
-  },
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
