@@ -45,6 +45,7 @@ export class MatchingService {
         // Scoring Variables
         let bestMatchId: string | null = null;
         let bestMatchScore = -1;
+        let bestMatchItemString: string | null = null;
 
         for (const item of waiting) {
             const candidate: MatchRequest = JSON.parse(item);
@@ -89,23 +90,14 @@ export class MatchingService {
                 if (score > bestMatchScore) {
                     bestMatchScore = score;
                     bestMatchId = candidate.socketId;
-                    // TODO: Could remove candidate instantly here, but cleaner to do separately?
-                    // Actually, we need to iterate ALL to find BEST.
+                    bestMatchItemString = item;
                 }
             }
         }
 
-        if (bestMatchId) {
+        if (bestMatchId && bestMatchItemString) {
             // Remove the matched user from the queue (so they don't get matched again)
-            // Note: We need to find the correct item string to remove
-            const waitingAgain = await this.redis.zrange(queueKey, 0, -1);
-            for (const i of waitingAgain) {
-                const c = JSON.parse(i);
-                if (c.socketId === bestMatchId) {
-                    await this.redis.zrem(queueKey, i);
-                    break;
-                }
-            }
+            await this.redis.zrem(queueKey, bestMatchItemString);
             return bestMatchId;
         }
 

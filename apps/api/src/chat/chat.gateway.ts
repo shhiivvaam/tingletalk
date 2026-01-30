@@ -137,11 +137,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         const session = await this.sessionService.getSession(client.id);
         if (session) {
             // Remove from matching queue if they were waiting
-            await this.matchingService.removeFromQueue(
-                client.id,
-                session.scope || 'global',
-                session.country
-            );
+            // OPTIMIZATION: Only search queue if we KNOW they are in it (saves huge ZRANGE reads)
+            if (session.isInQueue) {
+                await this.matchingService.removeFromQueue(
+                    client.id,
+                    session.scope || 'global',
+                    session.country
+                );
+            }
 
             // Broadcast user left
             this.server.emit('userLeft', { userId: client.id });
@@ -274,6 +277,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 const matchSession = await this.sessionService.getSession(matchId);
 
                 if (matchSession) {
+                    // Update flags - Both are NOT in queue now
+                    this.sessionService.updateSession(client.id, { isInQueue: false });
+                    this.sessionService.updateSession(matchId, { isInQueue: false });
+
                     // Notify Requestor
                     client.emit('matchFound', {
                         user: {
@@ -336,6 +343,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
             } else {
                 this.logger.log(`No match found, adding ${client.id} to queue`);
                 await this.matchingService.addToQueue(matchRequest);
+                // Mark user as being in queue
+                await this.sessionService.updateSession(client.id, { isInQueue: true });
                 client.emit('waitingForMatch');
             }
 

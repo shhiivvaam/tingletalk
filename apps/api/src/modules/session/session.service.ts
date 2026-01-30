@@ -11,6 +11,7 @@ export interface AnonymousSession {
     state?: string;
     scope?: 'local' | 'global';
     createdAt: number;
+    isInQueue?: boolean; // Optimization to avoid zrange on disconnect
 }
 
 @Injectable()
@@ -28,6 +29,7 @@ export class SessionService {
             ...data,
             id: socketId,
             createdAt: Date.now(),
+            isInQueue: false,
         };
 
         const sessionKey = this.getSessionKey(socketId);
@@ -41,16 +43,40 @@ export class SessionService {
         return session;
     }
 
+    async updateSession(socketId: string, updates: Partial<AnonymousSession>): Promise<void> {
+        const key = this.getSessionKey(socketId);
+        const current = await this.redis.get(key);
+        if (current) {
+            const sessions = JSON.parse(current);
+            const updated = { ...sessions, ...updates };
+            // Update with same TTL
+            await this.redis.setex(key, 86400, JSON.stringify(updated));
+        }
+    }
+
     async getSession(socketId: string): Promise<AnonymousSession | null> {
         const data = await this.redis.get(this.getSessionKey(socketId));
         return data ? JSON.parse(data) : null;
     }
 
+    private cachedSessions: AnonymousSession[] | null = null;
+    private lastCacheTime = 0;
+    private readonly CACHE_TTL = 3000; // 3 seconds cache is enough to kill the spike but keep it snappy
+
     async getAllSessions(): Promise<AnonymousSession[]> {
+        // Return cached data if valid to save Redis Reads (Crucial for free tier limits)
+        if (this.cachedSessions && (Date.now() - this.lastCacheTime < this.CACHE_TTL)) {
+            return this.cachedSessions;
+        }
+
         // Get all socketIds from the Set (O(1) relative to total keyspace, O(N) relative to online users)
         const socketIds = await this.redis.smembers(this.ONLINE_USERS_SET);
 
-        if (socketIds.length === 0) return [];
+        if (socketIds.length === 0) {
+            this.cachedSessions = [];
+            this.lastCacheTime = Date.now();
+            return [];
+        }
 
         // Construct keys for MGET
         const sessionKeys = socketIds.map(id => this.getSessionKey(id));
@@ -81,6 +107,10 @@ export class SessionService {
                 console.error('Failed to clean up stale sessions', err);
             });
         }
+
+        // Update Cache
+        this.cachedSessions = activeSessions;
+        this.lastCacheTime = Date.now();
 
         return activeSessions;
     }
