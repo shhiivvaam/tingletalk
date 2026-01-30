@@ -60,6 +60,16 @@ export default function OnlineUsersList({ users, currentUserId, selectedUserId, 
             .filter(user => {
                 const userMessages = messages[user.id] || [];
                 return userMessages.some(m => m.senderId === user.id);
+            })
+            .sort((a, b) => {
+                const msgsA = messages[a.id] || [];
+                const msgsB = messages[b.id] || [];
+
+                // Get latest timestamp (assuming messages are chronological, take last)
+                const lastTimeA = msgsA.length > 0 ? msgsA[msgsA.length - 1].timestamp : 0;
+                const lastTimeB = msgsB.length > 0 ? msgsB[msgsB.length - 1].timestamp : 0;
+
+                return lastTimeB - lastTimeA;
             });
     }, [messages, knownUsers]);
 
@@ -72,8 +82,19 @@ export default function OnlineUsersList({ users, currentUserId, selectedUserId, 
             return matchesSearch && matchesGender;
         });
 
-        if (locationFilter === 'nearest') {
-            result = result.sort((a, b) => {
+        // Default Sort: Recency -> Nearest -> Standard
+        result = result.sort((a, b) => {
+            // Priority 0: Recent Message Activity (Global for all views effectively)
+            const msgsA = messages[a.id] || [];
+            const msgsB = messages[b.id] || [];
+            const lastTimeA = msgsA.length > 0 ? msgsA[msgsA.length - 1].timestamp : 0;
+            const lastTimeB = msgsB.length > 0 ? msgsB[msgsB.length - 1].timestamp : 0;
+
+            if (lastTimeA !== lastTimeB) {
+                return lastTimeB - lastTimeA; // Descending (Newest first)
+            }
+
+            if (locationFilter === 'nearest') {
                 // Priority 1: State Match
                 const aState = a.state || '';
                 const bState = b.state || '';
@@ -95,14 +116,15 @@ export default function OnlineUsersList({ users, currentUserId, selectedUserId, 
 
                 if (aIsSameCountry && !bIsSameCountry) return -1;
                 if (!aIsSameCountry && bIsSameCountry) return 1;
+            }
 
-                // Priority 3 (Optional): Fallback to string comparison for stable sort
-                return 0;
-            });
-        }
+            // Priority 3: Fallback stable sort
+            return 0;
+        });
 
         return result;
-    }, [users, searchTerm, genderFilter, locationFilter, country, state]);
+    }, [users, searchTerm, genderFilter, locationFilter, country, state, messages]);
+
 
     // 3. History: Closed chats or just duplicates of Inbox for now?
     const historyUsers = useMemo(() => {
