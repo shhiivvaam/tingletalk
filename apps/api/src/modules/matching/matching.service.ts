@@ -39,8 +39,8 @@ export class MatchingService {
     async findMatch(request: MatchRequest): Promise<string | null> {
         const queueKey = this.getQueueKey(request.scope, request.country);
 
-        // Get all waiting users (LIMIT to top 100 to prevent O(N) explosion)
-        const waiting = await this.redis.zrange(queueKey, 0, 99);
+        // Get all waiting users
+        const waiting = await this.redis.zrange(queueKey, 0, -1);
 
         // Scoring Variables
         let bestMatchId: string | null = null;

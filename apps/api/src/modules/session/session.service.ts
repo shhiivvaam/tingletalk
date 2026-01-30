@@ -38,8 +38,7 @@ export class SessionService {
 
         // Use pipeline to execute commands atomically
         const pipeline = this.redis.pipeline();
-        // REDUCED TTL TO 1 HOUR (3600s) from 24h to prevent zombie accumulation
-        pipeline.setex(sessionKey, 3600, JSON.stringify(session));
+        pipeline.setex(sessionKey, 86400, JSON.stringify(session)); // 24h TVL
         pipeline.sadd(this.ONLINE_USERS_SET, socketId);
         await pipeline.exec();
 
@@ -52,40 +51,14 @@ export class SessionService {
         if (current) {
             const sessions = JSON.parse(current);
             const updated = { ...sessions, ...updates };
-            // Update with same TTL (refreshing it)
-            await this.redis.setex(key, 3600, JSON.stringify(updated));
+            // Update with same TTL
+            await this.redis.setex(key, 86400, JSON.stringify(updated));
         }
     }
 
     async getSession(socketId: string): Promise<AnonymousSession | null> {
         const data = await this.redis.get(this.getSessionKey(socketId));
         return data ? JSON.parse(data) : null;
-    }
-
-    // New optimized method for Random Matching to avoid fetching ALL sessions
-    async getRandomOnlineSession(ignoreIds: string[] = []): Promise<AnonymousSession | null> {
-        // OPTIMIZATION: Fetch a batch of random IDs (e.g. 50) in ONE round-trip
-        // instead of looping 15 times with 15 round-trips.
-        const batchSize = 50;
-        const randomIds = await this.redis.srandmember(this.ONLINE_USERS_SET, batchSize) as string[];
-
-        // Shuffle isn't strictly necessary as Redis returns random, but good for local processing if needed
-        // Filter out ignored IDs and process
-        for (const id of randomIds) {
-            if (ignoreIds.includes(id)) continue;
-
-            const session = await this.getSession(id);
-            if (session && !session.isOccupied) {
-                return session;
-            }
-
-            // Lazy cleanup for expired sessions
-            if (!session) {
-                this.redis.srem(this.ONLINE_USERS_SET, id).catch(() => { });
-            }
-        }
-
-        return null;
     }
 
     private cachedSessions: AnonymousSession[] | null = null;
@@ -107,13 +80,8 @@ export class SessionService {
             return [];
         }
 
-        // If too many users, we must slice to avoid exploding Redis packet size
-        // For now, let's cap at 5000 users for the "list" view. 
-        // Realistically, the frontend stops rendering gracefully way before that.
-        const limitedSocketIds = socketIds.slice(0, 5000);
-
         // Construct keys for MGET
-        const sessionKeys = limitedSocketIds.map(id => this.getSessionKey(id));
+        const sessionKeys = socketIds.map(id => this.getSessionKey(id));
 
         // Fetch all sessions in one go
         const sessionsData = await this.redis.mget(sessionKeys);
@@ -127,11 +95,11 @@ export class SessionService {
                     activeSessions.push(JSON.parse(data));
                 } catch (e) {
                     // Corruption check
-                    staleIds.push(limitedSocketIds[index]);
+                    staleIds.push(socketIds[index]);
                 }
             } else {
                 // Session expired or key missing, but ID still in set -> Stale
-                staleIds.push(limitedSocketIds[index]);
+                staleIds.push(socketIds[index]);
             }
         });
 
@@ -160,7 +128,7 @@ export class SessionService {
         const session = await this.getSession(socketId);
         if (session) {
             session.isOccupied = isOccupied;
-            await this.redis.setex(this.getSessionKey(socketId), 3600, JSON.stringify(session));
+            await this.redis.setex(this.getSessionKey(socketId), 86400, JSON.stringify(session));
         }
     }
 }
