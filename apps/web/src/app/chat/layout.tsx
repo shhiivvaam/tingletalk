@@ -6,7 +6,7 @@ import { io, Socket } from 'socket.io-client';
 import { useUserStore } from '@/store/useUserStore';
 import { useChatStore } from '@/store/useChatStore';
 import OnlineUsersList from '@/components/chat/OnlineUsersList';
-import { Menu, X, Calendar, MapPin } from 'lucide-react';
+import { Menu, X, Calendar, MapPin, ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { playNotificationSound, playMessageSound } from '@/utils/audio';
 
@@ -244,19 +244,49 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
                 </div>
             )}
 
-            {/* Mobile Sidebar Toggle */}
-            <button
-                onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                className="md:hidden absolute top-4 left-4 z-50 p-2 bg-slate-800/80 backdrop-blur-md rounded-lg border border-white/10 text-white"
-            >
-                {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
-            </button>
+
 
             {/* Sidebar */}
-            <div className={`
-                fixed inset-y-0 left-0 z-40 w-full md:w-80 bg-slate-900/95 backdrop-blur-2xl border-r border-white/5 transform transition-transform duration-300 md:relative md:translate-x-0 flex flex-col
-                ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
-            `}>
+            <motion.div
+                initial={false}
+                animate={{
+                    x: isSidebarOpen ? 0 : '-100%',
+                }}
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                className={`
+                    fixed inset-y-0 left-0 z-40 w-full md:w-80 bg-slate-900/95 backdrop-blur-2xl border-r border-white/5 md:relative md:translate-x-0 flex flex-col
+                `}
+            >
+                {/* Premium Mobile Slice Toggle (Center-Left) */}
+                <button
+                    onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                    className={`
+                        md:hidden absolute top-1/2 -translate-y-1/2 z-50
+                        flex items-center justify-center
+                        h-32 w-12
+                        bg-gradient-to-b from-pink-500/90 to-violet-600/90
+                        backdrop-blur-md border border-white/20 shadow-[10px_0_30px_rgba(236,72,153,0.3)]
+                        transition-all duration-500 ease-in-out group
+                        ${isSidebarOpen 
+                            ? 'right-6 rounded-2xl bg-slate-800/40 backdrop-blur-2xl border-white/10 shadow-none' 
+                            : 'left-full rounded-r-2xl border-l-0'}
+                    `}
+                >
+                    <div className="flex flex-col items-center gap-2">
+                        {isSidebarOpen ? (
+                            <>
+                                <ChevronLeft size={24} className="text-white group-hover:-translate-x-1 transition-transform" />
+                                <span className="text-[9px] font-black text-white/40 uppercase tracking-[0.2em] [writing-mode:vertical-lr] rotate-180">HIDE</span>
+                            </>
+                        ) : (
+                            <>
+                                <ChevronRight size={24} className="text-white group-hover:translate-x-1 transition-transform animate-pulse" />
+                                <span className="text-[9px] font-black text-white/90 uppercase tracking-[0.2em] [writing-mode:vertical-lr]">USERS</span>
+                            </>
+                        )}
+                    </div>
+                </button>
+
                 {/* Branding & Profile Header */}
                 <div className="h-16 shrink-0 flex items-center justify-between px-4 border-b border-white/5 bg-slate-900/50 gap-2 relative z-50">
                     {/* Left: Brand */}
@@ -341,7 +371,6 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
                         )}
                     </AnimatePresence>
                 </div>
-
                 <div className="flex-1 overflow-hidden relative">
                     <OnlineUsersList
                         users={onlineUsers}
@@ -355,7 +384,20 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
                         isSearching={isSearching}
                     />
                 </div>
-            </div>
+            </motion.div>
+
+            {/* Backdrop for Mobile Sidebar */}
+            <AnimatePresence>
+                {isSidebarOpen && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        onClick={() => setIsSidebarOpen(false)}
+                        className="md:hidden fixed inset-0 bg-slate-950/60 backdrop-blur-[2px] z-30"
+                    />
+                )}
+            </AnimatePresence>
 
             {/* Main Content */}
             <div className="flex-1 flex flex-col relative w-full h-full">
