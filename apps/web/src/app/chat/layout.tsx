@@ -8,6 +8,7 @@ import { useChatStore } from '@/store/useChatStore';
 import OnlineUsersList from '@/components/chat/OnlineUsersList';
 import { Menu, X, Calendar, MapPin } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { playNotificationSound } from '@/utils/audio';
 
 interface OnlineUser {
     id: string;
@@ -144,6 +145,13 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
                         nickname: sender.nickname,
                         message: data.type === 'text' ? data.message : `Sent a ${data.type}`
                     });
+
+
+
+                    // ... (inside the component)
+
+                    // Play Notification Sound
+                    playNotificationSound();
 
                     // Auto hide after 3 seconds
                     setTimeout(() => setNotification(null), 3000);
