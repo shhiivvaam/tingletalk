@@ -376,7 +376,7 @@ export default function ChatWindow({ socket, currentUserId }: ChatWindowProps) {
             </div>
 
             {/* Messages Area */}
-            <div className="flex-1 overflow-y-auto p-3 md:p-6 space-y-4 md:space-y-6 custom-scrollbar z-10 w-full">
+            <div className="flex-1 min-h-0 overflow-y-auto p-3 md:p-6 space-y-4 md:space-y-6 custom-scrollbar z-10 w-full">
                 {userMessages.length === 0 ? (
                     <div className="flex flex-col items-center justify-center h-full text-slate-500 space-y-6">
                         <motion.div
