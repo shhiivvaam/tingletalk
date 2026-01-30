@@ -27,6 +27,7 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
     const [isSearching, setIsSearching] = useState(false);
     const [isConnected, setIsConnected] = useState(false);
     const [isHydrated, setIsHydrated] = useState(false);
+    const [notification, setNotification] = useState<{ id: string, nickname: string, message: string } | null>(null);
 
     // Wait for Zustand to hydrate from localStorage
     useEffect(() => {
@@ -118,6 +119,36 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
                 metadata: data.metadata,
                 timestamp: data.timestamp
             });
+
+            // TOAST LOGIC
+            // If the message is NOT from the current user (sent by me) 
+            // AND not from the person I'm currently talking to
+            // Show a "New Message" popup 
+            const currentSelected = useChatStore.getState().selectedUser?.id;
+            const isMe = data.senderId === newSocket.id;
+
+            if (!isMe && data.senderId !== currentSelected) {
+                // Find user info
+                const sender = store.onlineUsers.find(u => u.id === data.senderId) || store.knownUsers[data.senderId];
+                if (sender) {
+                    // We can use a simple HTML API notification or a custom state-based toast
+                    // For now, let's inject a custom toast into the DOM or use a library if available.
+                    // Since we don't have a toast library installed, we'll dispatch a custom event or simple alert?
+                    // No, alert is blocking. 
+                    // Let's add a `setLastNotification` to the store or a local state? 
+                    // Actually, let's use a browser Notification if allowed, or console log for now as placeholder for the UI component?
+                    // User asked for "toast kind of thing".
+                    // Best way: Trigger a local state update that the Layout renders.
+                    setNotification({
+                        id: data.senderId,
+                        nickname: sender.nickname,
+                        message: data.type === 'text' ? data.message : `Sent a ${data.type}`
+                    });
+
+                    // Auto hide after 3 seconds
+                    setTimeout(() => setNotification(null), 3000);
+                }
+            }
         });
 
         newSocket.on('userTyping', (data: { userId: string, isTyping: boolean }) => {
@@ -135,10 +166,6 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
 
             // Also ensure we know about this user
             useChatStore.getState().addOnlineUser(data.user);
-
-            // Optional: Notification Sound?
-            // const audio = new Audio('/sounds/match.mp3');
-            // audio.play().catch(() => {});
         });
 
         setSocket(newSocket);
@@ -183,6 +210,34 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
 
     return (
         <div className="flex h-screen text-slate-200 overflow-hidden relative">
+            {/* Notification Toast */}
+            <AnimatePresence>
+                {notification && (
+                    <motion.div
+                        initial={{ opacity: 0, y: -50, x: -50 }}
+                        animate={{ opacity: 1, y: 0, x: -50 }}
+                        exit={{ opacity: 0, y: -50, x: -50 }}
+                        transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                        className="fixed top-8 left-1/2 transform -translate-x-1/2 bg-slate-800 text-white px-5 py-3 rounded-full shadow-2xl z-[100] flex items-center gap-4 border border-slate-700 cursor-pointer hover:bg-slate-750 active:scale-95 transition-all"
+                        onClick={() => {
+                            const user = useChatStore.getState().knownUsers[notification.id] || useChatStore.getState().onlineUsers.find(u => u.id === notification.id);
+                            if (user) {
+                                setSelectedUser(user);
+                                setNotification(null);
+                            }
+                        }}
+                    >
+                        <div className="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center text-sm font-bold shadow-md">
+                            {(notification.nickname || '?')[0].toUpperCase()}
+                        </div>
+                        <div className="flex flex-col min-w-[120px]">
+                            <span className="text-sm font-bold text-indigo-300">{notification.nickname}</span>
+                            <span className="text-xs text-slate-300 truncate max-w-[200px]">{notification.message}</span>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
             {/* Connection Status Banner */}
             {!isConnected && isHydrated && (
                 <div className="absolute top-0 left-0 right-0 z-50 bg-amber-500/90 backdrop-blur-sm text-white py-2 px-4 text-center text-sm font-medium flex items-center justify-center gap-2">
