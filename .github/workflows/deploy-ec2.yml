@@ -75,8 +75,8 @@ jobs:
           tags: |
             ${{ env.BACKEND_IMAGE }}:latest
             ${{ env.BACKEND_IMAGE }}:${{ steps.vars.outputs.sha_short }}
-          # cache-from: type=registry,ref=${{ env.BACKEND_IMAGE }}:buildcache
-          # cache-to: type=registry,ref=${{ env.BACKEND_IMAGE }}:buildcache,mode=max
+          cache-from: type=registry,ref=${{ env.BACKEND_IMAGE }}:buildcache
+          cache-to: type=registry,ref=${{ env.BACKEND_IMAGE }}:buildcache,mode=max
 
       - name: Image digest
         run: |
@@ -116,8 +116,8 @@ jobs:
           tags: |
             ${{ env.FRONTEND_IMAGE }}:latest
             ${{ env.FRONTEND_IMAGE }}:${{ steps.vars.outputs.sha_short }}
-          # cache-from: type=registry,ref=${{ env.FRONTEND_IMAGE }}:buildcache
-          # cache-to: type=registry,ref=${{ env.FRONTEND_IMAGE }}:buildcache,mode=max
+          cache-from: type=registry,ref=${{ env.FRONTEND_IMAGE }}:buildcache
+          cache-to: type=registry,ref=${{ env.FRONTEND_IMAGE }}:buildcache,mode=max
 
       - name: Image digest
         run: |
