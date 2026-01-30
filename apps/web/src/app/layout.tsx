@@ -13,19 +13,18 @@ export const metadata: Metadata = {
   title: "Tingle Talk | Anonymous Dating & Fun Chats",
   description: "Meet new people, find a date, or just have fun. 100% anonymous, safe, and instant.",
   manifest: '/manifest.json',
+  themeColor: '#ec4899',
+  viewport: {
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 1,
+    userScalable: false,
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
     title: 'TingleTalk',
   },
-};
-
-export const viewport = {
-  width: 'device-width',
-  initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
-  themeColor: '#ec4899',
 };
 
 import ToastContainer from "@/components/ui/ToastContainer";
