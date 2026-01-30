@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Flame } from 'lucide-react';
+import { Flame, ChevronDown } from 'lucide-react';
 import Image from 'next/image';
 
 export default function AnimatedHero() {
@@ -35,6 +35,16 @@ export default function AnimatedHero() {
             <p className="text-xl text-slate-400 font-light max-w-xl mx-auto lg:mx-0 leading-relaxed">
                 Skip the signup. Skip the profile. Just pure, anonymous connection. Find your match, share a secret, or just have fun on the most secure anonymous chatting platform.
             </p>
+
+            <div className="flex justify-center lg:justify-start pt-4">
+                <a
+                    href="#how-it-works"
+                    className="flex items-center gap-2 text-slate-500 hover:text-pink-400 font-semibold tracking-wide transition-all group"
+                >
+                    <span>How it works</span>
+                    <ChevronDown size={18} className="group-hover:translate-y-1 transition-transform" />
+                </a>
+            </div>
         </motion.div>
     );
 }
