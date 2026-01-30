@@ -8,7 +8,7 @@ import { useChatStore } from '@/store/useChatStore';
 import OnlineUsersList from '@/components/chat/OnlineUsersList';
 import { Menu, X, Calendar, MapPin } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { playNotificationSound } from '@/utils/audio';
+import { playNotificationSound, playMessageSound } from '@/utils/audio';
 
 interface OnlineUser {
     id: string;
@@ -128,35 +128,25 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
             const currentSelected = useChatStore.getState().selectedUser?.id;
             const isMe = data.senderId === newSocket.id;
 
-            if (!isMe && data.senderId !== currentSelected) {
-                // Find user info
-                const sender = store.onlineUsers.find(u => u.id === data.senderId) || store.knownUsers[data.senderId];
-                if (sender) {
-                    // We can use a simple HTML API notification or a custom state-based toast
-                    // For now, let's inject a custom toast into the DOM or use a library if available.
-                    // Since we don't have a toast library installed, we'll dispatch a custom event or simple alert?
-                    // No, alert is blocking. 
-                    // Let's add a `setLastNotification` to the store or a local state? 
-                    // Actually, let's use a browser Notification if allowed, or console log for now as placeholder for the UI component?
-                    // User asked for "toast kind of thing".
-                    // Best way: Trigger a local state update that the Layout renders.
-                    setNotification({
-                        id: data.senderId,
-                        nickname: sender.nickname,
-                        message: data.type === 'text' ? data.message : `Sent a ${data.type}`
-                    });
-
-
-
-                    // ... (inside the component)
-
-                    // Play Notification Sound
+            if (!isMe) {
+                if (data.senderId === currentSelected) {
+                    playMessageSound();
+                } else {
+                    const sender = store.onlineUsers.find(u => u.id === data.senderId) || store.knownUsers[data.senderId];
                     playNotificationSound();
 
-                    // Auto hide after 3 seconds
-                    setTimeout(() => setNotification(null), 3000);
+                    if (sender) {
+                        setNotification({
+                            id: data.senderId,
+                            nickname: sender.nickname,
+                            message: data.type === 'text' ? data.message : `Sent a ${data.type}`
+                        });
+                        setTimeout(() => setNotification(null), 3000);
+                    }
                 }
+
             }
+
         });
 
         newSocket.on('userTyping', (data: { userId: string, isTyping: boolean }) => {
