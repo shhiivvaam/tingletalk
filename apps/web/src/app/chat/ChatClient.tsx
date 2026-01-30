@@ -33,14 +33,14 @@ export default function ChatClient() {
                 </motion.div>
 
                 <div className="space-y-4">
-                    <motion.h2
+                    <motion.h1
                         initial={{ y: 20, opacity: 0 }}
                         animate={{ y: 0, opacity: 1 }}
                         transition={{ delay: 0.2 }}
                         className="text-4xl md:text-5xl font-bold text-white tracking-tight"
                     >
                         Tingle<span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-violet-400">Lobby</span>
-                    </motion.h2>
+                    </motion.h1>
                     <motion.p
                         initial={{ y: 20, opacity: 0 }}
                         animate={{ y: 0, opacity: 1 }}

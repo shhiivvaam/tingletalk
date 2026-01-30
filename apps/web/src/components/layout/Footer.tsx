@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function Footer() {
     return (
@@ -6,7 +7,13 @@ export default function Footer() {
             <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
                 <div className="flex flex-col items-center md:items-start gap-4">
                     <div className="flex items-center gap-2">
-                        <img src="/assets/logo.png" alt="Tingle Talk" className="w-8 h-8 object-contain" />
+                        <Image
+                            src="/assets/logo.png"
+                            alt="Tingle Talk"
+                            width={32}
+                            height={32}
+                            className="w-8 h-8 object-contain"
+                        />
                         <span className="text-xl font-bold text-white tracking-tight">
                             Tingle<span className="text-pink-500">Talk</span>
                         </span>

@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { Flame } from 'lucide-react';
+import Image from 'next/image';
 
 export default function AnimatedHero() {
     return (
@@ -12,9 +13,12 @@ export default function AnimatedHero() {
             className="space-y-6"
         >
             <div className="flex items-center gap-8 justify-center lg:justify-start mb-6">
-                <img
+                <Image
                     src="/assets/logo.png"
-                    alt="TingleTalk Logo"
+                    alt="Tingle Talk Logo - Best Anonymous Chat Platform"
+                    width={128}
+                    height={128}
+                    priority
                     className="w-24 h-24 md:w-32 md:h-32 object-contain drop-shadow-[0_0_15px_rgba(236,72,153,0.5)]"
                 />
 
