@@ -46,7 +46,7 @@ export default function NotFound() {
                     initial={{ y: 20, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ delay: 0.4 }}
-                    className="mt-12"
+                    className="mt-12 flex flex-col items-center gap-8"
                 >
                     <Link
                         href="/"
@@ -55,11 +55,11 @@ export default function NotFound() {
                         <Home size={20} />
                         <span>Return to Base</span>
                     </Link>
-                </motion.div>
 
-                <div className="absolute bottom-8 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-700">
-                    Error Code: 404 • Transmission Terminated
-                </div>
+                    <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-700">
+                        Error Code: 404 • Transmission Terminated
+                    </div>
+                </motion.div>
             </div>
         </div>
     );
