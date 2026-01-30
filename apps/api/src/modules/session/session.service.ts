@@ -70,7 +70,7 @@ export class SessionService {
                     staleIds.push(socketIds[index]);
                 }
             } else {
-                // Session expired or key missing, but ID still in set -> Stale
+                // Session expired or key missing, but ID still in set - Stale
                 staleIds.push(socketIds[index]);
             }
         });
