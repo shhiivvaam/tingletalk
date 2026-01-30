@@ -17,18 +17,19 @@ export const metadata: Metadata = {
     apple: '/icons/icon-192x192.png',
   },
   manifest: '/manifest.json',
-  themeColor: '#ec4899',
-  viewport: {
-    width: 'device-width',
-    initialScale: 1,
-    maximumScale: 1,
-    userScalable: false,
-  },
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
     title: 'TingleTalk',
   },
+};
+
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  themeColor: '#ec4899',
 };
 
 import ToastContainer from "@/components/ui/ToastContainer";
