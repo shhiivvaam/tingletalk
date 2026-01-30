@@ -38,7 +38,7 @@ export class SessionService {
 
         // Use pipeline to execute commands atomically
         const pipeline = this.redis.pipeline();
-        pipeline.setex(sessionKey, 86400, JSON.stringify(session)); // 24h TVL
+        pipeline.setex(sessionKey, 86400, JSON.stringify(session)); // 24h TTL
         pipeline.sadd(this.ONLINE_USERS_SET, socketId);
         await pipeline.exec();
 
