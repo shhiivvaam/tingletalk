@@ -284,7 +284,7 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
                     {/* Header */}
                     <div className="h-16 shrink-0 flex items-center justify-between px-4 border-b border-white/5 bg-slate-900/50">
                         <div className="flex items-center gap-2">
-                            <img src="/logo.png" alt="TingleTalk" className="w-8 h-8 object-contain" />
+                            <img src="/assets/logo.png" alt="TingleTalk" className="w-8 h-8 object-contain" />
                             <span className="font-black text-lg tracking-tight text-white/90">
                                 Tingle<span className="text-pink-500">Talk</span>
                             </span>

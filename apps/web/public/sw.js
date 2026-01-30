@@ -1,13 +1,13 @@
 // Service Worker for TingleTalk PWA
-const CACHE_NAME = 'tingletalk-v1';
+const CACHE_NAME = 'tingletalk';
 const RUNTIME_CACHE = 'tingletalk-runtime';
 
 // Assets to cache on install
 const PRECACHE_ASSETS = [
     '/',
     '/chat',
-    '/favicon.png',
-    '/logo.png',
+    '/assets/favicon.png',
+    '/assets/logo.png',
 ];
 
 // Install event - cache essential assets
@@ -101,8 +101,8 @@ self.addEventListener('push', (event) => {
     console.log('[Service Worker] Push received');
     const options = {
         body: event.data ? event.data.text() : 'New message received!',
-        icon: '/icons/icon-192x192.png',
-        badge: '/icons/icon-72x72.png',
+        icon: '/assets/icons/icon-192x192.png',
+        badge: '/assets/icons/icon-72x72.png',
         vibrate: [200, 100, 200],
         tag: 'tingletalk-notification',
         requireInteraction: false,

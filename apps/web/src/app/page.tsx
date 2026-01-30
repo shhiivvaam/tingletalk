@@ -102,7 +102,7 @@ export default function Home() {
             {/* Header: Logo & Badge */}
             <div className="flex items-center gap-8 justify-center lg:justify-start mb-6">
               <img
-                src="/logo.png"
+                src="/assets/logo.png"
                 alt="TingleTalk Logo"
                 className="w-24 h-24 md:w-32 md:h-32 object-contain drop-shadow-[0_0_15px_rgba(236,72,153,0.5)]"
               />

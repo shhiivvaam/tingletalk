@@ -6,10 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint",
-    "generate-icons": "node generate-icons.js",
-    "generate-favicons": "node generate-favicons.js",
-    "update-icons": "node update-icons-from-logo.js"
+    "lint": "eslint"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.2.4",
