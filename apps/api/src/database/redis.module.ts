@@ -21,6 +21,7 @@ import Redis from 'ioredis';
                 }
 
                 const redis = new Redis(redisUrl, {
+                    db: 0, // Explicitly use DB 0 for Upstash
                     maxRetriesPerRequest: 3,
                     enableReadyCheck: true,
                     lazyConnect: false,
