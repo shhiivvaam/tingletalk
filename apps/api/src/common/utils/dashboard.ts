@@ -20,14 +20,12 @@ export async function showServiceLogs(configService: ConfigService, port: number
             style: { head: [], border: [] }
         });
 
-        const redisHost = configService.get('REDIS_HOST') || 'localhost';
-        const redisPort = configService.get('REDIS_PORT') || '6379';
         const env = process.env.NODE_ENV || 'development';
 
         table.push(
             ['API Server', chalk.green.bold('RUNNING'), `http://localhost:${port}`],
             ['Database', chalk.green.bold('CONNECTED'), 'PostgreSQL'],
-            ['Redis', chalk.green.bold('CONNECTED'), `${redisHost}:${redisPort}`],
+            ['Redis', chalk.green.bold('CONNECTED'), 'Upstash'],
             ['Environment', chalk.yellow.bold(env), '-']
         );
 
