@@ -59,7 +59,7 @@ export default function Home() {
       </div>
 
       {/* Mid Page Ad */}
-      <div className="w-full max-w-4xl mx-auto py-8 px-4">
+      <div className="w-full max-w-4xl mx-auto py-4 md:py-8 px-4">
         <AdUnit
           // Default slot
           format="auto"
@@ -71,7 +71,7 @@ export default function Home() {
       <LandingInfo />
 
       {/* Bottom Page Ad */}
-      <div className="w-full max-w-6xl mx-auto py-8">
+      <div className="w-full max-w-6xl mx-auto py-4 md:py-8">
         <AdUnit
           // Default slot
           format="auto"

@@ -253,7 +253,7 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
             )}
 
             {/* GLOBAL TOP FRAME AD */}
-            <div className="shrink-0 w-full z-30 bg-slate-900 border-b border-white/5 h-[90px] overflow-hidden flex justify-center items-center">
+            <div className="flex shrink-0 w-full z-30 bg-slate-900 border-b border-white/5 h-[90px] overflow-hidden justify-center items-center">
                 <AdUnit
                     key="global-top-frame"
                     slot="f1ecdc5056db3521ecee075d39c94dca"
@@ -281,25 +281,25 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
                 {/* CENTER APP BOX (Sidebar + content) */}
                 <div className="flex-1 flex relative min-w-0 bg-slate-950 shadow-2xl z-10">
 
-                    {/* Premium Vertical Toggle Button (Floating within App Box) */}
+                    {/* Premium Vertical Toggle Button - Refined & Compact */}
                     <button
                         onClick={() => setIsSidebarOpen(!isSidebarOpen)}
                         className={`
                         absolute top-1/2 -translate-y-1/2 z-[60]
                         flex items-center justify-center
-                        h-24 w-6 md:w-8
+                        h-12 w-5 md:w-6
                         transition-all duration-500 ease-out group
                         ${isSidebarOpen
-                                ? 'left-[100%] md:left-80 -translate-x-full rounded-l-2xl hover:bg-white/5 border-r-0'
-                                : 'left-0 rounded-r-2xl bg-gradient-to-b from-pink-600 to-violet-600 shadow-[4px_0_15px_rgba(236,72,153,0.3)]'}
-                        border border-white/10 backdrop-blur-md
+                                ? 'left-[100%] md:left-80 -translate-x-full rounded-l-xl bg-slate-900/40 hover:bg-white/10 border-r-0'
+                                : 'left-0 rounded-r-xl bg-gradient-to-b from-pink-600 to-violet-600 shadow-[4px_0_15px_rgba(236,72,153,0.25)]'}
+                        border border-white/10 backdrop-blur-xl
                     `}
                     >
-                        <div className="flex flex-col items-center gap-1">
+                        <div className="flex flex-col items-center">
                             {isSidebarOpen ? (
-                                <ChevronLeft size={20} className="text-white/40 group-hover:text-white transition-colors" />
+                                <ChevronLeft size={16} className="text-white/40 group-hover:text-white transition-colors" />
                             ) : (
-                                <ChevronRight size={20} className="text-white animate-pulse" />
+                                <ChevronRight size={16} className="text-white animate-pulse" />
                             )}
                         </div>
                     </button>
@@ -327,13 +327,23 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
                                     </span>
                                 </div>
 
-                                <button
-                                    onClick={() => setIsProfileOpen(!isProfileOpen)}
-                                    className="relative w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-teal-400 flex items-center justify-center font-bold text-xs text-white shadow-sm border border-white/10"
-                                >
-                                    {(username || '?').charAt(0).toUpperCase()}
-                                    <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-slate-900 rounded-full"></span>
-                                </button>
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        onClick={() => setIsProfileOpen(!isProfileOpen)}
+                                        className="relative w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-teal-400 flex items-center justify-center font-bold text-xs text-white shadow-sm border border-white/10"
+                                    >
+                                        {(username || '?').charAt(0).toUpperCase()}
+                                        <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-slate-900 rounded-full"></span>
+                                    </button>
+
+                                    {/* Mobile Close Button */}
+                                    <button
+                                        onClick={() => setIsSidebarOpen(false)}
+                                        className="md:hidden p-2 text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
+                                    >
+                                        <X size={20} />
+                                    </button>
+                                </div>
                             </div>
 
                             {/* Profile Dropdown (Inside Sidebar context) */}
@@ -420,8 +430,8 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
 
             </div>
 
-            {/* GLOBAL BOTTOM FRAME AD */}
-            <div className="shrink-0 w-full z-30 bg-slate-900 border-t border-white/5 h-[90px] overflow-hidden flex justify-center items-center">
+            {/* GLOBAL BOTTOM FRAME AD - Hidden on Mobile */}
+            <div className="hidden md:flex shrink-0 w-full z-30 bg-slate-900 border-t border-white/5 h-[90px] overflow-hidden justify-center items-center">
                 <AdUnit
                     key="global-bottom-frame"
                     slot="f1ecdc5056db3521ecee075d39c94dca"

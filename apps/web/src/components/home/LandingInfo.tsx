@@ -53,8 +53,8 @@ export default function LandingInfo() {
                         <span>End-to-End Encrypted Conversations</span>
                     </div>
 
-                    {/* Ad Grid in Left Column - 2x2 */}
-                    <div className="pt-4 grid grid-cols-2 gap-3">
+                    {/* Ad Grid in Left Column - 2x2 Responsive */}
+                    <div className="pt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <AdUnit
                             format="rectangle"
                             label="FAQ Ad 1"
