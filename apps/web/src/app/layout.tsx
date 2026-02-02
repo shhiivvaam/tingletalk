@@ -106,13 +106,14 @@ export default function RootLayout({
           crossOrigin="anonymous">
         </script>
         {/* AdsTerra - EffectiveGate */}
-        <Script
+        {/* <Script
           src="https://pl28597008.effectivegatecpm.com/f6/ec/2f/f6ec2f262184e8f9a191cb7befad4db0.js"
           strategy="afterInteractive"
-        />
+        /> */}
       </head>
       <body className="font-sans min-h-screen selection:bg-pink-500/30">
         <div className="aurora-bg" />
+        {/* Main layout wrapper */}
         <div className="relative z-10">
           <ToastContainer />
           <PWAInstallPrompt />
