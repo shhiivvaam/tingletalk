@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { MessageSquare, ShieldCheck, UserPlus, Globe } from 'lucide-react';
+import AdUnit from '@/components/ads/AdUnit';
 
 export default function LandingInfo() {
     return (
@@ -50,6 +51,30 @@ export default function LandingInfo() {
                     <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-white/10 bg-white/5 text-slate-300 text-sm">
                         <ShieldCheck size={16} className="text-green-500" />
                         <span>End-to-End Encrypted Conversations</span>
+                    </div>
+
+                    {/* Ad Grid in Left Column - 2x2 */}
+                    <div className="pt-4 grid grid-cols-2 gap-3">
+                        <AdUnit
+                            format="rectangle"
+                            label="FAQ Ad 1"
+                            style={{ minHeight: '150px', maxHeight: '200px' }}
+                        />
+                        <AdUnit
+                            format="rectangle"
+                            label="FAQ Ad 2"
+                            style={{ minHeight: '150px', maxHeight: '200px' }}
+                        />
+                        <AdUnit
+                            format="rectangle"
+                            label="FAQ Ad 3"
+                            style={{ minHeight: '150px', maxHeight: '200px' }}
+                        />
+                        <AdUnit
+                            format="rectangle"
+                            label="FAQ Ad 4"
+                            style={{ minHeight: '150px', maxHeight: '200px' }}
+                        />
                     </div>
                 </div>
 

@@ -4,6 +4,7 @@ import { useChatStore } from '@/store/useChatStore';
 import { useUserStore } from '@/store/useUserStore';
 import { motion, AnimatePresence } from 'framer-motion';
 import RandomMatchModal from './RandomMatchModal';
+import AdUnit from '../ads/AdUnit';
 
 interface OnlineUser {
     id: string;
@@ -239,6 +240,43 @@ export default function OnlineUsersList({ users, currentUserId, selectedUserId, 
         );
     };
 
+    const renderWithAds = (userList: any[], keyPrefix: string, mode: 'online' | 'offline' | 'check') => {
+        const items: any[] = [];
+        userList.forEach((user, index) => {
+            const isOnline = mode === 'online' ? true :
+                mode === 'offline' ? false :
+                    users.some(u => u.id === user.id);
+
+            items.push(
+                <UserRow
+                    key={`${keyPrefix}-${user.id}`}
+                    user={user}
+                    isOnline={isOnline}
+                    unreadCount={unreadCounts[user.id] || 0}
+                    onSelectUser={onSelectUser}
+                />
+            );
+
+            // Insert Ad every 5 users
+            if ((index + 1) % 5 === 0) {
+                items.push(
+                    <div key={`${keyPrefix}-ad-${index}`} className="py-2 px-1">
+                        <AdUnit
+                            // Default slot (Native Banner)
+                            format="horizontal"
+                            label="Sidebar List Ad"
+                            style={{ minHeight: '160px' }}
+                        />
+                    </div>
+                );
+            }
+        });
+
+        if (items.length === 0) return null;
+
+        return <>{items}</>;
+    };
+
     return (
         <div className="flex flex-col h-full bg-transparent">
             {/* Content Area */}
@@ -423,15 +461,7 @@ export default function OnlineUsersList({ users, currentUserId, selectedUserId, 
                                         <p className="text-xs">No users found</p>
                                     </div>
                                 ) : (
-                                    filteredOnlineUsers.map(user => (
-                                        <UserRow
-                                            key={`online-${user.id}`}
-                                            user={user}
-                                            isOnline={true}
-                                            unreadCount={unreadCounts[user.id] || 0}
-                                            onSelectUser={onSelectUser}
-                                        />
-                                    ))
+                                    renderWithAds(filteredOnlineUsers, 'online', 'online')
                                 )}
                             </div>
                         </motion.div>
@@ -453,15 +483,7 @@ export default function OnlineUsersList({ users, currentUserId, selectedUserId, 
                                     <p className="text-xs">No active conversations</p>
                                 </div>
                             ) : (
-                                inboxUsers.map(user => (
-                                    <UserRow
-                                        key={`inbox-${user.id}`}
-                                        user={user}
-                                        isOnline={users.some(u => u.id === user.id)}
-                                        unreadCount={unreadCounts[user.id] || 0}
-                                        onSelectUser={onSelectUser}
-                                    />
-                                ))
+                                renderWithAds(inboxUsers, 'inbox', 'check')
                             )}
                         </motion.div>
                     )}
@@ -489,15 +511,7 @@ export default function OnlineUsersList({ users, currentUserId, selectedUserId, 
                                         <p className="text-xs">No recent history</p>
                                     </div>
                                 ) : (
-                                    historyUsers.map(user => (
-                                        <UserRow
-                                            key={`history-${user.id}`}
-                                            user={user}
-                                            isOnline={false}
-                                            unreadCount={unreadCounts[user.id] || 0}
-                                            onSelectUser={onSelectUser}
-                                        />
-                                    ))
+                                    renderWithAds(historyUsers, 'history', 'offline')
                                 )}
                             </div>
                         </motion.div>

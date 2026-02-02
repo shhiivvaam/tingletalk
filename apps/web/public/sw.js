@@ -47,6 +47,11 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
+    // Only cache GET requests
+    if (event.request.method !== 'GET') {
+        return;
+    }
+
     // Skip WebSocket requests
     if (event.request.url.includes('socket.io')) {
         return;
@@ -101,8 +106,8 @@ self.addEventListener('push', (event) => {
     console.log('[Service Worker] Push received');
     const options = {
         body: event.data ? event.data.text() : 'New message received!',
-        icon: '/assets/icons/icon-192x192.png',
-        badge: '/assets/icons/icon-72x72.png',
+        icon: '/assets/logo.png',
+        badge: '/assets/favicon.png',
         vibrate: [200, 100, 200],
         tag: 'tingletalk-notification',
         requireInteraction: false,

@@ -100,16 +100,6 @@ export default function RootLayout({
       <head>
         {/* Google Adsense */}
         <meta name="google-adsense-account" content="ca-pub-9299390652489427"></meta>
-        <script
-          async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9299390652489427"
-          crossOrigin="anonymous">
-        </script>
-        {/* AdsTerra - EffectiveGate */}
-        {/* <Script
-          src="https://pl28597008.effectivegatecpm.com/f6/ec/2f/f6ec2f262184e8f9a191cb7befad4db0.js"
-          strategy="afterInteractive"
-        /> */}
       </head>
       <body className="font-sans min-h-screen selection:bg-pink-500/30">
         <div className="aurora-bg" />
@@ -120,6 +110,14 @@ export default function RootLayout({
           {children}
         </div>
         <Analytics />
+
+        {/* Google AdSense Script */}
+        <Script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9299390652489427"
+          crossOrigin="anonymous"
+          strategy="afterInteractive"
+        />
       </body>
     </html>
   );

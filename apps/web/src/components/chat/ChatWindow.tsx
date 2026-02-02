@@ -9,6 +9,7 @@ import CameraModal from './media/CameraModal';
 import VoiceRecorder from './media/VoiceRecorder';
 import GifPicker from './media/GifPicker';
 import { UploadService } from '@/services/uploadService';
+import AdUnit from '../ads/AdUnit';
 
 interface ChatWindowProps {
     socket: any;
@@ -375,6 +376,8 @@ export default function ChatWindow({ socket, currentUserId }: ChatWindowProps) {
                 </div>
             </div>
 
+
+
             {/* Messages Area */}
             <div className="flex-1 min-h-0 overflow-y-auto p-3 md:p-6 space-y-4 md:space-y-6 custom-scrollbar z-10 w-full">
                 {userMessages.length === 0 ? (
@@ -482,6 +485,8 @@ export default function ChatWindow({ socket, currentUserId }: ChatWindowProps) {
 
                 <div ref={messagesEndRef} />
             </div>
+
+
 
             {/* Input Area */}
             <div className="p-2 md:p-6 bg-slate-900/60 backdrop-blur-xl border-t border-white/5 z-20 relative shrink-0">

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ad</title>
+    <style>
+        body { margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; overflow: hidden; background: transparent; }
+        /* Ensure the container takes full width if needed */
+        div[id^="container-"] { width: 100%; display: flex; justify-content: center; }
+    </style>
+</head>
+<body>
+    <script>
+        // Parse the hash from the URL query params
+        const urlParams = new URLSearchParams(window.location.search);
+        const adHash = urlParams.get('hash');
+
+        if (adHash) {
+            // Create the specific container div required by Adsterra
+            const container = document.createElement('div');
+            container.id = `container-${adHash}`;
+            document.body.appendChild(container);
+
+            // Inject the script
+            const script = document.createElement('script');
+            script.src = `https://duepose.com/${adHash}/invoke.js`;
+            script.async = true;
+            script.dataset.cfasync = "false";
+            document.body.appendChild(script);
+        }
+    </script>
+</body>
+</html>

@@ -85,7 +85,7 @@ export default function PWAInstallPrompt() {
     if (isInstalled || !showInstallPrompt) return null;
 
     return (
-        <div className="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:max-w-md z-50 animate-slide-up">
+        <div className="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:max-w-md z-[100] animate-slide-up">
             <div className="glass-card p-4 rounded-2xl border border-white/10 shadow-2xl backdrop-blur-xl bg-gradient-to-br from-pink-500/10 via-purple-500/10 to-blue-500/10">
                 <button
                     onClick={handleDismiss}

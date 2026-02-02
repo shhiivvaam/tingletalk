@@ -5,6 +5,7 @@ import QuickEntryForm from '@/components/home/QuickEntryForm';
 import StructuredData from '@/components/SEO/StructuredData';
 import Footer from '@/components/layout/Footer';
 import LandingInfo from '@/components/home/LandingInfo';
+import AdUnit from '@/components/ads/AdUnit';
 
 export const metadata: Metadata = {
   title: "Tingle Talk | #1 Anonymous Dating & Random Chat Platform",
@@ -18,6 +19,16 @@ export default function Home() {
   return (
     <main className="relative min-h-screen flex flex-col items-center overflow-x-hidden">
       <StructuredData />
+
+      {/* Top Banner Ad */}
+      <div className="w-full max-w-6xl mx-auto pt-4 px-4">
+        <AdUnit
+          // Default slot used (Native Banner)
+          format="horizontal"
+          label="Homepage Top Banner"
+          style={{ minHeight: '90px' }}
+        />
+      </div>
 
       <div className="flex flex-col items-center justify-center p-4 w-full min-h-screen">
         {/* Background blobs - move to static for better LCP */}
@@ -34,13 +45,40 @@ export default function Home() {
           </section>
 
           {/* Right Column: Interactive Form */}
-          <section className="w-full max-w-md mx-auto">
+          <section className="w-full max-w-md mx-auto space-y-8">
+            {/* Ad above form for visibility */}
+            <AdUnit
+              // Default slot
+              format="rectangle"
+              label="Form Top Ad"
+              style={{ minHeight: '250px' }}
+            />
             <QuickEntryForm />
           </section>
         </div>
       </div>
 
+      {/* Mid Page Ad */}
+      <div className="w-full max-w-4xl mx-auto py-8 px-4">
+        <AdUnit
+          // Default slot
+          format="auto"
+          label="Homepage Mid Banner"
+          style={{ minHeight: '160px', maxHeight: '250px' }}
+        />
+      </div>
+
       <LandingInfo />
+
+      {/* Bottom Page Ad */}
+      <div className="w-full max-w-6xl mx-auto py-8">
+        <AdUnit
+          // Default slot
+          format="auto"
+          label="Homepage Bottom Banner"
+          style={{ minHeight: '160px', maxHeight: '250px' }}
+        />
+      </div>
 
       <Footer />
     </main>

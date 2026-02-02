@@ -9,6 +9,7 @@ import OnlineUsersList from '@/components/chat/OnlineUsersList';
 import { Menu, X, Calendar, MapPin, ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { playNotificationSound, playMessageSound } from '@/utils/audio';
+import AdUnit from '@/components/ads/AdUnit';
 
 interface OnlineUser {
     id: string;
@@ -169,12 +170,19 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
         setSocket(newSocket);
 
         return () => {
-            // Only disconnect if not in development hot reload
+            // Clean up listeners first
+            newSocket.removeAllListeners();
+
+            // In production, disconnect immediately
             if (process.env.NODE_ENV === 'production') {
                 newSocket.disconnect();
             } else {
-                // In development, just clean up listeners but keep connection
-                newSocket.removeAllListeners();
+                // In development, disconnect after a short delay to handle hot reloads
+                setTimeout(() => {
+                    if (newSocket.connected) {
+                        newSocket.disconnect();
+                    }
+                }, 1000);
             }
         };
     }, [username, gender, preferences, router, setOnlineUsers, addOnlineUser, removeOnlineUser, addMessage, setSelectedUser, isHydrated]);
@@ -207,7 +215,7 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
     }
 
     return (
-        <div className="flex h-screen bg-slate-950 text-slate-200 overflow-hidden relative">
+        <div className="flex flex-col h-screen bg-slate-950 text-slate-200 overflow-hidden relative">
             {/* Notification Toast */}
             <AnimatePresence>
                 {notification && (
@@ -244,120 +252,183 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
                 </div>
             )}
 
-            {/* Premium Vertical Toggle Button (Floating) */}
-            <button
-                onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                className={`
-                    fixed top-1/2 -translate-y-1/2 z-[60]
-                    flex items-center justify-center
-                    h-24 w-6 md:w-8
-                    transition-all duration-500 ease-out group
-                    ${isSidebarOpen
-                        ? 'left-[100%] md:left-80 -translate-x-full rounded-l-2xl hover:bg-white/5 border-r-0'
-                        : 'left-0 rounded-r-2xl bg-gradient-to-b from-pink-600 to-violet-600 shadow-[4px_0_15px_rgba(236,72,153,0.3)]'}
-                    border border-white/10 backdrop-blur-md
-                `}
-            >
-                <div className="flex flex-col items-center gap-1">
-                    {isSidebarOpen ? (
-                        <ChevronLeft size={20} className="text-white/40 group-hover:text-white transition-colors" />
-                    ) : (
-                        <ChevronRight size={20} className="text-white animate-pulse" />
-                    )}
-                </div>
-            </button>
+            {/* GLOBAL TOP FRAME AD */}
+            <div className="shrink-0 w-full z-30 bg-slate-900 border-b border-white/5 h-[90px] overflow-hidden flex justify-center items-center">
+                <AdUnit
+                    key="global-top-frame"
+                    slot="f1ecdc5056db3521ecee075d39c94dca"
+                    format="horizontal"
+                    label="Top Frame Ad"
+                    style={{ height: '90px', width: '100%', minHeight: 'unset' }}
+                />
+            </div>
 
-            {/* Sidebar */}
-            <motion.div
-                initial={false}
-                animate={{
-                    x: isSidebarOpen ? 0 : '-100%',
-                    width: isSidebarOpen ? (typeof window !== 'undefined' && window.innerWidth >= 768 ? 320 : '100%') : 0
-                }}
-                transition={{ type: "spring", stiffness: 400, damping: 40 }}
-                className={`
-                    fixed inset-y-0 left-0 z-50 md:relative bg-slate-900/95 backdrop-blur-3xl border-r border-white/5 flex flex-col overflow-hidden
-                `}
-            >
-                {/* Fixed Width Content Container */}
-                <div className="w-[100vw] md:w-80 h-full flex flex-col shrink-0">
-                    {/* Header */}
-                    <div className="h-16 shrink-0 flex items-center justify-between px-4 border-b border-white/5 bg-slate-900/50">
-                        <div className="flex items-center gap-2">
-                            <img src="/assets/logo.png" alt="TingleTalk" className="w-8 h-8 object-contain" />
-                            <span className="font-black text-lg tracking-tight text-white/90">
-                                Tingle<span className="text-pink-500">Talk</span>
-                            </span>
-                        </div>
+            {/* MAIN CONTENT ROW */}
+            <div className="flex-1 flex min-h-0 overflow-hidden relative w-full">
 
-                        <button
-                            onClick={() => setIsProfileOpen(!isProfileOpen)}
-                            className="relative w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-teal-400 flex items-center justify-center font-bold text-xs text-white shadow-sm border border-white/10"
-                        >
-                            {(username || '?').charAt(0).toUpperCase()}
-                            <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-slate-900 rounded-full"></span>
-                        </button>
-                    </div>
-
-                    {/* Profile Dropdown (Inside Sidebar context) */}
-                    <AnimatePresence>
-                        {isProfileOpen && (
-                            <motion.div
-                                initial={{ opacity: 0, y: -10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, y: -10 }}
-                                className="absolute top-16 left-4 right-4 z-[70] bg-slate-800/90 backdrop-blur-xl rounded-xl border border-white/10 p-4 shadow-2xl"
-                            >
-                                <div className="flex items-center gap-3 pb-3 border-b border-white/5">
-                                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-teal-400 flex items-center justify-center font-bold text-sm text-white">{getInitials(username)}</div>
-                                    <div className="min-w-0">
-                                        <h3 className="font-bold text-white truncate">{username}</h3>
-                                        <p className="text-xs text-slate-400 capitalize">{gender} • {useUserStore.getState().age}</p>
-                                    </div>
-                                </div>
-                                <div className="pt-3 flex items-center gap-2 text-xs text-slate-300">
-                                    <MapPin size={12} className="text-pink-500" />
-                                    <span>{useUserStore.getState().state}, {useUserStore.getState().country}</span>
-                                </div>
-                            </motion.div>
-                        )}
-                    </AnimatePresence>
-
-                    {/* User List */}
-                    <div className="flex-1 overflow-hidden relative">
-                        <OnlineUsersList
-                            users={onlineUsers}
-                            currentUserId={socket?.id || null}
-                            selectedUserId={selectedUser?.id || null}
-                            onSelectUser={(user) => {
-                                setSelectedUser(user);
-                                if (typeof window !== 'undefined' && window.innerWidth < 768) setIsSidebarOpen(false);
-                            }}
-                            onFindMatch={handleRandomMatch}
-                            isSearching={isSearching}
+                {/* LEFT FRAME AD (Desktop Only) */}
+                <div className="hidden xl:flex shrink-0 w-[160px] border-r border-white/5 bg-slate-900/40 flex-col overflow-hidden">
+                    <div className="h-full flex flex-col overflow-y-auto custom-scrollbar">
+                        <div className="p-2 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest text-center shrink-0">Sponsored</div>
+                        <AdUnit
+                            key="left-frame-1"
+                            label="Left Frame 1"
+                            style={{ minHeight: '600px', width: '100%' }} // Skyscraper
                         />
                     </div>
                 </div>
-            </motion.div>
 
-            {/* Mobile Backdrop */}
-            <AnimatePresence>
-                {isSidebarOpen && (
+                {/* CENTER APP BOX (Sidebar + content) */}
+                <div className="flex-1 flex relative min-w-0 bg-slate-950 shadow-2xl z-10">
+
+                    {/* Premium Vertical Toggle Button (Floating within App Box) */}
+                    <button
+                        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                        className={`
+                        absolute top-1/2 -translate-y-1/2 z-[60]
+                        flex items-center justify-center
+                        h-24 w-6 md:w-8
+                        transition-all duration-500 ease-out group
+                        ${isSidebarOpen
+                                ? 'left-[100%] md:left-80 -translate-x-full rounded-l-2xl hover:bg-white/5 border-r-0'
+                                : 'left-0 rounded-r-2xl bg-gradient-to-b from-pink-600 to-violet-600 shadow-[4px_0_15px_rgba(236,72,153,0.3)]'}
+                        border border-white/10 backdrop-blur-md
+                    `}
+                    >
+                        <div className="flex flex-col items-center gap-1">
+                            {isSidebarOpen ? (
+                                <ChevronLeft size={20} className="text-white/40 group-hover:text-white transition-colors" />
+                            ) : (
+                                <ChevronRight size={20} className="text-white animate-pulse" />
+                            )}
+                        </div>
+                    </button>
+
+                    {/* Sidebar (Left of App Box) */}
                     <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        onClick={() => setIsSidebarOpen(false)}
-                        className="md:hidden fixed inset-0 bg-slate-950/60 backdrop-blur-[2px] z-40"
-                    />
-                )}
-            </AnimatePresence>
+                        initial={false}
+                        animate={{
+                            x: isSidebarOpen ? 0 : '-100%',
+                            width: isSidebarOpen ? (typeof window !== 'undefined' && window.innerWidth >= 768 ? 320 : '100%') : 0
+                        }}
+                        transition={{ type: "spring", stiffness: 400, damping: 40 }}
+                        className={`
+                        absolute inset-y-0 left-0 z-50 md:relative bg-slate-900/95 backdrop-blur-3xl border-r border-white/5 flex flex-col overflow-hidden h-full
+                    `}
+                    >
+                        {/* Fixed Width Content Container */}
+                        <div className="w-[100vw] md:w-80 h-full flex flex-col shrink-0">
+                            {/* Header */}
+                            <div className="h-16 shrink-0 flex items-center justify-between px-4 border-b border-white/5 bg-slate-900/50">
+                                <div className="flex items-center gap-2">
+                                    <img src="/assets/logo.png" alt="TingleTalk" className="w-8 h-8 object-contain" />
+                                    <span className="font-black text-lg tracking-tight text-white/90">
+                                        Tingle<span className="text-pink-500">Talk</span>
+                                    </span>
+                                </div>
 
-            {/* Content Area */}
-            <div className="flex-1 flex flex-col relative min-w-0 h-full bg-slate-950">
-                <SocketContext.Provider value={socket}>
-                    {children}
-                </SocketContext.Provider>
+                                <button
+                                    onClick={() => setIsProfileOpen(!isProfileOpen)}
+                                    className="relative w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-teal-400 flex items-center justify-center font-bold text-xs text-white shadow-sm border border-white/10"
+                                >
+                                    {(username || '?').charAt(0).toUpperCase()}
+                                    <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-slate-900 rounded-full"></span>
+                                </button>
+                            </div>
+
+                            {/* Profile Dropdown (Inside Sidebar context) */}
+                            <AnimatePresence>
+                                {isProfileOpen && (
+                                    <motion.div
+                                        initial={{ opacity: 0, y: -10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: -10 }}
+                                        className="absolute top-16 left-4 right-4 z-[70] bg-slate-800/90 backdrop-blur-xl rounded-xl border border-white/10 p-4 shadow-2xl"
+                                    >
+                                        <div className="flex items-center gap-3 pb-3 border-b border-white/5">
+                                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-teal-400 flex items-center justify-center font-bold text-sm text-white">{getInitials(username)}</div>
+                                            <div className="min-w-0">
+                                                <h3 className="font-bold text-white truncate">{username}</h3>
+                                                <p className="text-xs text-slate-400 capitalize">{gender} • {useUserStore.getState().age}</p>
+                                            </div>
+                                        </div>
+                                        <div className="pt-3 flex items-center gap-2 text-xs text-slate-300">
+                                            <MapPin size={12} className="text-pink-500" />
+                                            <span>{useUserStore.getState().state}, {useUserStore.getState().country}</span>
+                                        </div>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+
+                            {/* User List */}
+                            <div className="flex-1 overflow-hidden relative">
+                                <OnlineUsersList
+                                    users={onlineUsers}
+                                    currentUserId={socket?.id || null}
+                                    selectedUserId={selectedUser?.id || null}
+                                    onSelectUser={(user) => {
+                                        setSelectedUser(user);
+                                        if (typeof window !== 'undefined' && window.innerWidth < 768) setIsSidebarOpen(false);
+                                    }}
+                                    onFindMatch={handleRandomMatch}
+                                    isSearching={isSearching}
+                                />
+                            </div>
+
+
+                        </div>
+                    </motion.div>
+
+                    {/* Mobile Backdrop */}
+                    <AnimatePresence>
+                        {isSidebarOpen && (
+                            <motion.div
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                onClick={() => setIsSidebarOpen(false)}
+                                className="md:hidden fixed inset-0 bg-slate-950/60 backdrop-blur-[2px] z-40"
+                            />
+                        )}
+                    </AnimatePresence>
+
+                    {/* Main Content Area (Center) */}
+                    <div className="flex-1 flex flex-col relative min-w-0 h-full bg-slate-950">
+                        <SocketContext.Provider value={socket}>
+                            {children}
+                        </SocketContext.Provider>
+                    </div>
+                </div>
+
+                {/* RIGHT FRAME AD (Desktop Only) */}
+                <div className="hidden xl:flex shrink-0 w-[160px] border-l border-white/5 bg-slate-900/40 flex-col overflow-hidden">
+                    <div className="h-full flex flex-col overflow-y-auto custom-scrollbar">
+                        <div className="p-2 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest text-center shrink-0">Sponsored</div>
+                        {/* Stack Ads Vertically */}
+                        <AdUnit
+                            key="right-frame-1"
+                            label="Right Frame 1"
+                            style={{ minHeight: '600px', width: '100%' }}
+                        />
+                        <AdUnit
+                            key="right-frame-2"
+                            label="Right Frame 2"
+                            style={{ minHeight: '600px', width: '100%' }}
+                        />
+                    </div>
+                </div>
+
+            </div>
+
+            {/* GLOBAL BOTTOM FRAME AD */}
+            <div className="shrink-0 w-full z-30 bg-slate-900 border-t border-white/5 h-[90px] overflow-hidden flex justify-center items-center">
+                <AdUnit
+                    key="global-bottom-frame"
+                    slot="f1ecdc5056db3521ecee075d39c94dca"
+                    format="horizontal"
+                    label="Bottom Frame Ad"
+                    style={{ height: '90px', width: '100%', minHeight: 'unset' }}
+                />
             </div>
         </div>
     );
