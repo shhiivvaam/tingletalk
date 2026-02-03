@@ -89,6 +89,7 @@ export const metadata: Metadata = {
 
 import ToastContainer from "@/components/ui/ToastContainer";
 import PWAInstallPrompt from "@/components/PWAInstallPrompt";
+import Navbar from "@/components/layout/Navbar";
 
 export default function RootLayout({
   children,
@@ -127,6 +128,7 @@ export default function RootLayout({
         <div className="aurora-bg" />
         {/* Main layout wrapper */}
         <div className="relative z-10">
+          <Navbar />
           <ToastContainer />
           <PWAInstallPrompt />
           {children}

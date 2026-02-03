@@ -21,7 +21,7 @@ export default function Home() {
       <StructuredData />
 
       {/* Top Banner Ad */}
-      <div className="w-full max-w-6xl mx-auto pt-4 px-4">
+      <div className="w-full max-w-6xl mx-auto pt-28 px-4">
         <AdUnit
           // Default slot used (Native Banner)
           format="horizontal"

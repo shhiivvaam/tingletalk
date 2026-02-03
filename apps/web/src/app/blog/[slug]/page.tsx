@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowLeft, Calendar, User, Clock, Shield, AlertTriangle, Lock } from 'lucide-react';
 import Footer from '@/components/layout/Footer';
+import Image from 'next/image';
 
 type Props = {
     params: { slug: string };
@@ -31,25 +32,40 @@ export default function BlogPost({ params }: Props) {
                     </Link>
 
                     <article className="glass-panel p-8 md:p-12 rounded-[2.5rem] border border-white/5">
-                        <header className="mb-12 space-y-6">
-                            <div className="flex items-center gap-4 text-sm text-pink-500 font-bold uppercase tracking-widest">
-                                Safety & Privacy
+                        <header className="mb-12 space-y-8">
+                            <div className="aspect-[21/9] relative overflow-hidden rounded-[2rem] border border-white/10 shadow-2xl">
+                                <Image
+                                    src={isSafeChatting ? "/assets/blog-safety.png" : "/assets/blog-trends.png"}
+                                    alt="Blog Header"
+                                    fill
+                                    className="object-cover"
+                                    priority
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/20 to-transparent" />
+                                <div className="absolute bottom-6 left-6 flex items-center gap-4">
+                                    <span className="bg-pink-600 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-widest shadow-lg">
+                                        {isSafeChatting ? "Safety & Privacy" : "Insights"}
+                                    </span>
+                                </div>
                             </div>
-                            <h1 className="text-4xl md:text-6xl font-black text-white leading-tight">
-                                {isSafeChatting ? "The Ultimate Guide to Safe Anonymous Chatting" : params.slug.split('-').join(' ')}
-                            </h1>
-                            <div className="flex flex-wrap items-center gap-6 text-slate-400 border-y border-white/5 py-4">
-                                <div className="flex items-center gap-2">
-                                    <User size={18} />
-                                    <span>Tingle Team</span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <Calendar size={18} />
-                                    <span>Feb 1, 2026</span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <Clock size={18} />
-                                    <span>5 min read</span>
+
+                            <div className="space-y-6">
+                                <h1 className="text-4xl md:text-6xl font-black text-white leading-tight">
+                                    {isSafeChatting ? "The Ultimate Guide to Safe Anonymous Chatting" : params.slug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
+                                </h1>
+                                <div className="flex flex-wrap items-center gap-6 text-slate-400 border-y border-white/5 py-4">
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-6 h-6 rounded-full bg-pink-500/20 flex items-center justify-center text-pink-500 font-bold text-[10px]">TT</div>
+                                        <span className="text-sm font-medium">Tingle Team</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <Calendar size={16} className="text-slate-500" />
+                                        <span className="text-sm">Feb 1, 2026</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <Clock size={16} className="text-slate-500" />
+                                        <span className="text-sm">5 min read</span>
+                                    </div>
                                 </div>
                             </div>
                         </header>
