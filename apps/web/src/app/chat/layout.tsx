@@ -313,7 +313,7 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
 
             {/* GLOBAL TOP FRAME AD */}
             {AD_CONFIG.ENABLE_ADS && (
-                <div className="flex shrink-0 w-full z-30 bg-slate-900 border-b border-white/5 h-[90px] overflow-hidden justify-center items-center">
+                <div className="flex shrink-0 w-full z-30 bg-slate-900 border-b border-white/5 h-[50px] overflow-hidden justify-center items-center">
                     <AdUnit
                         type="adsterra-native"
                         format="horizontal"
@@ -326,7 +326,7 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
             <div className="flex-1 flex min-h-0 overflow-hidden relative w-full">
 
                 {AD_CONFIG.ENABLE_ADS && (
-                    <div className="hidden xl:flex shrink-0 w-[160px] border-r border-white/5 bg-slate-900/40 flex-col overflow-hidden">
+                    <div className="hidden xl:flex shrink-0 w-[100px] border-r border-white/5 bg-slate-900/40 flex-col overflow-hidden">
                         <div className="h-full flex flex-col overflow-y-auto custom-scrollbar">
                             <div className="p-2 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest text-center shrink-0">Sponsored</div>
                             <AdUnit
@@ -484,7 +484,7 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
                 </div>
 
                 {AD_CONFIG.ENABLE_ADS && (
-                    <div className="hidden xl:flex shrink-0 w-[160px] border-l border-white/5 bg-slate-900/40 flex-col overflow-hidden">
+                    <div className="hidden xl:flex shrink-0 w-[100px] border-l border-white/5 bg-slate-900/40 flex-col overflow-hidden">
                         <div className="h-full flex flex-col overflow-y-auto custom-scrollbar">
                             <div className="p-2 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest text-center shrink-0">Sponsored</div>
                             <AdUnit
@@ -499,7 +499,7 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
             </div>
 
             {AD_CONFIG.ENABLE_ADS && (
-                <div className="hidden md:flex shrink-0 w-full z-30 bg-slate-900 border-t border-white/5 h-[90px] overflow-hidden justify-center items-center">
+                <div className="hidden md:flex shrink-0 w-full z-30 bg-slate-900 border-t border-white/5 h-[50px] overflow-hidden justify-center items-center">
                     <AdUnit
                         type="adsterra-native"
                         format="horizontal"

@@ -89,7 +89,7 @@ export default function AdUnit({
         position: 'relative',
         display: 'flex',
         justifyContent: 'center',
-        margin: '1rem auto',
+        margin: '0 auto',
         ...style
     };
 

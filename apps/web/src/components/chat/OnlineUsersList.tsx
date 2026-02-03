@@ -265,7 +265,7 @@ export default function OnlineUsersList({ users, currentUserId, selectedUserId, 
                             // Default slot (Native Banner)
                             format="horizontal"
                             label="Sidebar List Ad"
-                            style={{ minHeight: '160px' }}
+                            style={{ minHeight: '80px' }}
                         />
                     </div>
                 );

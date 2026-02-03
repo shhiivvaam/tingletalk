@@ -37,12 +37,12 @@ export default function ChatClient() {
                 <motion.div
                     initial={{ y: -20, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
-                    className="mb-6 md:mb-8 pt-6 md:pt-0"
+                    className="mb-4 md:mb-6 pt-6 md:pt-0"
                 >
-                    <h1 className="text-2xl md:text-5xl font-black text-white tracking-tight leading-tight">
+                    <h1 className="text-2xl md:text-4xl font-black text-white tracking-tight leading-tight">
                         Welcome <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-violet-400">@{username}</span>
                     </h1>
-                    <p className="mt-2 text-slate-400 text-sm md:text-xl font-medium">
+                    <p className="mt-2 text-slate-400 text-sm md:text-lg font-medium">
                         TingleTalk is the best place to find new people!
                     </p>
                 </motion.div>

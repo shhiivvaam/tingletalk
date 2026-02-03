@@ -36,7 +36,7 @@ export interface AdDimensions {
 export const AD_DIMENSIONS: Record<AdFormat, AdDimensions> = {
     auto: { minHeight: '250px', width: '100%' },
     rectangle: { minHeight: '280px', width: '100%' },
-    horizontal: { minHeight: '90px', width: '100%' },
-    vertical: { minHeight: '600px', width: '160px' },
+    horizontal: { minHeight: '60px', width: '100%' },
+    vertical: { minHeight: '600px', width: '120px' },
     skyscraper: { minHeight: '600px', width: '300px' },
 };
