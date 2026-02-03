@@ -3,7 +3,8 @@
 import { useRef, useState, useCallback, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import Webcam from 'react-webcam';
-import { X, RefreshCw, Send, Loader2, Video, Camera as CameraIcon, Zap, ZapOff } from 'lucide-react';
+import { X, RefreshCw, Send, Loader2, Video, Camera as CameraIcon, Zap, ZapOff, Heart } from 'lucide-react';
+import HeartLoader from '@/components/ui/HeartLoader';
 import { UploadService } from '@/services/uploadService';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useToastStore } from '@/store/useToastStore';
@@ -209,9 +210,9 @@ export default function CameraModal({ onClose, onSend }: CameraModalProps) {
                     <>
                         {!isCameraReady && (
                             <div className="absolute inset-0 z-10 flex items-center justify-center bg-zinc-950 text-zinc-500">
-                                <div className="flex flex-col items-center gap-3">
-                                    <Loader2 className="animate-spin w-8 h-8 text-pink-500" />
-                                    <p className="text-xs font-medium tracking-wide">INITIALIZING CAMERA</p>
+                                <div className="flex flex-col items-center gap-4">
+                                    <HeartLoader size={100} />
+                                    <p className="text-[10px] font-black tracking-[0.3em] text-pink-500/80 uppercase">INITIALIZING LENS</p>
                                 </div>
                             </div>
                         )}
@@ -301,8 +302,14 @@ export default function CameraModal({ onClose, onSend }: CameraModalProps) {
                                 disabled={isUploading}
                                 className="flex flex-col items-center gap-2 text-white"
                             >
-                                <div className="p-5 bg-gradient-to-tr from-pink-500 to-rose-500 rounded-full shadow-xl shadow-pink-500/30 ring-4 ring-pink-500/20 group-disabled:opacity-50">
-                                    {isUploading ? <Loader2 size={24} className="animate-spin" /> : <Send size={24} fill="currentColor" />}
+                                <div className="p-5 bg-gradient-to-tr from-pink-500 to-rose-500 rounded-full shadow-xl shadow-pink-500/30 ring-4 ring-pink-500/20 group-disabled:opacity-50 flex items-center justify-center">
+                                    {isUploading ? (
+                                        <motion.div animate={{ scale: [1, 1.2, 1] }} transition={{ repeat: Infinity, duration: 0.6 }}>
+                                            <Heart size={24} fill="currentColor" />
+                                        </motion.div>
+                                    ) : (
+                                        <Send size={24} fill="currentColor" />
+                                    )}
                                 </div>
                                 <span className="text-xs font-medium tracking-wide uppercase shadow-black/50 text-glow">Send</span>
                             </motion.button>

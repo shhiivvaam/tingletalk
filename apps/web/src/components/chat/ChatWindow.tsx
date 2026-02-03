@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Send, User as UserIcon, MoreVertical, Phone, Video, Ghost, Flame, Calendar, MapPin, X, Check, CheckCheck, Plus, Play, Pause, File as FileIcon } from 'lucide-react';
+import { Send, User as UserIcon, MoreVertical, Phone, Video, Ghost, Flame, Calendar, MapPin, X, Check, CheckCheck, Plus, Play, Pause, File as FileIcon, Heart } from 'lucide-react';
 import { useChatStore, Message } from '@/store/useChatStore';
 import { useToastStore } from '@/store/useToastStore';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -472,10 +472,16 @@ export default function ChatWindow({ socket, currentUserId }: ChatWindowProps) {
                         exit={{ opacity: 0, scale: 0.9 }}
                         className="flex justify-start"
                     >
-                        <div className="bg-slate-800/80 rounded-2xl rounded-tl-sm px-4 py-3 border border-white/5 flex items-center gap-1.5 shadow-lg backdrop-blur-sm">
-                            <span className="w-1.5 h-1.5 bg-pink-500 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
-                            <span className="w-1.5 h-1.5 bg-pink-500 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
-                            <span className="w-1.5 h-1.5 bg-pink-500 rounded-full animate-bounce"></span>
+                        <div className="bg-slate-800/80 rounded-2xl rounded-tl-sm px-4 py-3 border border-white/5 flex items-center gap-1 shadow-lg backdrop-blur-sm">
+                            <motion.div animate={{ scale: [1, 1.2, 1] }} transition={{ repeat: Infinity, duration: 0.6, delay: 0 }}>
+                                <Heart size={10} fill="#ec4899" className="text-pink-500" />
+                            </motion.div>
+                            <motion.div animate={{ scale: [1, 1.2, 1] }} transition={{ repeat: Infinity, duration: 0.6, delay: 0.2 }}>
+                                <Heart size={10} fill="#ec4899" className="text-pink-500" />
+                            </motion.div>
+                            <motion.div animate={{ scale: [1, 1.2, 1] }} transition={{ repeat: Infinity, duration: 0.6, delay: 0.4 }}>
+                                <Heart size={10} fill="#ec4899" className="text-pink-500" />
+                            </motion.div>
                         </div>
                     </motion.div>
                 )}

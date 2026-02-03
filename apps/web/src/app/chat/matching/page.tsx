@@ -3,9 +3,10 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { io, Socket } from 'socket.io-client';
-import { Search, Loader2, Globe, MapPin, Sparkles, UserCheck, Zap } from 'lucide-react';
+import { io } from 'socket.io-client';
+import { Globe, MapPin, Sparkles, UserCheck, Zap, Heart } from 'lucide-react';
 import { useUserStore } from '@/store/useUserStore';
+import HeartLoader from '@/components/ui/HeartLoader';
 
 export default function MatchingPage() {
     const router = useRouter();
@@ -63,23 +64,25 @@ export default function MatchingPage() {
     return (
         <div className="min-h-screen flex flex-col items-center justify-center p-6 relative overflow-hidden">
             {/* Background Animations */}
-            <div className="absolute inset-0 z-0">
+            <div className="absolute inset-0 z-0 text-pink-500/10">
                 <AnimatePresence>
                     {status === 'searching' && (
                         <div className="absolute inset-0 flex items-center justify-center">
-                            {[1, 2, 3].map((circle) => (
+                            {[1, 2, 3, 4, 5].map((circle) => (
                                 <motion.div
                                     key={circle}
-                                    initial={{ scale: 0, opacity: 0 }}
-                                    animate={{ scale: 4, opacity: 0 }}
+                                    initial={{ scale: 0.5, opacity: 0 }}
+                                    animate={{ scale: 2.5, opacity: 0 }}
                                     transition={{
-                                        duration: 4,
+                                        duration: 3,
                                         repeat: Infinity,
-                                        delay: circle * 1.3,
+                                        delay: circle * 0.6,
                                         ease: "easeOut"
                                     }}
-                                    className="absolute w-40 h-40 border border-pink-500/20 rounded-full"
-                                />
+                                    className="absolute"
+                                >
+                                    <Heart size={100} fill="currentColor" />
+                                </motion.div>
                             ))}
                         </div>
                     )}
@@ -90,23 +93,15 @@ export default function MatchingPage() {
                 <div className="space-y-4">
                     <motion.div
                         animate={status === 'matched' ? { scale: [1, 1.2, 1], rotate: [0, 10, -10, 0] } : {}}
-                        className="inline-flex p-6 rounded-full bg-pink-500/10 border-2 border-pink-500/20 text-pink-500 mb-2 relative"
+                        className="inline-flex mb-2 relative"
                     >
                         {status === 'matched' ? (
-                            <UserCheck size={48} />
+                            <div className="p-6 rounded-full bg-pink-500/10 border-2 border-pink-500/20 text-pink-500">
+                                <UserCheck size={48} />
+                            </div>
                         ) : (
-                            <Search size={48} className="animate-pulse" />
+                            <HeartLoader size={160} />
                         )}
-                        <AnimatePresence>
-                            {status === 'searching' && (
-                                <motion.div
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    exit={{ opacity: 0 }}
-                                    className="absolute inset-0 border-2 border-pink-500 rounded-full animate-ping"
-                                />
-                            )}
-                        </AnimatePresence>
                     </motion.div>
 
                     <h2 className="text-3xl font-black tracking-tight">

@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { useEffect, useState } from 'react';
-import { MessageSquare, Shield, Sparkles } from 'lucide-react';
+import HeartLoader from './HeartLoader';
 
 const LOADING_MESSAGES = [
     "Establishing secure connection...",
@@ -37,55 +37,16 @@ export default function FullPageLoader({ message, showMessages = true }: FullPag
             <div className="absolute top-1/4 right-1/4 w-[400px] h-[400px] bg-violet-600/5 rounded-full blur-[100px] pointer-events-none animate-pulse" />
 
             <div className="relative z-10 flex flex-col items-center">
-                {/* Logo / Icon Hexagon Wrapper */}
+                {/* Loader Wrapper */}
                 <div className="relative mb-12">
                     {/* Animated Rotating Rings */}
                     <motion.div
                         animate={{ rotate: 360 }}
                         transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-                        className="absolute -inset-8 border border-white/5 rounded-[3rem] opacity-20"
-                    />
-                    <motion.div
-                        animate={{ rotate: -360 }}
-                        transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
-                        className="absolute -inset-12 border border-white/5 rounded-[4rem] opacity-10"
+                        className="absolute -inset-16 border border-white/5 rounded-full opacity-20"
                     />
 
-                    {/* Central Pulsing Container */}
-                    <motion.div
-                        animate={{
-                            scale: [1, 1.05, 1],
-                            boxShadow: [
-                                "0 0 0px 0px rgba(236,72,153,0)",
-                                "0 0 40px 10px rgba(236,72,153,0.1)",
-                                "0 0 0px 0px rgba(236,72,153,0)"
-                            ]
-                        }}
-                        transition={{ duration: 2, repeat: Infinity }}
-                        className="w-24 h-24 rounded-3xl bg-gradient-to-br from-slate-900 to-slate-950 border border-white/10 flex items-center justify-center relative shadow-2xl backdrop-blur-xl"
-                    >
-                        <img
-                            src="/assets/logo.png"
-                            alt="TingleTalk"
-                            className="w-12 h-12 object-contain drop-shadow-[0_0_15px_rgba(236,72,153,0.5)]"
-                        />
-
-                        {/* Floating Micro Icons */}
-                        <motion.div
-                            animate={{ y: [0, -10, 0], opacity: [0.2, 0.6, 0.2] }}
-                            transition={{ duration: 3, repeat: Infinity, delay: 0 }}
-                            className="absolute -top-4 -right-4 text-pink-500"
-                        >
-                            <Sparkles size={16} />
-                        </motion.div>
-                        <motion.div
-                            animate={{ y: [0, 10, 0], opacity: [0.2, 0.6, 0.2] }}
-                            transition={{ duration: 3.5, repeat: Infinity, delay: 0.5 }}
-                            className="absolute -bottom-2 -left-4 text-violet-400"
-                        >
-                            <MessageSquare size={14} />
-                        </motion.div>
-                    </motion.div>
+                    <HeartLoader size={120} />
                 </div>
 
                 {/* Text Content */}
@@ -126,11 +87,6 @@ export default function FullPageLoader({ message, showMessages = true }: FullPag
                         />
                     </div>
                 </div>
-            </div>
-
-            {/* Version / Technical hint */}
-            <div className="absolute bottom-8 text-[9px] font-mono text-slate-700 uppercase tracking-widest">
-                Nodes Connected: {3000 + Math.floor(Math.random() * 500)} // System Ready
             </div>
         </div>
     );

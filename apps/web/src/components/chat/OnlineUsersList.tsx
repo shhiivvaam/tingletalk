@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Search, Zap, ChevronDown, ChevronRight, MessageSquare, Clock, Users, Filter, Inbox, Globe, MapPin } from 'lucide-react';
+import { Search, Zap, ChevronDown, ChevronRight, MessageSquare, Clock, Users, Filter, Inbox, Globe, MapPin, Heart } from 'lucide-react';
 import { useChatStore } from '@/store/useChatStore';
 import { useUserStore } from '@/store/useUserStore';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -344,10 +344,15 @@ export default function OnlineUsersList({ users, currentUserId, selectedUserId, 
                                 >
                                     <div className="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
                                     {isSearching ? (
-                                        <>
-                                            <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
-                                            Scanning...
-                                        </>
+                                        <div className="flex items-center gap-2">
+                                            <motion.div
+                                                animate={{ scale: [1, 1.2, 1] }}
+                                                transition={{ duration: 0.8, repeat: Infinity }}
+                                            >
+                                                <Heart size={16} fill="white" className="text-white" />
+                                            </motion.div>
+                                            <span className="animate-pulse">Scanning...</span>
+                                        </div>
                                     ) : (
                                         <>
                                             <Zap size={16} className="fill-white animate-pulse" />
@@ -511,15 +516,6 @@ export default function OnlineUsersList({ users, currentUserId, selectedUserId, 
                                         <p className="text-xs">No recent history</p>
                                     </div>
                                 ) : (
-                                    // historyUsers.map(user => (
-                                    //     <UserRow
-                                    //         key={`history-${user.id}`}
-                                    //         user={user}
-                                    //         isOnline={false}
-                                    //         unreadCount={unreadCounts[user.id] || 0}
-                                    //         onSelectUser={onSelectUser}
-                                    //     />
-                                    // ))
                                     renderWithAds(historyUsers, 'history', 'offline')
                                 )}
                             </div>
