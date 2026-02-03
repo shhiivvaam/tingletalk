@@ -1,8 +1,8 @@
 'use client';
 
-import { motion } from 'framer-motion';
 import { MessageSquare, ShieldCheck, UserPlus, Globe } from 'lucide-react';
 import AdUnit from '@/components/ads/AdUnit';
+import { AD_CONFIG } from '@/constants/ads';
 
 export default function LandingInfo() {
     return (
@@ -54,32 +54,34 @@ export default function LandingInfo() {
                     </div>
 
                     {/* Ad Grid in Left Column - 2x2 Responsive */}
-                    <div className="pt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <AdUnit
-                            type="adsterra-native"
-                            format="rectangle"
-                            label="FAQ Ad 1"
-                            delay={100}
-                        />
-                        <AdUnit
-                            type="adsterra-native"
-                            format="rectangle"
-                            label="FAQ Ad 2"
-                            delay={300}
-                        />
-                        <AdUnit
-                            type="adsterra-native"
-                            format="rectangle"
-                            label="FAQ Ad 3"
-                            delay={500}
-                        />
-                        <AdUnit
-                            type="adsterra-native"
-                            format="rectangle"
-                            label="FAQ Ad 4"
-                            delay={700}
-                        />
-                    </div>
+                    {AD_CONFIG.ENABLE_ADS && (
+                        <div className="pt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <AdUnit
+                                type="adsterra-native"
+                                format="rectangle"
+                                label="FAQ Ad 1"
+                                delay={100}
+                            />
+                            <AdUnit
+                                type="adsterra-native"
+                                format="rectangle"
+                                label="FAQ Ad 2"
+                                delay={300}
+                            />
+                            <AdUnit
+                                type="adsterra-native"
+                                format="rectangle"
+                                label="FAQ Ad 3"
+                                delay={500}
+                            />
+                            <AdUnit
+                                type="adsterra-native"
+                                format="rectangle"
+                                label="FAQ Ad 4"
+                                delay={700}
+                            />
+                        </div>
+                    )}
                 </div>
 
                 <div className="space-y-4">

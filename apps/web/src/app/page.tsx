@@ -6,6 +6,7 @@ import StructuredData from '@/components/SEO/StructuredData';
 import Footer from '@/components/layout/Footer';
 import LandingInfo from '@/components/home/LandingInfo';
 import AdUnit from '@/components/ads/AdUnit';
+import { AD_CONFIG } from '@/constants/ads';
 
 export const metadata: Metadata = {
   title: "Tingle Talk | #1 Anonymous Dating & Random Chat Platform",
@@ -21,13 +22,15 @@ export default function Home() {
       <StructuredData />
 
       {/* Top Banner Ad */}
-      <div className="w-full max-w-6xl mx-auto pt-28 px-4">
-        <AdUnit
-          type="adsterra-native"
-          format="horizontal"
-          label="Top Homepage Banner"
-        />
-      </div>
+      {AD_CONFIG.ENABLE_ADS && (
+        <div className="w-full max-w-6xl mx-auto pt-28 px-4">
+          <AdUnit
+            type="adsterra-native"
+            format="horizontal"
+            label="Top Homepage Banner"
+          />
+        </div>
+      )}
 
       <div className="flex flex-col items-center justify-center p-4 w-full min-h-screen">
         {/* Background blobs - move to static for better LCP */}
@@ -56,24 +59,28 @@ export default function Home() {
       </div>
 
       {/* Mid Page Ad */}
-      <div className="w-full max-w-4xl mx-auto py-4 md:py-8 px-4">
-        <AdUnit
-          type="adsterra-native"
-          format="auto"
-          label="Mid Homepage Banner"
-        />
-      </div>
+      {AD_CONFIG.ENABLE_ADS && (
+        <div className="w-full max-w-4xl mx-auto py-4 md:py-8 px-4">
+          <AdUnit
+            type="adsterra-native"
+            format="auto"
+            label="Mid Homepage Banner"
+          />
+        </div>
+      )}
 
       <LandingInfo />
 
       {/* Bottom Page Ad */}
-      <div className="w-full max-w-6xl mx-auto py-4 md:py-8">
-        <AdUnit
-          type="adsterra-native"
-          format="auto"
-          label="Bottom Homepage Banner"
-        />
-      </div>
+      {AD_CONFIG.ENABLE_ADS && (
+        <div className="w-full max-w-6xl mx-auto py-4 md:py-8">
+          <AdUnit
+            type="adsterra-native"
+            format="auto"
+            label="Bottom Homepage Banner"
+          />
+        </div>
+      )}
 
       <Footer />
     </main>

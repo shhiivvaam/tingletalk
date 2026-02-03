@@ -19,7 +19,10 @@ export const AD_CONFIG = {
         HOMEPAGE_MID: 'adsense_slot_id_2',
         HOMEPAGE_BOTTOM: 'adsense_slot_id_3',
         CHAT_TOP: 'f1ecdc5056db3521ecee075d39c94dca', // Using adsterra for now
-    }
+    },
+
+    // Global Switch
+    ENABLE_ADS: process.env.NEXT_PUBLIC_ENABLE_ADS === 'true',
 };
 
 export type AdProvider = 'adsense' | 'adsterra-native' | 'adsterra-direct';

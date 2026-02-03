@@ -26,6 +26,8 @@ export default function AdUnit({
     label = 'Advertisement',
     delay = 0
 }: AdUnitProps) {
+    if (!AD_CONFIG.ENABLE_ADS) return null;
+
     const [isVisible, setIsVisible] = useState(false);
     const [isLoaded, setIsLoaded] = useState(false);
     const [uid, setUid] = useState<string>('');

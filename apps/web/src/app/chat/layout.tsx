@@ -10,6 +10,7 @@ import { Menu, X, Calendar, MapPin, ChevronLeft, ChevronRight } from 'lucide-rea
 import { motion, AnimatePresence } from 'framer-motion';
 import { playNotificationSound, playMessageSound } from '@/utils/audio';
 import AdUnit from '@/components/ads/AdUnit';
+import { AD_CONFIG } from '@/constants/ads';
 
 interface OnlineUser {
     id: string;
@@ -253,27 +254,31 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
             )}
 
             {/* GLOBAL TOP FRAME AD */}
-            <div className="flex shrink-0 w-full z-30 bg-slate-900 border-b border-white/5 h-[90px] overflow-hidden justify-center items-center">
-                <AdUnit
-                    type="adsterra-native"
-                    format="horizontal"
-                    label="Chat Top Banner"
-                />
-            </div>
+            {AD_CONFIG.ENABLE_ADS && (
+                <div className="flex shrink-0 w-full z-30 bg-slate-900 border-b border-white/5 h-[90px] overflow-hidden justify-center items-center">
+                    <AdUnit
+                        type="adsterra-native"
+                        format="horizontal"
+                        label="Chat Top Banner"
+                    />
+                </div>
+            )}
 
             {/* MAIN CONTENT ROW */}
             <div className="flex-1 flex min-h-0 overflow-hidden relative w-full">
 
-                <div className="hidden xl:flex shrink-0 w-[160px] border-r border-white/5 bg-slate-900/40 flex-col overflow-hidden">
-                    <div className="h-full flex flex-col overflow-y-auto custom-scrollbar">
-                        <div className="p-2 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest text-center shrink-0">Sponsored</div>
-                        <AdUnit
-                            type="adsterra-native"
-                            format="vertical"
-                            label="Left Skyscraper"
-                        />
+                {AD_CONFIG.ENABLE_ADS && (
+                    <div className="hidden xl:flex shrink-0 w-[160px] border-r border-white/5 bg-slate-900/40 flex-col overflow-hidden">
+                        <div className="h-full flex flex-col overflow-y-auto custom-scrollbar">
+                            <div className="p-2 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest text-center shrink-0">Sponsored</div>
+                            <AdUnit
+                                type="adsterra-native"
+                                format="vertical"
+                                label="Left Skyscraper"
+                            />
+                        </div>
                     </div>
-                </div>
+                )}
 
                 {/* CENTER APP BOX (Sidebar + content) */}
                 <div className="flex-1 flex relative min-w-0 bg-slate-950 shadow-2xl z-10">
@@ -407,26 +412,30 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
                     </div>
                 </div>
 
-                <div className="hidden xl:flex shrink-0 w-[160px] border-l border-white/5 bg-slate-900/40 flex-col overflow-hidden">
-                    <div className="h-full flex flex-col overflow-y-auto custom-scrollbar">
-                        <div className="p-2 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest text-center shrink-0">Sponsored</div>
-                        <AdUnit
-                            type="adsterra-native"
-                            format="vertical"
-                            label="Right Skyscraper"
-                        />
+                {AD_CONFIG.ENABLE_ADS && (
+                    <div className="hidden xl:flex shrink-0 w-[160px] border-l border-white/5 bg-slate-900/40 flex-col overflow-hidden">
+                        <div className="h-full flex flex-col overflow-y-auto custom-scrollbar">
+                            <div className="p-2 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest text-center shrink-0">Sponsored</div>
+                            <AdUnit
+                                type="adsterra-native"
+                                format="vertical"
+                                label="Right Skyscraper"
+                            />
+                        </div>
                     </div>
+                )}
+
+            </div>
+
+            {AD_CONFIG.ENABLE_ADS && (
+                <div className="hidden md:flex shrink-0 w-full z-30 bg-slate-900 border-t border-white/5 h-[90px] overflow-hidden justify-center items-center">
+                    <AdUnit
+                        type="adsterra-native"
+                        format="horizontal"
+                        label="Chat Bottom Banner"
+                    />
                 </div>
-
-            </div>
-
-            <div className="hidden md:flex shrink-0 w-full z-30 bg-slate-900 border-t border-white/5 h-[90px] overflow-hidden justify-center items-center">
-                <AdUnit
-                    type="adsterra-native"
-                    format="horizontal"
-                    label="Chat Bottom Banner"
-                />
-            </div>
+            )}
         </div>
     );
 }

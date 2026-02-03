@@ -90,6 +90,7 @@ export const metadata: Metadata = {
 import ToastContainer from "@/components/ui/ToastContainer";
 import PWAInstallPrompt from "@/components/PWAInstallPrompt";
 import Navbar from "@/components/layout/Navbar";
+import { AD_CONFIG } from "@/constants/ads";
 
 export default function RootLayout({
   children,
@@ -101,29 +102,24 @@ export default function RootLayout({
       <head>
         {/* Google Adsense */}
         <meta name="google-adsense-account" content="ca-pub-9299390652489427"></meta>
-        <script
-          async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9299390652489427"
-          crossOrigin="anonymous"
-        ></script>
+        {AD_CONFIG.ENABLE_ADS && (
+          <script
+            async
+            src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9299390652489427"
+            crossOrigin="anonymous"
+          ></script>
+        )}
       </head>
       <body className="font-sans min-h-screen selection:bg-pink-500/30">
 
         {/* Adsterra SocialBar */}
-        <Script
-          id="adsterra-social-bar"
-          src="https://duepose.com/2f/bc/d0/2fbcd035290b7d3b8ce9a6a656d7edc6.js"
-          strategy="lazyOnload"
-        />
-
-        {/* Adsterra Popunder */}
-        {/* 
-        <Script 
-          id="adsterra-popunder"
-          src="https://duepose.com/f6/ec/2f/f6ec2f262184e8f9a191cb7befad4db0.js" 
-          strategy="lazyOnload"
-        /> 
-        */}
+        {AD_CONFIG.ENABLE_ADS && (
+          <Script
+            id="adsterra-social-bar"
+            src="https://duepose.com/2f/bc/d0/2fbcd035290b7d3b8ce9a6a656d7edc6.js"
+            strategy="lazyOnload"
+          />
+        )}
 
         <div className="aurora-bg" />
         {/* Main layout wrapper */}
