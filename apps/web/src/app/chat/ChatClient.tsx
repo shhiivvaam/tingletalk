@@ -19,19 +19,19 @@ export default function ChatClient() {
     const benefits = [
         { icon: <Heart size={16} className="text-pink-400" />, text: "TingleTalk is FREE & will always stay free! :)" },
         { icon: <Smartphone size={16} className="text-blue-400" />, text: "Mobile friendly! Chat seamlessly on your smartphone." },
-        { icon: <User size={16} className="text-violet-400" />, text: "Anonymous matching—no sign up needed to start." },
+        { icon: <User size={16} className="text-violet-400" />, text: "Anonymous matching - no sign up needed to start." },
         { icon: <MessageSquare size={16} className="text-emerald-400" />, text: "Select a stranger from the list & say Hi!" },
         { icon: <Sparkles size={16} className="text-amber-400" />, text: "Enjoy your time and make new friends!" }
     ];
 
     return (
-        <div className="flex flex-col items-center justify-start md:justify-center h-full p-4 md:p-6 text-center relative overflow-y-auto custom-scrollbar bg-slate-950/20">
+        <div className="flex flex-col items-center justify-start min-h-full p-4 md:p-12 text-center relative overflow-y-auto custom-scrollbar bg-slate-950/20">
 
             {/* Background Effects */}
             <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-pink-500/5 rounded-full blur-[120px] animate-pulse pointer-events-none" />
             <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-violet-600/5 rounded-full blur-[120px] animate-pulse delay-1000 pointer-events-none" />
 
-            <div className="relative z-10 max-w-2xl w-full">
+            <div className="relative z-10 max-w-2xl w-full mt-4 mb-12">
 
                 {/* Welcome Header */}
                 <motion.div
