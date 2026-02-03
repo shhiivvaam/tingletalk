@@ -37,13 +37,13 @@ export default function Navbar() {
             <div className="max-w-7xl mx-auto px-4 md:px-8 flex justify-between items-center">
                 {/* Logo */}
                 <Link href="/" className="flex items-center gap-2 group">
-                    <div className="relative w-10 h-10 flex items-center justify-center bg-pink-500 rounded-xl group-hover:rotate-6 transition-transform">
+                    <div className="relative group-hover:scale-110 transition-transform duration-300">
                         <Image
                             src="/assets/logo.png"
                             alt="Tingle Talk"
-                            width={28}
-                            height={28}
-                            className="w-7 h-7 object-contain"
+                            width={32}
+                            height={32}
+                            className="w-8 h-8 object-contain"
                         />
                     </div>
                     <span className="text-2xl font-black text-white tracking-tighter">
