@@ -1,8 +1,9 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { AlertOctagon, RotateCw } from 'lucide-react';
+import { AlertOctagon, RotateCw, Home, ArrowLeft } from 'lucide-react';
 import { useEffect } from 'react';
+import Link from 'next/link';
 
 export default function Error({
     error,
@@ -15,11 +16,15 @@ export default function Error({
         console.error(error);
     }, [error]);
 
+    const handleBack = () => {
+        window.history.back();
+    };
+
     return (
         <div className="min-h-screen flex flex-col items-center justify-center p-6 bg-slate-950 text-white overflow-hidden relative">
             <div className="absolute inset-0 bg-mesh opacity-20 pointer-events-none" />
 
-            <div className="relative z-10 flex flex-col items-center justify-center text-center max-w-md">
+            <div className="relative z-10 flex flex-col items-center justify-center text-center max-w-md w-full">
                 <motion.div
                     initial={{ scale: 0.8, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
@@ -41,13 +46,32 @@ export default function Error({
                     <p className="truncate mt-1">{error.message}</p>
                 </div>
 
-                <button
-                    onClick={reset}
-                    className="flex items-center gap-2 px-8 py-3 rounded-xl bg-red-500/10 text-red-500 border border-red-500/20 hover:bg-red-500/20 hover:scale-105 transition-all active:scale-95 font-bold uppercase tracking-wider text-sm"
-                >
-                    <RotateCw size={16} />
-                    <span>Reboot System</span>
-                </button>
+                <div className="flex flex-col w-full gap-4">
+                    <button
+                        onClick={reset}
+                        className="flex items-center justify-center gap-2 px-8 py-4 rounded-2xl bg-gradient-to-br from-red-500 to-pink-600 text-white font-bold tracking-wide shadow-lg hover:shadow-red-500/25 transition-all hover:scale-105 active:scale-95 text-sm uppercase"
+                    >
+                        <RotateCw size={18} />
+                        <span>Reboot System</span>
+                    </button>
+
+                    <div className="grid grid-cols-2 gap-4">
+                        <Link
+                            href="/"
+                            className="flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all text-sm font-bold text-slate-300"
+                        >
+                            <Home size={16} />
+                            <span>Home</span>
+                        </Link>
+                        <button
+                            onClick={handleBack}
+                            className="flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all text-sm font-bold text-slate-300"
+                        >
+                            <ArrowLeft size={16} />
+                            <span>Go Back</span>
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     );

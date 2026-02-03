@@ -46,17 +46,24 @@ export default function NotFound() {
                     initial={{ y: 20, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ delay: 0.4 }}
-                    className="mt-12 flex flex-col items-center gap-8"
+                    className="mt-12 flex flex-col items-center gap-4 w-full max-w-sm"
                 >
                     <Link
                         href="/"
-                        className="group flex items-center gap-2 px-8 py-4 rounded-2xl bg-gradient-to-br from-pink-500 to-violet-600 text-white font-bold tracking-wide shadow-lg hover:shadow-pink-500/25 transition-all hover:scale-105 active:scale-95"
+                        className="w-full group flex items-center justify-center gap-2 px-8 py-4 rounded-2xl bg-gradient-to-br from-pink-500 to-violet-600 text-white font-bold tracking-wide shadow-lg hover:shadow-pink-500/25 transition-all hover:scale-105 active:scale-95"
                     >
                         <Home size={20} />
                         <span>Home</span>
                     </Link>
 
-                    <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-700">
+                    <button
+                        onClick={() => window.history.back()}
+                        className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all text-sm font-bold text-slate-300"
+                    >
+                        <span>Go Back</span>
+                    </button>
+
+                    <div className="mt-8 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-700">
                         Error Code: 404 • Transmission Terminated
                     </div>
                 </motion.div>
