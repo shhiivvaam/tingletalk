@@ -64,7 +64,7 @@ export default function Navbar() {
                     ))}
                     <div className="ml-4 h-6 w-px bg-white/10" />
                     <Link
-                        href="/chat"
+                        href="/#start"
                         className="ml-4 px-6 py-2.5 bg-gradient-to-r from-pink-600 to-indigo-600 hover:from-pink-500 hover:to-indigo-500 text-white font-bold rounded-xl transition-all transform hover:scale-105 active:scale-95 shadow-lg shadow-pink-500/20"
                     >
                         Start Chatting
@@ -97,7 +97,7 @@ export default function Navbar() {
                         ))}
                         <div className="h-px bg-white/5 my-2" />
                         <Link
-                            href="/chat"
+                            href="/#start"
                             onClick={() => setIsMobileMenuOpen(false)}
                             className="w-full py-4 bg-gradient-to-r from-pink-600 to-indigo-600 text-white font-bold rounded-2xl text-center shadow-lg"
                         >

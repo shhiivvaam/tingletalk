@@ -45,7 +45,7 @@ export default function Home() {
           </section>
 
           {/* Right Column: Interactive Form */}
-          <section className="w-full max-w-md mx-auto space-y-8">
+          <section id="start" className="w-full max-w-md mx-auto space-y-8 scroll-mt-32">
             {/* Ad above form for visibility */}
             <AdUnit
               // Default slot
