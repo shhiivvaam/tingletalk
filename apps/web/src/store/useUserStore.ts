@@ -17,6 +17,7 @@ interface UserState {
     setAnonymousUser: (data: { username: string; gender: string; age: number; country: string; state: string }) => void;
     setHasAgreedToRules: (val: boolean) => void;
     updatePreferences: (prefs: Partial<UserState['preferences']>) => void;
+    logout: () => void;
     reset: () => void;
 }
 
@@ -52,6 +53,12 @@ export const useUserStore = create<UserState>()(
                     ...state,
                     preferences: { ...state.preferences, ...prefs },
                 })),
+            logout: () => set({
+                userId: null,
+                isAnonymous: false,
+                hasAgreedToRules: false,
+                // Preserving username, gender, age, country, state for convenient autofill
+            }),
             reset: () => set({
                 userId: null,
                 username: null,

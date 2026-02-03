@@ -90,6 +90,7 @@ export const metadata: Metadata = {
 import ToastContainer from "@/components/ui/ToastContainer";
 import PWAInstallPrompt from "@/components/PWAInstallPrompt";
 import Navbar from "@/components/layout/Navbar";
+import SessionTimeoutHandler from "@/components/layout/SessionTimeoutHandler";
 import { AD_CONFIG } from "@/constants/ads";
 
 export default function RootLayout({
@@ -127,6 +128,7 @@ export default function RootLayout({
           <Navbar />
           <ToastContainer />
           <PWAInstallPrompt />
+          <SessionTimeoutHandler />
           {children}
         </div>
         <Analytics />
