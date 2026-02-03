@@ -186,7 +186,51 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
                 }, 1000);
             }
         };
-    }, [username, gender, preferences, router, setOnlineUsers, addOnlineUser, removeOnlineUser, addMessage, setSelectedUser, isHydrated]);
+    }, [username, gender, preferences, router, setOnlineUsers, addOnlineUser, removeOnlineUser, addMessage, setSelectedUser, addSessionId, isHydrated]);
+
+    // Prevent accidental navigation away from chat
+    useEffect(() => {
+        if (!isHydrated || !username) return;
+
+        // Warn user before leaving the page
+        const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+            e.preventDefault();
+            e.returnValue = 'You have an active chat session. Are you sure you want to leave?';
+            return e.returnValue;
+        };
+
+        // Add a history entry to prevent immediate back navigation
+        const preventBackNavigation = () => {
+            // Push current state to history
+            window.history.pushState(null, '', window.location.href);
+        };
+
+        // Handle popstate (back button)
+        const handlePopState = (e: PopStateEvent) => {
+            // Confirm before allowing navigation
+            const confirmLeave = window.confirm(
+                'You have an active chat session. Going back will end your current conversations. Are you sure?'
+            );
+
+            if (!confirmLeave) {
+                // Stay on the page
+                window.history.pushState(null, '', window.location.href);
+            } else {
+                // Allow navigation and cleanup
+                router.push('/');
+            }
+        };
+
+        // Initialize
+        preventBackNavigation();
+        window.addEventListener('beforeunload', handleBeforeUnload);
+        window.addEventListener('popstate', handlePopState);
+
+        return () => {
+            window.removeEventListener('beforeunload', handleBeforeUnload);
+            window.removeEventListener('popstate', handlePopState);
+        };
+    }, [isHydrated, username, router]);
 
     const handleRandomMatch = (strategy: 'optimal' | 'immediate' = 'optimal') => {
         if (!socket) return;
@@ -216,7 +260,7 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
     }
 
     return (
-        <div className="flex flex-col h-screen bg-slate-950 text-slate-200 overflow-hidden relative">
+        <div className="flex flex-col h-screen bg-slate-950 text-slate-200 overflow-hidden relative" style={{ overscrollBehaviorX: 'none' }}>
             {/* Notification Toast */}
             <AnimatePresence>
                 {notification && (

@@ -51,7 +51,7 @@ export const useUserStore = create<UserState>()(
         }),
         {
             name: 'tingle-user-storage',
-            storage: createJSONStorage(() => sessionStorage), // Use sessionStorage for tab isolation
+            storage: createJSONStorage(() => localStorage), // Use localStorage to persist across navigation
         }
     )
 );

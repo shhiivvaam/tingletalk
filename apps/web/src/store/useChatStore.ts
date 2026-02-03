@@ -131,7 +131,7 @@ export const useChatStore = create<ChatState>()(
                 mySessionIds: state.mySessionIds,
                 // Don't persist: onlineUsers, typingUsers
             }),
-            storage: createJSONStorage(() => sessionStorage), // Use sessionStorage for tab isolation
+            storage: createJSONStorage(() => localStorage), // Use localStorage to persist across navigation
         }
     )
 );
