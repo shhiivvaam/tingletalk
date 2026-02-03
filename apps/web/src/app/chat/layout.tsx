@@ -6,11 +6,12 @@ import { io, Socket } from 'socket.io-client';
 import { useUserStore } from '@/store/useUserStore';
 import { useChatStore } from '@/store/useChatStore';
 import OnlineUsersList from '@/components/chat/OnlineUsersList';
-import { Menu, X, Calendar, MapPin, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Menu, X, Calendar, MapPin, ChevronLeft, ChevronRight, Power } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { playNotificationSound, playMessageSound } from '@/utils/audio';
 import AdUnit from '@/components/ads/AdUnit';
 import { AD_CONFIG } from '@/constants/ads';
+import ConfirmModal from '@/components/ui/ConfirmModal';
 
 interface OnlineUser {
     id: string;
@@ -31,6 +32,7 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
     const [isConnected, setIsConnected] = useState(false);
     const [isHydrated, setIsHydrated] = useState(false);
     const [notification, setNotification] = useState<{ id: string, nickname: string, message: string } | null>(null);
+    const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
 
     // Wait for Zustand to hydrate from localStorage
     useEffect(() => {
@@ -207,18 +209,10 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
 
         // Handle popstate (back button)
         const handlePopState = (e: PopStateEvent) => {
-            // Confirm before allowing navigation
-            const confirmLeave = window.confirm(
-                'You have an active chat session. Going back will end your current conversations. Are you sure?'
-            );
-
-            if (!confirmLeave) {
-                // Stay on the page
-                window.history.pushState(null, '', window.location.href);
-            } else {
-                // Allow navigation and cleanup
-                router.push('/');
-            }
+            // Show custom confirmation modal
+            e.preventDefault();
+            window.history.pushState(null, '', window.location.href);
+            setShowLeaveConfirm(true);
         };
 
         // Initialize
@@ -261,6 +255,21 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
 
     return (
         <div className="flex flex-col h-screen bg-slate-950 text-slate-200 overflow-hidden relative" style={{ overscrollBehaviorX: 'none' }}>
+            {/* Custom Confirm Modal */}
+            <ConfirmModal
+                isOpen={showLeaveConfirm}
+                onClose={() => setShowLeaveConfirm(false)}
+                onConfirm={() => {
+                    // Force navigation to home
+                    router.push('/');
+                }}
+                title="End Active Chat?"
+                message="You have an active chat session. Going back will disconnect you from others. Your nickname and preferences will be kept."
+                confirmText="Leave Chat"
+                cancelText="Stay Here"
+                type="warning"
+            />
+
             {/* Notification Toast */}
             <AnimatePresence>
                 {notification && (
@@ -408,9 +417,22 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
                                                 <p className="text-xs text-slate-400 capitalize">{gender} • {useUserStore.getState().age}</p>
                                             </div>
                                         </div>
-                                        <div className="pt-3 flex items-center gap-2 text-xs text-slate-300">
-                                            <MapPin size={12} className="text-pink-500" />
-                                            <span>{useUserStore.getState().state}, {useUserStore.getState().country}</span>
+                                        <div className="pt-3 flex flex-col gap-3">
+                                            <div className="flex items-center gap-2 text-xs text-slate-300">
+                                                <MapPin size={12} className="text-pink-500" />
+                                                <span>{useUserStore.getState().state}, {useUserStore.getState().country}</span>
+                                            </div>
+
+                                            <button
+                                                onClick={() => {
+                                                    setIsProfileOpen(false);
+                                                    setShowLeaveConfirm(true);
+                                                }}
+                                                className="w-full flex items-center gap-2 px-3 py-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs font-bold transition-colors border border-red-500/10"
+                                            >
+                                                <Power size={14} />
+                                                End Session
+                                            </button>
                                         </div>
                                     </motion.div>
                                 )}

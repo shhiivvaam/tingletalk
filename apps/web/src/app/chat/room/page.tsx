@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { io, Socket } from 'socket.io-client';
 import { useUserStore } from '@/store/useUserStore';
 import { Send, ArrowLeft, MoreHorizontal, Smile, Paperclip, Zap, Shield, User, Power } from 'lucide-react';
+import { useToastStore } from '@/store/useToastStore';
 
 interface Message {
     senderId: string;
@@ -89,7 +90,7 @@ export default function ChatRoom() {
         if (!cleanMessage || !socket || !roomId) return;
 
         if (cleanMessage.length > 500) {
-            alert("Message is too long (max 500 characters)");
+            useToastStore.getState().addToast("Message is too long (max 500 characters)", "error");
             return;
         }
 

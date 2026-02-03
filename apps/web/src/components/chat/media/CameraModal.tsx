@@ -6,6 +6,7 @@ import Webcam from 'react-webcam';
 import { X, RefreshCw, Send, Loader2, Video, Camera as CameraIcon, Zap, ZapOff } from 'lucide-react';
 import { UploadService } from '@/services/uploadService';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useToastStore } from '@/store/useToastStore';
 
 interface CameraModalProps {
     onClose: () => void;
@@ -160,7 +161,7 @@ export default function CameraModal({ onClose, onSend }: CameraModalProps) {
             }
         } catch (err) {
             console.error('Upload failed', err);
-            alert('Failed to upload media. Please try again.');
+            useToastStore.getState().addToast('Failed to upload media. Please try again.', 'error');
         } finally {
             setIsUploading(false);
         }
