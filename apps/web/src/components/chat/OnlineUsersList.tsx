@@ -511,6 +511,15 @@ export default function OnlineUsersList({ users, currentUserId, selectedUserId, 
                                         <p className="text-xs">No recent history</p>
                                     </div>
                                 ) : (
+                                    // historyUsers.map(user => (
+                                    //     <UserRow
+                                    //         key={`history-${user.id}`}
+                                    //         user={user}
+                                    //         isOnline={false}
+                                    //         unreadCount={unreadCounts[user.id] || 0}
+                                    //         onSelectUser={onSelectUser}
+                                    //     />
+                                    // ))
                                     renderWithAds(historyUsers, 'history', 'offline')
                                 )}
                             </div>
