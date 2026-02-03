@@ -1,147 +1,144 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { AD_CONFIG, AD_DIMENSIONS, AdProvider, AdFormat } from '@/constants/ads';
 
 interface AdUnitProps {
-    type?: 'adsense' | 'custom' | 'adsterra-native';
-    slot?: string; // Google AdSense Slot ID
-    client?: string; // Google AdSense Client ID (e.g., ca-pub-XXXX)
-    format?: 'auto' | 'fluid' | 'rectangle' | 'horizontal' | 'vertical';
+    type?: AdProvider;
+    slot?: string;
+    client?: string;
+    format?: AdFormat;
     responsive?: boolean;
     style?: React.CSSProperties;
     className?: string;
-    label?: string; // Internal label for debugging/placeholder
+    label?: string;
+    delay?: number; // Optional delay before loading
 }
 
 export default function AdUnit({
-    type = 'adsterra-native', // Defaulting to Adsterra now per user request
+    type = 'adsterra-native',
     slot,
-    client = 'ca-pub-9299390652489427',
+    client = AD_CONFIG.ADSENSE_CLIENT,
     format = 'auto',
     responsive = true,
     style,
     className,
-    label = 'Advertisement'
+    label = 'Advertisement',
+    delay = 0
 }: AdUnitProps) {
+    const [isVisible, setIsVisible] = useState(false);
+    const [isLoaded, setIsLoaded] = useState(false);
+    const [uid, setUid] = useState<string>('');
+    const containerRef = useRef<HTMLDivElement>(null);
+    const hasPushedRef = useRef(false);
 
-    const hasPushedRef = React.useRef(false);
-
+    // Setup viewport intersection observer for lazy loading
     useEffect(() => {
         if (typeof window === 'undefined') return;
 
-        // AdSense Logic
-        if (type === 'adsense' && !hasPushedRef.current) {
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (entry.isIntersecting) {
+                    // Start loading when ad is near viewport (200px threshold)
+                    setTimeout(() => setIsVisible(true), delay);
+                    observer.disconnect();
+                }
+            },
+            { rootMargin: '200px' }
+        );
+
+        if (containerRef.current) {
+            observer.observe(containerRef.current);
+        }
+
+        return () => observer.disconnect();
+    }, [delay]);
+
+    // Unique ID for iframe sync
+    useEffect(() => {
+        if (isVisible) {
+            setUid(Math.random().toString(36).substring(7));
+        }
+    }, [isVisible]);
+
+    // Handle AdSense script push
+    useEffect(() => {
+        if (isVisible && type === 'adsense' && !hasPushedRef.current) {
             try {
                 // @ts-ignore
                 if (window.adsbygoogle) {
                     // @ts-ignore
                     window.adsbygoogle.push({});
                     hasPushedRef.current = true;
+                    setIsLoaded(true);
                 }
             } catch (err: any) {
-                if (err.message && err.message.includes('already have ads')) {
-                    console.warn('AdSense: Slot already has ad, skipping push.');
-                    hasPushedRef.current = true;
-                } else {
-                    console.error('AdSense error:', err);
-                }
+                console.error('AdSense push error:', err);
             }
         }
+    }, [isVisible, type]);
 
-        // Adsterra Native Logic
-        else if (type === 'adsterra-native' && !hasPushedRef.current) {
-            // We use iframe isolation now, so no global script injection needed.
-            hasPushedRef.current = true;
-        }
+    const dimensions = AD_DIMENSIONS[format] || AD_DIMENSIONS.auto;
 
-    }, [type, slot]);
+    const containerStyle: React.CSSProperties = {
+        minHeight: dimensions.minHeight,
+        width: dimensions.width,
+        maxWidth: '100%',
+        position: 'relative',
+        display: 'flex',
+        justifyContent: 'center',
+        margin: '1rem auto',
+        ...style
+    };
 
-    // Condition updated to allow seeing ads in Dev mode per user request
-    if (process.env.NODE_ENV === 'development' && false) {
-        return (
-            <div
-                className={`flex flex-col items-center justify-center bg-slate-800/50 border border-dashed border-slate-600 text-slate-500 text-xs font-mono p-4 mx-auto my-2 overflow-hidden ${className}`}
-                style={{ minHeight: '100px', width: '100%', ...style }}
-            >
-                <span className="font-bold text-slate-400">AD SPACE: {label}</span>
-                <span>Type: {type}</span>
-                <span className="text-[10px] text-slate-600 truncate max-w-full px-2">ID: {slot || 'Default'}</span>
-                <span className="mt-1 opacity-50 text-[10px]">Actual ads will appear here in production</span>
-            </div>
-        );
-    }
+    return (
+        <div
+            ref={containerRef}
+            className={`ad-container overflow-hidden rounded-xl transition-all duration-500 ${className || ''}`}
+            style={containerStyle}
+        >
+            {/* Professional Skeleton Placeholder */}
+            {!isLoaded && (
+                <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-900/40 border border-white/5 animate-pulse overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />
+                    <div className="flex flex-col items-center gap-2 opacity-30">
+                        <div className="w-8 h-8 rounded-full border-2 border-slate-500 border-t-transparent animate-spin" />
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500 tabular-nums">
+                            {label}
+                        </span>
+                    </div>
+                </div>
+            )}
 
-    if (type === 'adsense') {
-        return (
-            <div className={`w-full overflow-hidden my-2 flex justify-center ${className}`} style={style}>
-                <ins className="adsbygoogle"
-                    style={{ display: 'block', width: '100%', ...style }}
+            {/* Adsterra Implementation */}
+            {isVisible && type === 'adsterra-native' && uid && (
+                <iframe
+                    title={`Ad-${slot}`}
+                    src={`/ad-frame.html?hash=${slot || AD_CONFIG.ADSTERRA.NATIVE_DEFAULT}&uid=${uid}`}
+                    style={{
+                        width: '100%',
+                        height: '100%',
+                        border: 'none',
+                        opacity: isLoaded ? 1 : 0,
+                        transition: 'opacity 0.5s ease-in'
+                    }}
+                    onLoad={() => setIsLoaded(true)}
+                    scrolling="no"
+                    sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
+                />
+            )}
+
+            {/* AdSense Implementation */}
+            {isVisible && type === 'adsense' && (
+                <ins
+                    className="adsbygoogle"
+                    style={{ display: 'block', width: '100%', height: '100%' }}
                     data-ad-client={client}
-                    data-ad-slot={slot || '1234567890'}
-                    data-ad-format={format}
+                    data-ad-slot={slot}
+                    data-ad-format={format === 'auto' ? 'auto' : undefined}
                     data-full-width-responsive={responsive ? "true" : "false"}
                 />
-            </div>
-        );
-    }
-
-    if (type === 'adsterra-native') {
-        const adHash = slot || 'f1ecdc5056db3521ecee075d39c94dca';
-
-        // Logic to generate random ID only on the client
-        const [uid, setUid] = React.useState<string>('');
-        const [mounted, setMounted] = React.useState(false);
-
-        React.useEffect(() => {
-            setUid(Math.random().toString(36).substring(7));
-            setMounted(true);
-        }, []);
-
-        const containerStyle: React.CSSProperties = {
-            minHeight: '300px',
-            ...style,
-            width: '100%',
-            display: 'flex',
-            justifyContent: 'center',
-            overflow: 'hidden'
-        };
-
-        // Server/Hydration Mismatch protection:
-        // Render a specialized placeholder structure that matches the container logic
-        if (!mounted) {
-            return (
-                <div
-                    className={`my-2 ${className || ''}`}
-                    style={containerStyle}
-                />
-            );
-        }
-
-        const iframeSrc = uid ? `/ad-frame.html?hash=${adHash}&uid=${uid}` : '';
-
-        return (
-            <div
-                className={`my-2 ${className || ''}`}
-                style={containerStyle}
-            >
-                {uid && (
-                    <iframe
-                        // content key only
-                        title={`Ad-${adHash}`}
-                        src={iframeSrc}
-                        style={{ width: '100%', height: '100%', border: 'none' }}
-                        scrolling="no"
-                        sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
-                    />
-                )}
-            </div>
-        );
-    }
-
-    // Placeholder for custom
-    return (
-        <div className={`w-full overflow-hidden my-2 ${className}`}>
-            {/* Custom Ad Script Here */}
+            )}
         </div>
     );
 }

@@ -23,10 +23,9 @@ export default function Home() {
       {/* Top Banner Ad */}
       <div className="w-full max-w-6xl mx-auto pt-28 px-4">
         <AdUnit
-          // Default slot used (Native Banner)
+          type="adsterra-native"
           format="horizontal"
-          label="Homepage Top Banner"
-          style={{ minHeight: '90px' }}
+          label="Top Homepage Banner"
         />
       </div>
 
@@ -46,12 +45,10 @@ export default function Home() {
 
           {/* Right Column: Interactive Form */}
           <section id="start" className="w-full max-w-md mx-auto space-y-8 scroll-mt-32">
-            {/* Ad above form for visibility */}
             <AdUnit
-              // Default slot
+              type="adsterra-native"
               format="rectangle"
-              label="Form Top Ad"
-              style={{ minHeight: '250px' }}
+              label="Interactive Form Ad"
             />
             <QuickEntryForm />
           </section>
@@ -61,10 +58,9 @@ export default function Home() {
       {/* Mid Page Ad */}
       <div className="w-full max-w-4xl mx-auto py-4 md:py-8 px-4">
         <AdUnit
-          // Default slot
+          type="adsterra-native"
           format="auto"
-          label="Homepage Mid Banner"
-          style={{ minHeight: '160px', maxHeight: '250px' }}
+          label="Mid Homepage Banner"
         />
       </div>
 
@@ -73,10 +69,9 @@ export default function Home() {
       {/* Bottom Page Ad */}
       <div className="w-full max-w-6xl mx-auto py-4 md:py-8">
         <AdUnit
-          // Default slot
+          type="adsterra-native"
           format="auto"
-          label="Homepage Bottom Banner"
-          style={{ minHeight: '160px', maxHeight: '250px' }}
+          label="Bottom Homepage Banner"
         />
       </div>
 

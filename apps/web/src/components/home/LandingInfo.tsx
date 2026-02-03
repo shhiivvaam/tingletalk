@@ -56,24 +56,28 @@ export default function LandingInfo() {
                     {/* Ad Grid in Left Column - 2x2 Responsive */}
                     <div className="pt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <AdUnit
+                            type="adsterra-native"
                             format="rectangle"
                             label="FAQ Ad 1"
-                            style={{ minHeight: '150px', maxHeight: '200px' }}
+                            delay={100}
                         />
                         <AdUnit
+                            type="adsterra-native"
                             format="rectangle"
                             label="FAQ Ad 2"
-                            style={{ minHeight: '150px', maxHeight: '200px' }}
+                            delay={300}
                         />
                         <AdUnit
+                            type="adsterra-native"
                             format="rectangle"
                             label="FAQ Ad 3"
-                            style={{ minHeight: '150px', maxHeight: '200px' }}
+                            delay={500}
                         />
                         <AdUnit
+                            type="adsterra-native"
                             format="rectangle"
                             label="FAQ Ad 4"
-                            style={{ minHeight: '150px', maxHeight: '200px' }}
+                            delay={700}
                         />
                     </div>
                 </div>

@@ -255,25 +255,22 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
             {/* GLOBAL TOP FRAME AD */}
             <div className="flex shrink-0 w-full z-30 bg-slate-900 border-b border-white/5 h-[90px] overflow-hidden justify-center items-center">
                 <AdUnit
-                    key="global-top-frame"
-                    slot="f1ecdc5056db3521ecee075d39c94dca"
+                    type="adsterra-native"
                     format="horizontal"
-                    label="Top Frame Ad"
-                    style={{ height: '90px', width: '100%', minHeight: 'unset' }}
+                    label="Chat Top Banner"
                 />
             </div>
 
             {/* MAIN CONTENT ROW */}
             <div className="flex-1 flex min-h-0 overflow-hidden relative w-full">
 
-                {/* LEFT FRAME AD (Desktop Only) */}
                 <div className="hidden xl:flex shrink-0 w-[160px] border-r border-white/5 bg-slate-900/40 flex-col overflow-hidden">
                     <div className="h-full flex flex-col overflow-y-auto custom-scrollbar">
                         <div className="p-2 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest text-center shrink-0">Sponsored</div>
                         <AdUnit
-                            key="left-frame-1"
-                            label="Left Frame 1"
-                            style={{ minHeight: '600px', width: '100%' }} // Skyscraper
+                            type="adsterra-native"
+                            format="vertical"
+                            label="Left Skyscraper"
                         />
                     </div>
                 </div>
@@ -410,34 +407,24 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
                     </div>
                 </div>
 
-                {/* RIGHT FRAME AD (Desktop Only) */}
                 <div className="hidden xl:flex shrink-0 w-[160px] border-l border-white/5 bg-slate-900/40 flex-col overflow-hidden">
                     <div className="h-full flex flex-col overflow-y-auto custom-scrollbar">
                         <div className="p-2 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest text-center shrink-0">Sponsored</div>
-                        {/* Stack Ads Vertically */}
                         <AdUnit
-                            key="right-frame-1"
-                            label="Right Frame 1"
-                            style={{ minHeight: '600px', width: '100%' }}
-                        />
-                        <AdUnit
-                            key="right-frame-2"
-                            label="Right Frame 2"
-                            style={{ minHeight: '600px', width: '100%' }}
+                            type="adsterra-native"
+                            format="vertical"
+                            label="Right Skyscraper"
                         />
                     </div>
                 </div>
 
             </div>
 
-            {/* GLOBAL BOTTOM FRAME AD - Hidden on Mobile */}
             <div className="hidden md:flex shrink-0 w-full z-30 bg-slate-900 border-t border-white/5 h-[90px] overflow-hidden justify-center items-center">
                 <AdUnit
-                    key="global-bottom-frame"
-                    slot="f1ecdc5056db3521ecee075d39c94dca"
+                    type="adsterra-native"
                     format="horizontal"
-                    label="Bottom Frame Ad"
-                    style={{ height: '90px', width: '100%', minHeight: 'unset' }}
+                    label="Chat Bottom Banner"
                 />
             </div>
         </div>
