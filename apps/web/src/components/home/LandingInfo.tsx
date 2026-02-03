@@ -11,10 +11,10 @@ export default function LandingInfo() {
             {/* How it Works */}
             <div className="space-y-16">
                 <div className="text-center space-y-4">
-                    <h2 className="text-4xl md:text-5xl font-extrabold text-white">How it Works</h2>
+                    <h2 className="text-4xl md:text-5xl font-extrabold text-white">How Tingle Talk - The Best Anonymous Dating Site Works</h2>
                     <p className="text-slate-400 text-lg max-w-2xl mx-auto">
                         Starting a conversation on Tingle Talk is faster than sending a text.
-                        No passwords, no profile pictures, just instant connection.
+                        No passwords, no profile pictures, just instant <strong>private chatting</strong>.
                     </p>
                 </div>
 
@@ -23,19 +23,19 @@ export default function LandingInfo() {
                         icon={<UserPlus className="text-pink-500" size={32} />}
                         step="01"
                         title="Pick a Nickname"
-                        description="Choose any name you like. Your identity remains 100% hidden."
+                        description="Choose any name you like. Your identity remains 100% hidden on our anonymous dating site."
                     />
                     <StepCard
                         icon={<Globe className="text-violet-500" size={32} />}
                         step="02"
                         title="Set Location"
-                        description="Select your country and state to find matches in your area or globally."
+                        description="Select your country and state to find matches for private chatting in your area or globally."
                     />
                     <StepCard
                         icon={<MessageSquare className="text-cyan-500" size={32} />}
                         step="03"
                         title="Start Chatting"
-                        description="Boom! You're in. Match with strangers instantly and safely."
+                        description="Boom! You're in. Match with strangers instantly and safely on the world's best private chatting site."
                     />
                 </div>
             </div>

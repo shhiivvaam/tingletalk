@@ -3,6 +3,19 @@ import { MetadataRoute } from 'next';
 export default function sitemap(): MetadataRoute.Sitemap {
     const baseUrl = 'https://tingletalk.com';
 
+    const blogPosts = [
+        'safe-anonymous-chatting',
+        'break-the-ice-online',
+        'anonymous-dating-trends-2026'
+    ];
+
+    const blogPostUrls = blogPosts.map(slug => ({
+        url: `${baseUrl}/blog/${slug}`,
+        lastModified: new Date(),
+        changeFrequency: 'weekly' as const,
+        priority: 0.6,
+    }));
+
     return [
         {
             url: baseUrl,
@@ -46,5 +59,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
             changeFrequency: 'weekly',
             priority: 0.7,
         },
+        ...blogPostUrls,
     ];
 }

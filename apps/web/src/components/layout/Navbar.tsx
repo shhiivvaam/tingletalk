@@ -40,7 +40,7 @@ export default function Navbar() {
                     <div className="relative group-hover:scale-110 transition-transform duration-300">
                         <Image
                             src="/assets/logo.png"
-                            alt="Tingle Talk"
+                            alt="Tingle Talk - #1 Anonymous Dating Site & Private Chatting Platform"
                             width={32}
                             height={32}
                             className="w-8 h-8 object-contain"

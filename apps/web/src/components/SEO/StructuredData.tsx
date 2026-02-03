@@ -1,12 +1,12 @@
 import Script from 'next/script';
 
-export default function StructuredData() {
+export function GlobalStructuredData() {
     const data = {
         "@context": "https://schema.org",
         "@type": "WebApplication",
         "name": "Tingle Talk",
         "url": "https://tingletalk.com",
-        "description": "Anonymous dating and random chatting platform. Meet new people instantly and safely.",
+        "description": "Tingle Talk is the #1 anonymous dating site and private chatting platform. Meet new people, find a date, or just have fun with instant random chatting. 100% safe, secure, and private.",
         "applicationCategory": "SocialNetworkingApplication",
         "operatingSystem": "All",
         "offers": {
@@ -15,50 +15,38 @@ export default function StructuredData() {
             "priceCurrency": "USD"
         },
         "featureList": [
-            "Anonymous Chatting",
+            "Anonymous Dating",
+            "Private Chatting Site",
             "Random Matching",
             "Safe and Secure Messaging",
-            "No Registration Required"
+            "No Registration Required",
+            "Anonymous Messaging",
+            "Global Connections"
+        ],
+        "keywords": "anonymous dating, private chatting site, tingletalk, tingle talk, free dating, random chat"
+    };
+
+    const organizationData = {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "Tingle Talk",
+        "url": "https://tingletalk.com",
+        "logo": "https://tingletalk.com/assets/logo.png",
+        "sameAs": [
+            "https://twitter.com/tingletalk"
         ]
     };
 
-    const faqData = {
+    const websiteData = {
         "@context": "https://schema.org",
-        "@type": "FAQPage",
-        "mainEntity": [
-            {
-                "@type": "Question",
-                "name": "Is Tingle Talk really anonymous?",
-                "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "Yes. We don't store your IP address, your real name, or your personal data. Each session is unique and temporary."
-                }
-            },
-            {
-                "@type": "Question",
-                "name": "Do I need to create an account?",
-                "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "Never. Tingle Talk is built for speed. No sign-up, no email verification, and no passwords required."
-                }
-            },
-            {
-                "@type": "Question",
-                "name": "Is it safe to chat with strangers?",
-                "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "Safety is our priority. We use AI moderation to block malicious content, and you can report or block users instantly."
-                }
-            },
-            {
-                "@type": "Question",
-                "name": "Can I use Tingle Talk on my phone?",
-                "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "Absolutely! Tingle Talk is a Progressive Web App (PWA). You can install it on iOS or Android directly from the browser."
-                }
-            }
-        ]
+        "@type": "WebSite",
+        "name": "Tingle Talk",
+        "url": "https://tingletalk.com",
+        "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://tingletalk.com/?s={search_term_string}",
+            "query-input": "required name=search_term_string"
+        }
     };
 
     return (
@@ -69,10 +57,73 @@ export default function StructuredData() {
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
             />
             <Script
-                id="faq-data"
+                id="org-data"
                 type="application/ld+json"
-                dangerouslySetInnerHTML={{ __html: JSON.stringify(faqData) }}
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationData) }}
             />
+            <Script
+                id="website-data"
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteData) }}
+            />
+        </>
+    );
+}
+
+export function FAQStructuredData() {
+    const faqData = {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": "What is the best anonymous dating site?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Tingle Talk is widely considered the best anonymous dating site due to its focus on privacy, security, and instant connections without requiring any sign-up or personal information."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Is Tingle Talk really a private chatting site?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Yes. Tingle Talk is designed as a fully private chatting site. We don't store your IP address, real name, or personal data. Each session is unique and temporary, ensuring 100% anonymity."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Do I need to create an account for this dating site?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Never. Tingle Talk is built for speed and privacy. No sign-up, no email verification, and no passwords required. Just choose a nickname and start chatting."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Is it safe to use an anonymous dating site like Tingle Talk?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Safety is our top priority. Tingle Talk uses advanced AI moderation to block malicious content and harmful users, and provides instant reporting and blocking tools for all users."
+                }
+            }
+        ]
+    };
+
+    return (
+        <Script
+            id="faq-data"
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(faqData) }}
+        />
+    );
+}
+
+export default function StructuredData() {
+    return (
+        <>
+            <GlobalStructuredData />
+            <FAQStructuredData />
         </>
     );
 }

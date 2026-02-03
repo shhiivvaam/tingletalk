@@ -4,8 +4,8 @@ import { ArrowLeft } from 'lucide-react';
 import Footer from '@/components/layout/Footer';
 
 export const metadata: Metadata = {
-    title: "Privacy Policy | Tingle Talk",
-    description: "Learn how Tingle Talk protects your privacy and handles your data. Your anonymity is our top priority.",
+    title: "Privacy Policy | Tingle Talk - #1 Anonymous Dating & Private Chatting Site",
+    description: "Learn how Tingle Talk, the world's most secure anonymous dating site, protects your privacy and handles your data. Your anonymity is our top priority.",
 };
 
 export default function PrivacyPage() {

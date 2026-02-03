@@ -15,7 +15,7 @@ export default function AnimatedHero() {
             <div className="flex items-center gap-8 justify-center lg:justify-start mb-6">
                 <Image
                     src="/assets/logo.png"
-                    alt="Tingle Talk Logo - Best Anonymous Chat Platform"
+                    alt="Tingle Talk Logo - #1 Anonymous Dating Site & Private Chatting Site"
                     width={128}
                     height={128}
                     priority
@@ -30,10 +30,11 @@ export default function AnimatedHero() {
 
             <h1 className="text-6xl md:text-8xl font-black tracking-tighter leading-[0.9]">
                 Tingle<span className="gradient-text">Talk</span>
+                <span className="sr-only"> - #1 Anonymous Dating Site & Private Chatting Site</span>
             </h1>
 
             <p className="text-xl text-slate-400 font-light max-w-xl mx-auto lg:mx-0 leading-relaxed">
-                Skip the signup. Skip the profile. Just pure, anonymous connection. Find your match, share a secret, or just have fun on the most secure anonymous chatting platform.
+                Skip the signup. Skip the profile. Just pure, anonymous connection. Tingle Talk is the most secure <strong>anonymous dating site</strong> and <strong>private chatting site</strong>. Find your match, share a secret, or just have fun instantly.
             </p>
 
             <div className="flex justify-center lg:justify-start pt-4">

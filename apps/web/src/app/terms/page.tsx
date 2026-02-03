@@ -4,8 +4,8 @@ import { ArrowLeft } from 'lucide-react';
 import Footer from '@/components/layout/Footer';
 
 export const metadata: Metadata = {
-    title: "Terms & Conditions | Tingle Talk",
-    description: "Read the terms and conditions for using Tingle Talk. By using our platform, you agree to these rules.",
+    title: "Terms & Conditions | Tingle Talk - #1 Anonymous Dating & Private Chatting Site",
+    description: "Read the terms and conditions for using Tingle Talk, the world's leading anonymous dating site. By using our private chatting platform, you agree to these rules.",
 };
 
 export default function TermsPage() {

@@ -9,7 +9,7 @@ export default function Footer() {
                     <div className="flex items-center gap-2">
                         <Image
                             src="/assets/logo.png"
-                            alt="Tingle Talk"
+                            alt="Tingle Talk - #1 Anonymous Dating Site"
                             width={32}
                             height={32}
                             className="w-8 h-8 object-contain"
@@ -19,7 +19,7 @@ export default function Footer() {
                         </span>
                     </div>
                     <p className="text-slate-500 text-sm max-w-xs text-center md:text-left">
-                        Connect anonymously with people around the world. Safe, fast, and 100% private.
+                        Tingle Talk is the best <strong>anonymous dating site</strong> and <strong>private chatting platform</strong>. Connect safely and privately with people worldwide.
                     </p>
                 </div>
 

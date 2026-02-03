@@ -53,7 +53,7 @@ export default function NotFound() {
                         className="group flex items-center gap-2 px-8 py-4 rounded-2xl bg-gradient-to-br from-pink-500 to-violet-600 text-white font-bold tracking-wide shadow-lg hover:shadow-pink-500/25 transition-all hover:scale-105 active:scale-95"
                     >
                         <Home size={20} />
-                        <span>Return to Base</span>
+                        <span>Home</span>
                     </Link>
 
                     <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-700">

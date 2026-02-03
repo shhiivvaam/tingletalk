@@ -19,11 +19,26 @@ const outfit = Outfit({
 
 export const metadata: Metadata = {
   title: {
-    default: "Tingle Talk | Anonymous Dating & Fun Chats",
+    default: "Tingle Talk | #1 Anonymous Dating & Private Chatting Site",
     template: "%s | Tingle Talk"
   },
-  description: "Meet new people, find a date, or just have fun. 100% anonymous, safe, and instant random chatting platform.",
-  keywords: ["anonymous dating", "random chat", "chat with strangers", "anonymous messaging", "dating app", "instant connection", "group chat", "private chat"],
+  description: "Tingle Talk is the best anonymous dating and private chatting site. Meet new people, find a date, or just have fun with instant random chatting. 100% safe, secure, and private.",
+  keywords: [
+    "tingletalk",
+    "tingle talk",
+    "dating",
+    "dating site",
+    "private chatting site",
+    "anonymous dating site",
+    "random chat",
+    "chat with strangers",
+    "anonymous messaging",
+    "dating app",
+    "instant connection",
+    "private chat",
+    "secure chat",
+    "no login chat"
+  ],
   authors: [{ name: "Tingle Talk Team" }],
   creator: "Tingle Talk",
   publisher: "Tingle Talk",
@@ -48,8 +63,8 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: "Tingle Talk | Anonymous Dating & Fun Chats",
-    description: "Meet new people, find a date, or just have fun. 100% anonymous, safe, and instant.",
+    title: "Tingle Talk | #1 Anonymous Dating & Private Chatting Site",
+    description: "Connect instantly with strangers on Tingle Talk. The world's safest anonymous dating and private chatting site.",
     url: 'https://tingletalk.com',
     siteName: 'Tingle Talk',
     images: [
@@ -57,7 +72,7 @@ export const metadata: Metadata = {
         url: '/assets/logo.png',
         width: 800,
         height: 800,
-        alt: 'Tingle Talk Logo',
+        alt: 'Tingle Talk - Anonymous Dating Logo',
       },
     ],
     locale: 'en_US',
@@ -65,8 +80,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: "Tingle Talk | Anonymous Dating & Fun Chats",
-    description: "Meet new people, find a date, or just have fun. 100% anonymous, safe, and instant.",
+    title: "Tingle Talk | #1 Anonymous Dating & Private Chatting Site",
+    description: "The best anonymous dating and private chatting site. Join Tingle Talk today for instant connections.",
     images: ['/assets/logo.png'],
     creator: '@tingletalk',
   },
@@ -87,6 +102,7 @@ export const metadata: Metadata = {
   },
 };
 
+import { GlobalStructuredData } from "@/components/SEO/StructuredData";
 import ToastContainer from "@/components/ui/ToastContainer";
 import PWAInstallPrompt from "@/components/PWAInstallPrompt";
 import Navbar from "@/components/layout/Navbar";
@@ -101,6 +117,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${outfit.variable} antialiased`}>
       <head>
+        <GlobalStructuredData />
         {/* Google Adsense */}
         <meta name="google-adsense-account" content="ca-pub-9299390652489427"></meta>
         {AD_CONFIG.ENABLE_ADS && (

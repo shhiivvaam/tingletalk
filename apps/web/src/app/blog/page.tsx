@@ -5,15 +5,15 @@ import Footer from '@/components/layout/Footer';
 import Image from 'next/image';
 
 export const metadata: Metadata = {
-    title: "Blog & Articles | Tingle Talk",
-    description: "Read the latest tips, guides, and stories about anonymous dating, online safety, and finding connections in the digital age.",
+    title: "Blog & Articles | Tingle Talk - Tips for Anonymous Dating & Private Chatting",
+    description: "Read the latest tips, guides, and stories about the best anonymous dating sites, private chatting safety, and finding connections on Tingle Talk.",
 };
 
 const BLOG_POSTS = [
     {
         id: 1,
-        title: "The Ultimate Guide to Safe Anonymous Chatting",
-        excerpt: "Learn how to protect your identity while making meaningful connections online. Our top tips for staying safe.",
+        title: "The Ultimate Guide to Safe Anonymous Dating & Private Chatting",
+        excerpt: "Learn how to protect your identity while making meaningful connections on the best anonymous dating sites. Our top tips for staying safe.",
         date: "Feb 1, 2026",
         author: "Tingle Team",
         readTime: "5 min read",
@@ -23,8 +23,8 @@ const BLOG_POSTS = [
     },
     {
         id: 2,
-        title: "How to Break the Ice with Strangers Online",
-        excerpt: "Struggling to start a conversation? Here are 20 fun and engaging icebreakers that actually work.",
+        title: "20 Best Icebreakers for Anonymous Dating & Chatting",
+        excerpt: "Struggling to start a conversation on a private chatting site? Here are 20 fun and engaging icebreakers that actually work.",
         date: "Jan 28, 2026",
         author: "Alex Rivera",
         readTime: "4 min read",
@@ -34,8 +34,8 @@ const BLOG_POSTS = [
     },
     {
         id: 3,
-        title: "Why Anonymous Dating is Trending in 2026",
-        excerpt: "The shift away from traditional dating apps and why more people are choosing mystery and spontaneity.",
+        title: "Why Tingle Talk is the Best Anonymous Dating Site in 2026",
+        excerpt: "The shift away from traditional dating apps and why more people are choosing Tingle Talk for mystery and spontaneity.",
         date: "Jan 15, 2026",
         author: "Sarah Chen",
         readTime: "7 min read",

@@ -4,8 +4,8 @@ import { ArrowLeft, Users, Shield, Zap, Heart } from 'lucide-react';
 import Footer from '@/components/layout/Footer';
 
 export const metadata: Metadata = {
-    title: "About Us | Tingle Talk",
-    description: "Learn more about Tingle Talk, the world's leading anonymous dating and random chat platform. Our mission is to connect people safely and instantly.",
+    title: "About Us | Tingle Talk - #1 Anonymous Dating & Private Chatting Site",
+    description: "Learn more about Tingle Talk, the world's leading anonymous dating site and private chatting platform. Our mission is to connect people safely, privately, and instantly.",
 };
 
 export default function AboutPage() {
@@ -22,7 +22,7 @@ export default function AboutPage() {
                     </Link>
 
                     <div className="glass-panel p-8 md:p-12 rounded-[2.5rem]">
-                        <h1 className="text-4xl md:text-5xl font-black mb-8 gradient-text">About Tingle Talk</h1>
+                        <h1 className="text-4xl md:text-5xl font-black mb-8 gradient-text">About Tingle Talk - Anonymous Dating & Private Chatting</h1>
 
                         <div className="prose prose-invert prose-pink max-w-none space-y-12 text-slate-300">
                             <section className="space-y-4">

@@ -2,24 +2,25 @@ import { Metadata } from 'next';
 import AnimatedHero from '@/components/home/AnimatedHero';
 import AnimatedFeatures from '@/components/home/AnimatedFeatures';
 import QuickEntryForm from '@/components/home/QuickEntryForm';
-import StructuredData from '@/components/SEO/StructuredData';
+import { FAQStructuredData } from '@/components/SEO/StructuredData';
 import Footer from '@/components/layout/Footer';
 import LandingInfo from '@/components/home/LandingInfo';
 import AdUnit from '@/components/ads/AdUnit';
 import { AD_CONFIG } from '@/constants/ads';
 
 export const metadata: Metadata = {
-  title: "Tingle Talk | #1 Anonymous Dating & Random Chat Platform",
-  description: "Experience the thrill of anonymous dating and random chats with Tingle Talk. Connect instantly with strangers worldwide. No sign-up, 100% private, and safe.",
+  title: "Tingle Talk | The Best Anonymous Dating Site & Private Chatting Platform",
+  description: "Experience the thrill of anonymous dating and private chatting with Tingle Talk. The #1 anonymous dating site to connect instantly with strangers worldwide. 100% private, safe, and secure.",
   alternates: {
     canonical: 'https://tingletalk.com',
   },
+  keywords: ["anonymous dating site", "private chatting site", "tingletalk", "tingle talk", "free dating site", "anonymous chat"],
 };
 
 export default function Home() {
   return (
     <main className="relative min-h-screen flex flex-col items-center overflow-x-hidden">
-      <StructuredData />
+      <FAQStructuredData />
 
       {/* Top Banner Ad */}
       {AD_CONFIG.ENABLE_ADS && (

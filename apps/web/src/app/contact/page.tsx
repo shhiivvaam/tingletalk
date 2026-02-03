@@ -4,8 +4,8 @@ import { ArrowLeft, Mail, MessageSquare, ShieldCheck, Globe } from 'lucide-react
 import Footer from '@/components/layout/Footer';
 
 export const metadata: Metadata = {
-    title: "Contact Us | Tingle Talk",
-    description: "Got questions or feedback? Reach out to the Tingle Talk team. We're here to help you have the best experience.",
+    title: "Contact Us | Tingle Talk - #1 Anonymous Dating & Private Chatting Site",
+    description: "Got questions or feedback about our anonymous dating site? Reach out to the Tingle Talk team. We're here to help you have the best private chatting experience.",
 };
 
 export default function ContactPage() {
@@ -22,7 +22,7 @@ export default function ContactPage() {
                     </Link>
 
                     <div className="glass-panel p-8 md:p-12 rounded-[2.5rem]">
-                        <h1 className="text-4xl md:text-5xl font-black mb-8 gradient-text">Contact Us</h1>
+                        <h1 className="text-4xl md:text-5xl font-black mb-8 gradient-text">Contact Tingle Talk</h1>
 
                         <div className="grid md:grid-cols-2 gap-12">
                             <div className="space-y-8">
