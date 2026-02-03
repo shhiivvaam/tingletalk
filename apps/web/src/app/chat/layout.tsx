@@ -12,6 +12,7 @@ import { playNotificationSound, playMessageSound } from '@/utils/audio';
 import AdUnit from '@/components/ads/AdUnit';
 import { AD_CONFIG } from '@/constants/ads';
 import ConfirmModal from '@/components/ui/ConfirmModal';
+import FullPageLoader from '@/components/ui/FullPageLoader';
 
 interface OnlineUser {
     id: string;
@@ -243,14 +244,7 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
 
     // Show loading while hydrating to prevent flash
     if (!isHydrated) {
-        return (
-            <div className="flex h-screen bg-slate-950 text-slate-200 items-center justify-center">
-                <div className="flex flex-col items-center gap-4">
-                    <div className="w-12 h-12 border-4 border-pink-500/30 border-t-pink-500 rounded-full animate-spin"></div>
-                    <p className="text-slate-400 text-sm">Loading...</p>
-                </div>
-            </div>
-        );
+        return <FullPageLoader message="Initializing your chat session..." />;
     }
 
     return (
