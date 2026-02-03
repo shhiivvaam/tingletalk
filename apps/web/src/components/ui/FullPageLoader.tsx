@@ -125,14 +125,6 @@ export default function FullPageLoader({ message, showMessages = true }: FullPag
                             className="w-1/2 h-full bg-gradient-to-r from-transparent via-pink-500 to-transparent"
                         />
                     </div>
-
-                    {/* Security Badge */}
-                    <div className="flex items-center justify-center gap-2 pt-4">
-                        <div className="px-3 py-1 rounded-full bg-slate-900/50 border border-white/5 flex items-center gap-1.5">
-                            <Shield size={10} className="text-green-500" />
-                            <span className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">End-to-End Encrypted</span>
-                        </div>
-                    </div>
                 </div>
             </div>
 
