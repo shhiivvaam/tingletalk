@@ -32,7 +32,7 @@ export default function Navbar() {
     ];
 
     return (
-        <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? 'py-3 bg-slate-950/80 backdrop-blur-lg border-b border-white/5' : 'py-6 bg-transparent'
+        <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${isScrolled ? 'py-4 bg-slate-950/40 backdrop-blur-md shadow-[0_8px_32px_0_rgba(0,0,0,0.3)]' : 'py-6 bg-transparent'
             }`}>
             <div className="max-w-7xl mx-auto px-4 md:px-8 flex justify-between items-center">
                 {/* Logo */}
