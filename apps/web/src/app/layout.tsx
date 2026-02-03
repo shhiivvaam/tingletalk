@@ -10,6 +10,7 @@ export const viewport: Viewport = {
 import { Outfit } from "next/font/google";
 import "./globals.css";
 import { Analytics } from "@vercel/analytics/next";
+import Script from "next/script";
 
 const outfit = Outfit({
   subsets: ["latin"],
@@ -97,10 +98,6 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${outfit.variable} antialiased`}>
       <head>
-        {/* Adsterra Popunder */}
-        {/* <script src="https://duepose.com/f6/ec/2f/f6ec2f262184e8f9a191cb7befad4db0.js"></script> */}
-        {/* Adsterra SocialBar */}
-        <script src="https://duepose.com/2f/bc/d0/2fbcd035290b7d3b8ce9a6a656d7edc6.js"></script>
         {/* Google Adsense */}
         <meta name="google-adsense-account" content="ca-pub-9299390652489427"></meta>
         <script
@@ -110,6 +107,23 @@ export default function RootLayout({
         ></script>
       </head>
       <body className="font-sans min-h-screen selection:bg-pink-500/30">
+
+        {/* Adsterra SocialBar */}
+        <Script
+          id="adsterra-social-bar"
+          src="https://duepose.com/2f/bc/d0/2fbcd035290b7d3b8ce9a6a656d7edc6.js"
+          strategy="lazyOnload"
+        />
+
+        {/* Adsterra Popunder */}
+        {/* 
+        <Script 
+          id="adsterra-popunder"
+          src="https://duepose.com/f6/ec/2f/f6ec2f262184e8f9a191cb7befad4db0.js" 
+          strategy="lazyOnload"
+        /> 
+        */}
+
         <div className="aurora-bg" />
         {/* Main layout wrapper */}
         <div className="relative z-10">
