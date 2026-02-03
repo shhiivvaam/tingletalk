@@ -46,15 +46,27 @@ export default function PrivacyPage() {
                                 <h2 className="text-2xl font-bold text-white mb-4">3. Cookies & Tracking</h2>
                                 <p>
                                     We use local storage and essential cookies to maintain your session and preferences.
-                                    We may use third-party analytics (like Google Analytics) to improve our service.
+                                    These are necessary for the core functionality of the site.
+                                </p>
+                                <p className="mt-4">
+                                    <strong>Google AdSense & DoubleClick Cookie:</strong>
+                                    Google, as a third-party vendor, uses cookies to serve ads on our site.
+                                    Google's use of the DoubleClick cookie enables it and its partners to serve ads to our users
+                                    based on their visit to our site or other sites on the Internet.
+                                    You may opt out of the use of the DoubleClick cookie for interest-based advertising by visiting
+                                    <a href="https://adssettings.google.com" target="_blank" className="text-pink-500 hover:underline px-1">Google Ads Settings</a>.
                                 </p>
                             </section>
 
                             <section>
-                                <h2 className="text-2xl font-bold text-white mb-4">4. Third Parties</h2>
+                                <h2 className="text-2xl font-bold text-white mb-4">4. Third Parties & Advertising</h2>
                                 <p>
-                                    We show advertisements from third-party networks (like Google AdSense).
-                                    These partners may use cookies to show personalized ads based on your interests.
+                                    Third-party vendors, including Google, use cookies to serve ads based on a user's prior visits to your website or other websites.
+                                </p>
+                                <p className="mt-2">
+                                    We use third-party analytics (like Google Analytics) to improve our service.
+                                    These partners may collect information about your use of the site to provide us with reports
+                                    and help us understand user behavior.
                                 </p>
                             </section>
 

@@ -28,11 +28,17 @@ export default function Footer() {
                         <h4 className="text-white font-bold text-sm uppercase tracking-widest">Platform</h4>
                         <Link href="/" className="text-slate-400 hover:text-pink-400 text-sm transition-colors">Home</Link>
                         <Link href="/chat" className="text-slate-400 hover:text-pink-400 text-sm transition-colors">Chat Lobby</Link>
+                        <Link href="/blog" className="text-slate-400 hover:text-pink-400 text-sm transition-colors">Blog</Link>
+                    </div>
+                    <div className="flex flex-col gap-3">
+                        <h4 className="text-white font-bold text-sm uppercase tracking-widest">Company</h4>
+                        <Link href="/about" className="text-slate-400 hover:text-pink-400 text-sm transition-colors">About Us</Link>
+                        <Link href="/contact" className="text-slate-400 hover:text-pink-400 text-sm transition-colors">Contact Us</Link>
                     </div>
                     <div className="flex flex-col gap-3">
                         <h4 className="text-white font-bold text-sm uppercase tracking-widest">Legal</h4>
                         <Link href="/privacy" className="text-slate-400 hover:text-pink-400 text-sm transition-colors">Privacy Policy</Link>
-                        <Link href="/terms" className="text-slate-400 hover:text-pink-400 text-sm transition-colors">Terms of Service</Link>
+                        <Link href="/terms" className="text-slate-400 hover:text-pink-400 text-sm transition-colors">Terms & Conditions</Link>
                     </div>
                 </nav>
 

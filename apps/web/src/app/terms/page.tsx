@@ -4,7 +4,7 @@ import { ArrowLeft } from 'lucide-react';
 import Footer from '@/components/layout/Footer';
 
 export const metadata: Metadata = {
-    title: "Terms of Service | Tingle Talk",
+    title: "Terms & Conditions | Tingle Talk",
     description: "Read the terms and conditions for using Tingle Talk. By using our platform, you agree to these rules.",
 };
 
@@ -22,13 +22,13 @@ export default function TermsPage() {
                     </Link>
 
                     <div className="glass-panel p-8 md:p-12 rounded-[2.5rem]">
-                        <h1 className="text-4xl md:text-5xl font-black mb-8 gradient-text">Terms of Service</h1>
+                        <h1 className="text-4xl md:text-5xl font-black mb-8 gradient-text">Terms & Conditions</h1>
 
                         <div className="prose prose-invert prose-pink max-w-none space-y-6 text-slate-300">
                             <section>
                                 <h2 className="text-2xl font-bold text-white mb-4">1. Acceptance of Terms</h2>
                                 <p>
-                                    By accessing and using Tingle Talk, you agree to be bound by these Terms of Service.
+                                    By accessing and using Tingle Talk, you agree to be bound by these Terms & Conditions.
                                     If you do not agree, please do not use the service.
                                 </p>
                             </section>
