@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Sparkles, Heart, Hash, Globe, MapPin, Calendar } from 'lucide-react';
@@ -13,6 +13,13 @@ export default function QuickEntryForm() {
     const router = useRouter();
     const setAnonymousUser = useUserStore((state) => state.setAnonymousUser);
 
+    // Use individual selectors to avoid infinite loop
+    const storedUsername = useUserStore((state) => state.username);
+    const storedAge = useUserStore((state) => state.age);
+    const storedGender = useUserStore((state) => state.gender);
+    const storedCountry = useUserStore((state) => state.country);
+    const storedState = useUserStore((state) => state.state);
+
     const [formData, setFormData] = useState({
         username: '',
         age: '',
@@ -23,6 +30,24 @@ export default function QuickEntryForm() {
 
     const [isLoading, setIsLoading] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
+
+    // Auto-fill form with last used credentials
+    useEffect(() => {
+        if (storedUsername) {
+            const countries = Country.getAllCountries();
+            const countryCode = countries.find(c => c.name === storedCountry)?.isoCode || '';
+            const states = countryCode ? State.getStatesOfCountry(countryCode) : [];
+            const stateCode = states.find(s => s.name === storedState)?.isoCode || '';
+
+            setFormData({
+                username: storedUsername || '',
+                age: storedAge?.toString() || '',
+                gender: storedGender || '',
+                country: countryCode,
+                state: stateCode
+            });
+        }
+    }, []); // Run once on mount
 
     const countries = Country.getAllCountries();
     const states = formData.country ? State.getStatesOfCountry(formData.country) : [];
@@ -93,7 +118,19 @@ export default function QuickEntryForm() {
                             <span className="w-2 h-8 bg-pink-500 rounded-full" />
                             Quick Entry
                         </h3>
-                        <Sparkles className="text-pink-500 animate-spin-slow" />
+                        <div className="flex items-center gap-2">
+                            {storedUsername && (
+                                <motion.div
+                                    initial={{ opacity: 0, scale: 0.8 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    className="px-3 py-1 bg-green-500/10 border border-green-500/30 rounded-full text-xs font-semibold text-green-400 flex items-center gap-1"
+                                >
+                                    <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" />
+                                    Welcome back!
+                                </motion.div>
+                            )}
+                            <Sparkles className="text-pink-500 animate-spin-slow" />
+                        </div>
                     </div>
 
                     <form onSubmit={handleStartChatting} className="space-y-6">
