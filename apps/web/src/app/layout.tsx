@@ -97,6 +97,10 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${outfit.variable} antialiased`}>
       <head>
+        {/* Adsterra Popunder */}
+        {/* <script src="https://duepose.com/f6/ec/2f/f6ec2f262184e8f9a191cb7befad4db0.js"></script> */}
+        {/* Adsterra SocialBar */}
+        <script src="https://duepose.com/2f/bc/d0/2fbcd035290b7d3b8ce9a6a656d7edc6.js"></script>
         {/* Google Adsense */}
         <meta name="google-adsense-account" content="ca-pub-9299390652489427"></meta>
         <script
