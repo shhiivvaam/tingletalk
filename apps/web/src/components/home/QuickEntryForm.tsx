@@ -28,12 +28,19 @@ export default function QuickEntryForm() {
         state: ''
     });
 
+    const [hasHydrated, setHasHydrated] = useState(false);
+    const [hasAutoFilled, setHasAutoFilled] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
 
+    // Handle hydration
+    useEffect(() => {
+        setHasHydrated(true);
+    }, []);
+
     // Auto-fill form with last used credentials
     useEffect(() => {
-        if (storedUsername) {
+        if (hasHydrated && storedUsername && !hasAutoFilled) {
             const countries = Country.getAllCountries();
             const countryCode = countries.find(c => c.name === storedCountry)?.isoCode || '';
             const states = countryCode ? State.getStatesOfCountry(countryCode) : [];
@@ -46,8 +53,9 @@ export default function QuickEntryForm() {
                 country: countryCode,
                 state: stateCode
             });
+            setHasAutoFilled(true);
         }
-    }, []); // Run once on mount
+    }, [hasHydrated, storedUsername, hasAutoFilled, storedCountry, storedState, storedAge, storedGender]);
 
     const countries = Country.getAllCountries();
     const states = formData.country ? State.getStatesOfCountry(formData.country) : [];
