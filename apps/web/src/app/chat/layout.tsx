@@ -13,6 +13,7 @@ import AdUnit from '@/components/ads/AdUnit';
 import { AD_CONFIG } from '@/constants/ads';
 import ConfirmModal from '@/components/ui/ConfirmModal';
 import FullPageLoader from '@/components/ui/FullPageLoader';
+import RulesModal from '@/components/ui/RulesModal';
 
 interface OnlineUser {
     id: string;
@@ -24,7 +25,7 @@ interface OnlineUser {
 
 export default function ChatLayout({ children }: { children: React.ReactNode }) {
     const router = useRouter();
-    const { username, gender, preferences } = useUserStore();
+    const { username, gender, preferences, hasAgreedToRules, setHasAgreedToRules, reset } = useUserStore();
     const { onlineUsers, setOnlineUsers, addOnlineUser, removeOnlineUser, addMessage, selectedUser, setSelectedUser, addSessionId } = useChatStore();
     const [socket, setSocket] = useState<Socket | null>(null);
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -249,6 +250,16 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
 
     return (
         <div className="flex flex-col h-screen bg-slate-950 text-slate-200 overflow-hidden relative" style={{ overscrollBehaviorX: 'none' }}>
+            {/* Rules Compliance Modal */}
+            <RulesModal
+                isOpen={!!username && !hasAgreedToRules}
+                onAgree={() => setHasAgreedToRules(true)}
+                onDisagree={() => {
+                    reset();
+                    router.push('/');
+                }}
+            />
+
             {/* Custom Confirm Modal */}
             <ConfirmModal
                 isOpen={showLeaveConfirm}

@@ -9,11 +9,13 @@ interface UserState {
     age: number | null;
     country: string | null;
     state: string | null;
+    hasAgreedToRules: boolean;
     preferences: {
         targetGender: 'male' | 'female' | 'all';
         location: 'local' | 'global';
     };
     setAnonymousUser: (data: { username: string; gender: string; age: number; country: string; state: string }) => void;
+    setHasAgreedToRules: (val: boolean) => void;
     updatePreferences: (prefs: Partial<UserState['preferences']>) => void;
     reset: () => void;
 }
@@ -28,6 +30,7 @@ export const useUserStore = create<UserState>()(
             age: null,
             country: null,
             state: null,
+            hasAgreedToRules: false,
             preferences: {
                 targetGender: 'all',
                 location: 'global',
@@ -41,13 +44,24 @@ export const useUserStore = create<UserState>()(
                     country: data.country,
                     state: data.state,
                     isAnonymous: true,
+                    hasAgreedToRules: false, // Reset agreement on new user entry
                 })),
+            setHasAgreedToRules: (val) => set({ hasAgreedToRules: val }),
             updatePreferences: (prefs) =>
                 set((state) => ({
                     ...state,
                     preferences: { ...state.preferences, ...prefs },
                 })),
-            reset: () => set({ userId: null, username: null, isAnonymous: false, age: null, country: null, state: null }),
+            reset: () => set({
+                userId: null,
+                username: null,
+                isAnonymous: false,
+                gender: null,
+                age: null,
+                country: null,
+                state: null,
+                hasAgreedToRules: false
+            }),
         }),
         {
             name: 'tingle-user-storage',
