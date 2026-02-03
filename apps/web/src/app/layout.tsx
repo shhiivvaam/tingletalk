@@ -9,7 +9,6 @@ export const viewport: Viewport = {
 };
 import { Outfit } from "next/font/google";
 import "./globals.css";
-import Script from "next/script";
 import { Analytics } from "@vercel/analytics/next";
 
 const outfit = Outfit({
@@ -100,6 +99,11 @@ export default function RootLayout({
       <head>
         {/* Google Adsense */}
         <meta name="google-adsense-account" content="ca-pub-9299390652489427"></meta>
+        <script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9299390652489427"
+          crossOrigin="anonymous"
+        ></script>
       </head>
       <body className="font-sans min-h-screen selection:bg-pink-500/30">
         <div className="aurora-bg" />
@@ -110,14 +114,6 @@ export default function RootLayout({
           {children}
         </div>
         <Analytics />
-
-        {/* Google AdSense Script */}
-        <Script
-          async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9299390652489427"
-          crossOrigin="anonymous"
-          strategy="afterInteractive"
-        />
       </body>
     </html>
   );
